@@ -1,0 +1,7 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "NixiePocketWatch")(type "KiCad")(uri "C:/Users/minori/Dropbox/Dev/KiCad/NixiePocketWatch_IN-16_rev4/lib/modules/NixiePocketWatch.pretty")(options "")(descr ""))
+  (lib (name "NixieClockKit_ESP32")(type "KiCad")(uri "C:/Users/minori/Dropbox/Dev/KiCad/NixieClockKit_ESP32_IN-4_4digit/lib/modules/NixieClockKit_ESP32.pretty")(options "")(descr ""))
+  (lib (name "IN-16_Nixie_Clock")(type "KiCad")(uri "${KIPRJMOD}/lib/modules/IN-16_Nixie_Clock.pretty")(options "")(descr ""))
+  (lib (name "Package_LCC")(type "KiCad")(uri "${KICAD7_FOOTPRINT_DIR}/Package_LCC.pretty")(options "")(descr ""))
+)

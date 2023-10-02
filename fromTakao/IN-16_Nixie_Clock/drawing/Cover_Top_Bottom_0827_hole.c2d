@@ -1,0 +1,617 @@
+{
+    "CURVE_OBJECTS": [
+        {
+            "behavior": 3,
+            "corner_type": 0,
+            "cp1": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    -2.5,
+                    1.3807118745
+                ],
+                [
+                    1.3807118745,
+                    2.5
+                ],
+                [
+                    2.5,
+                    -1.3807118745
+                ],
+                [
+                    -1.3807118745,
+                    -2.5
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "cp2": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    -1.3807118745,
+                    2.5
+                ],
+                [
+                    2.5,
+                    1.3807118745
+                ],
+                [
+                    1.3807118745,
+                    -2.5
+                ],
+                [
+                    -2.5,
+                    -1.3807118745
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "group_id": [
+            ],
+            "height": -17.095195381827715,
+            "id": "{23389cdf-a1b2-4b27-addc-cd151fe69ba7}",
+            "num_sides": 6,
+            "point_type": [
+                0,
+                3,
+                3,
+                3,
+                3,
+                4
+            ],
+            "points": [
+                [
+                    -2.5,
+                    0
+                ],
+                [
+                    0,
+                    2.5
+                ],
+                [
+                    2.5,
+                    0
+                ],
+                [
+                    0,
+                    -2.5
+                ],
+                [
+                    -2.5,
+                    0
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "position": [
+                47.32374540049618,
+                68.74846785682566
+            ],
+            "radius": 2.5,
+            "rotation": 0,
+            "smooth": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            "width": 0
+        },
+        {
+            "behavior": 3,
+            "corner_type": 0,
+            "cp1": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    -2.5,
+                    1.3807118745
+                ],
+                [
+                    1.3807118745,
+                    2.5
+                ],
+                [
+                    2.5,
+                    -1.3807118745
+                ],
+                [
+                    -1.3807118745,
+                    -2.5
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "cp2": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    -1.3807118745,
+                    2.5
+                ],
+                [
+                    2.5,
+                    1.3807118745
+                ],
+                [
+                    1.3807118745,
+                    -2.5
+                ],
+                [
+                    -2.5,
+                    -1.3807118745
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "group_id": [
+            ],
+            "height": 22.904805214218733,
+            "id": "{6a83f308-fcc2-40dc-8bb4-290ef30030ce}",
+            "num_sides": 6,
+            "point_type": [
+                0,
+                3,
+                3,
+                3,
+                3,
+                4
+            ],
+            "points": [
+                [
+                    -2.5,
+                    0
+                ],
+                [
+                    0,
+                    2.5
+                ],
+                [
+                    2.5,
+                    0
+                ],
+                [
+                    0,
+                    -2.5
+                ],
+                [
+                    -2.5,
+                    0
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "position": [
+                87.32374599654264,
+                68.74846785682566
+            ],
+            "radius": 2.5,
+            "rotation": 0,
+            "smooth": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            "width": 0
+        },
+        {
+            "behavior": 3,
+            "corner_type": 0,
+            "cp1": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    -1.4999991938221664,
+                    0.8284266794602768
+                ],
+                [
+                    0.8284266794602768,
+                    1.4999991938221664
+                ],
+                [
+                    1.4999991938221664,
+                    -0.8284266794602768
+                ],
+                [
+                    -0.8284266794602768,
+                    -1.4999991938221664
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "cp2": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    -0.8284266794602768,
+                    1.4999991938221664
+                ],
+                [
+                    1.4999991938221664,
+                    0.8284266794602768
+                ],
+                [
+                    0.8284266794602768,
+                    -1.4999991938221664
+                ],
+                [
+                    -1.4999991938221664,
+                    -0.8284266794602768
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "group_id": [
+            ],
+            "height": 0.17860394046636574,
+            "id": "{3012b6b9-1ed6-464d-8395-4ca53391c814}",
+            "num_sides": 6,
+            "point_type": [
+                0,
+                3,
+                3,
+                3,
+                3,
+                4
+            ],
+            "points": [
+                [
+                    -1.4999991938221664,
+                    0
+                ],
+                [
+                    0,
+                    1.4999991938221664
+                ],
+                [
+                    1.4999991938221664,
+                    0
+                ],
+                [
+                    0,
+                    -1.4999991938221664
+                ],
+                [
+                    -1.4999991938221664,
+                    0
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "position": [
+                15.503743986967898,
+                22.773722329714
+            ],
+            "radius": 1.4999991938221664,
+            "rotation": 0,
+            "smooth": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            "width": 0
+        },
+        {
+            "behavior": 3,
+            "corner_type": 0,
+            "cp1": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    -1.4999991836919877,
+                    0.8284266738655336
+                ],
+                [
+                    0.8284266738655336,
+                    1.4999991836919877
+                ],
+                [
+                    1.4999991836919877,
+                    -0.8284266738655336
+                ],
+                [
+                    -0.8284266738655336,
+                    -1.4999991836919877
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "cp2": [
+                [
+                    0,
+                    0
+                ],
+                [
+                    -0.8284266738655336,
+                    1.4999991836919877
+                ],
+                [
+                    1.4999991836919877,
+                    0.8284266738655336
+                ],
+                [
+                    0.8284266738655336,
+                    -1.4999991836919877
+                ],
+                [
+                    -1.4999991836919877,
+                    -0.8284266738655336
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "group_id": [
+            ],
+            "height": 53.37540733635883,
+            "id": "{fae0de77-69fd-4088-b171-ed7e1ad0a053}",
+            "num_sides": 6,
+            "point_type": [
+                0,
+                3,
+                3,
+                3,
+                3,
+                4
+            ],
+            "points": [
+                [
+                    -1.4999991836919877,
+                    0
+                ],
+                [
+                    0,
+                    1.4999991836919877
+                ],
+                [
+                    1.4999991836919877,
+                    0
+                ],
+                [
+                    0,
+                    -1.4999991836919877
+                ],
+                [
+                    -1.4999991836919877,
+                    0
+                ],
+                [
+                    0,
+                    0
+                ]
+            ],
+            "position": [
+                119.5037439869679,
+                22.773722329714
+            ],
+            "radius": 1.4999991836919877,
+            "rotation": 0,
+            "smooth": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            "width": 0
+        }
+    ],
+    "DOCUMENT_VALUES": {
+        "BACKGROUND_IMAGE": "AAAAAYlQTkcNChoKAAAADUlIRFIAAAABAAAAAQgAAAAAOn6bVQAAAAlwSFlzAAASdAAAEnQB3mYfeAAAAApJREFUCJljYAAAAAIAAfRxZKYAAAAASUVORK5CYII=",
+        "BACKGROUND_OPACITY": 0.5,
+        "BACKGROUND_POSITION_X": 0,
+        "BACKGROUND_POSITION_Y": 0,
+        "BACKGROUND_ROTATION": 0,
+        "BACKGROUND_SCALE": 1,
+        "BACKGROUND_VISIBLE": false,
+        "DISPLAYMM": true,
+        "HEIGHT": 100,
+        "MACHINE": "Nomad 883",
+        "MACHINE_TYPE": "Nomad",
+        "MATERIAL": "MDF",
+        "RETRACT": 3,
+        "THICKNESS": 5,
+        "WIDTH": 150,
+        "ZERO_X": 0,
+        "ZERO_Y": 0,
+        "ZERO_Z": 0,
+        "build_num": 514,
+        "grid_enabled": true,
+        "grid_spacing": 10,
+        "minimum_build_num": 500,
+        "version": 1
+    },
+    "REQUIRES_PRO": false,
+    "TEXT_OBJECTS": [
+    ],
+    "TOOLPATH_GROUP_OBJECTS": [
+        {
+            "TOOLPATH_OBJECTS": [
+                {
+                    "automatic_parameters": true,
+                    "elements": [
+                        {
+                            "tab_index": [
+                            ],
+                            "tab_u": [
+                            ],
+                            "uuid": "{fae0de77-69fd-4088-b171-ed7e1ad0a053}"
+                        },
+                        {
+                            "tab_index": [
+                            ],
+                            "tab_u": [
+                            ],
+                            "uuid": "{3012b6b9-1ed6-464d-8395-4ca53391c814}"
+                        },
+                        {
+                            "tab_index": [
+                            ],
+                            "tab_u": [
+                            ],
+                            "uuid": "{6a83f308-fcc2-40dc-8bb4-290ef30030ce}"
+                        },
+                        {
+                            "tab_index": [
+                            ],
+                            "tab_u": [
+                            ],
+                            "uuid": "{23389cdf-a1b2-4b27-addc-cd151fe69ba7}"
+                        }
+                    ],
+                    "enabled": true,
+                    "end_depth": 6.2,
+                    "name": "Contour Toolpath 7",
+                    "ofset_dir": -1,
+                    "speeds": {
+                        "feedrate": 180,
+                        "plungerate": 100,
+                        "rpm": 10000
+                    },
+                    "start_depth": 0,
+                    "stepdown": 1,
+                    "stepover": 3,
+                    "tab_height": 3,
+                    "tab_width": 12,
+                    "tolerance": 0.01,
+                    "tool": {
+                        "angle": 0,
+                        "corner_radius": 0,
+                        "diameter": 2,
+                        "display_mm": true,
+                        "finish_allowance": 1,
+                        "flutes": 2,
+                        "length": 12.7,
+                        "model": "",
+                        "name": "2mm Square",
+                        "number": 10,
+                        "overall_length": 38.1,
+                        "plungerate": 100,
+                        "read_only": false,
+                        "slot_depth": 0.5,
+                        "slot_feedrate": 180,
+                        "slot_rpm": 10000,
+                        "surfacing_feedrate": 180,
+                        "surfacing_rpm": 10000,
+                        "surfacing_stepover": 70,
+                        "type": 0,
+                        "url": "",
+                        "uuid": "{00000000-0000-0000-0000-000000000000}",
+                        "vendor": ""
+                    },
+                    "uuid": "{4aa6a213-8f04-47ae-8281-968769688215}"
+                },
+                {
+                    "automatic_parameters": true,
+                    "elements": [
+                        {
+                            "tab_index": [
+                            ],
+                            "tab_u": [
+                            ],
+                            "uuid": "{23389cdf-a1b2-4b27-addc-cd151fe69ba7}"
+                        }
+                    ],
+                    "enabled": true,
+                    "end_depth": 2.54,
+                    "name": "Contour Toolpath 8",
+                    "ofset_dir": -1,
+                    "speeds": {
+                        "feedrate": 180,
+                        "plungerate": 100,
+                        "rpm": 10000
+                    },
+                    "start_depth": 0,
+                    "stepdown": 0.5,
+                    "stepover": 3,
+                    "tab_height": 3,
+                    "tab_width": 12,
+                    "tolerance": 0.01,
+                    "tool": {
+                        "angle": 0,
+                        "corner_radius": 0,
+                        "diameter": 2,
+                        "display_mm": true,
+                        "finish_allowance": 1,
+                        "flutes": 2,
+                        "length": 12.7,
+                        "model": "",
+                        "name": "2mm Square",
+                        "number": 10,
+                        "overall_length": 38.1,
+                        "plungerate": 100,
+                        "read_only": false,
+                        "slot_depth": 0.5,
+                        "slot_feedrate": 180,
+                        "slot_rpm": 10000,
+                        "surfacing_feedrate": 180,
+                        "surfacing_rpm": 10000,
+                        "surfacing_stepover": 70,
+                        "type": 0,
+                        "url": "",
+                        "uuid": "{00000000-0000-0000-0000-000000000000}",
+                        "vendor": ""
+                    },
+                    "uuid": "{6851fad9-dba1-4eb0-a59a-6711abe6ab8a}"
+                }
+            ],
+            "enabled": true,
+            "name": "Group 1",
+            "uuid": "{e366a53c-d126-4574-9568-47315a961222}"
+        }
+    ]
+}
+
+
+
+
+MODELV1
+
+
+
+xE‡¡  ŸÀBLÀlÄX8\Uç¨®ªø&=swDÏsÙwñ,]üÌÎGu
