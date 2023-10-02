@@ -1,5 +1,5 @@
-/*
- * (c) 2021 Yoichi Tanibayashi
+/**
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #include "Effect.h"
 #include "NixieArray.h"
@@ -13,7 +13,6 @@ Effect::Effect(effect_id_t eid, NixieElement *element, unsigned long el_n) {
   this->_id = eid;
   this->_el = element;
   this->_el_n = el_n;
-  // Serial.println("Effect::Effect> el_n=" + String(this->_el_n));
 }
 
 Effect::~Effect() {}
@@ -23,7 +22,6 @@ void Effect::start(unsigned long start_ms, unsigned long tick_ms) {
   this->_tick_ms = tick_ms;
   (void)this->tick(this->_start_ms);
   this->_active = true;
-  // Serial.println("Effect::start> start_ms=" + String(this->_start_ms));
 }
 void Effect::start(unsigned long start_ms, unsigned long tick_ms, int el) {
   this->start(start_ms, tick_ms);
@@ -167,7 +165,6 @@ void EffectXFade::start(unsigned long start_ms,
                         int el_i_in, int el_i_out) {
   Effect::start(start_ms, tick_ms);
 
-  // Serial.println("EffectXFade::start> ");
   this->_el_i_in  = el_i_in;
   this->_el_i_out = el_i_out;
   for (int e = 0; e < this->_el_n; e++) {

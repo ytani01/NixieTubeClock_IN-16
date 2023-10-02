@@ -29,7 +29,6 @@ NetMgr::NetMgr() {
  *
  */
 mode_t NetMgr::loop() {
-  String     myname = "NetMgr::loop";
   ConfWifi conf_data;
   String     ssid, ssid_pw;
   
@@ -40,13 +39,12 @@ mode_t NetMgr::loop() {
     break;
     
   case MODE_START:
-    log_i("%s> MODE_START", myname);
+    log_i("MODE_START");
 
     conf_data.load();
     ssid = conf_data.ssid;
     ssid_pw = conf_data.ssid_pw;
-    log_i("%s> |%s|%s|",
-          myname.c_str(), ssid.c_str(), ssid_pw.c_str());
+    log_i("|%s|%s|", ssid.c_str(), ssid_pw.c_str());
 
     WiFi.begin(ssid.c_str(), ssid_pw.c_str());
     delay(100);
@@ -56,7 +54,7 @@ mode_t NetMgr::loop() {
 
   case MODE_TRY_WIFI:
     if (WiFi.status() == WL_CONNECTED) {
-      log_i("%s> IPaddr=%s", myname.c_str(), WiFi.localIP().toString().c_str());
+      log_i("IPaddr=%s", WiFi.localIP().toString().c_str());
 
       this->net_is_available = true;
       this->cur_mode = MODE_WIFI_ON;
@@ -70,7 +68,7 @@ mode_t NetMgr::loop() {
       break;
     }
 
-    log_i("%s> loop_count=%d", myname.c_str(), this->_loop_count);
+    log_i("loop_count=%d", this->_loop_count);
     delay(WIFI_TRY_INTERVAL);
     break;
 
@@ -78,7 +76,7 @@ mode_t NetMgr::loop() {
     uint8_t mac_int[6];
     char    mac_str[13];
     
-    log_i("%s> MODE_AP_INIT", myname.c_str());
+    log_i("MODE_AP_INIT");
 
     WiFi.disconnect(true);
     WiFi.mode(WIFI_OFF);
@@ -88,32 +86,31 @@ mode_t NetMgr::loop() {
     sprintf(mac_str, "%02X%02X%02X%02X%02X%02X",
             mac_int[0], mac_int[1], mac_int[2],
             mac_int[3], mac_int[4], mac_int[5]);
-    log_i("%s> MacAddr=%s", myname.c_str(), mac_str);
+    log_i("MacAddr=%s", mac_str);
 
     this->ap_ssid = this->ap_ssid_hdr + String(mac_str);
-    log_i("%s> ap_ssid=%s", myname.c_str(), this->ap_ssid.c_str());
+    log_i("ap_ssid=%s", this->ap_ssid.c_str());
 
     WiFi.mode(WIFI_AP);
-    log_i("%s> WiFi.softAP(%s) .. ",
-          myname.c_str(), this->ap_ssid.c_str());
+    log_i("WiFi.softAP(%s) .. ", this->ap_ssid.c_str());
     delay(100);
 
     if ( ! WiFi.softAP(this->ap_ssid.c_str()) ) {
-      log_i("%s> .. failed", myname.c_str());
+      log_i(" .. failed");
       WiFi.mode(WIFI_OFF);
 
       this->cur_mode = MODE_WIFI_OFF;
       break;
     }
 
-    log_i("%s> .. start", myname.c_str());
+    log_i(" .. start");
     delay(300);
 
     WiFi.softAPConfig(this->ap_ip, this->ap_ip, this->ap_netmask);
 
     this->dns_svr.setErrorReplyCode(DNSReplyCode::NoError);
     this->dns_svr.start(DNS_PORT, "*", this->ap_ip);
-    log_i("%s> DNS server[%d] started", myname.c_str(), DNS_PORT);
+    log_i("DNS server[%d] started", DNS_PORT);
 
     NetMgr::async_scan_ssid_start();
 
@@ -126,7 +123,7 @@ mode_t NetMgr::loop() {
     web_svr.on("/do_reboot", NetMgr::handle_do_reboot);
     web_svr.onNotFound(NetMgr::handle_top);
     web_svr.begin();
-    log_i("%s> Web server[%d] started\n", myname.c_str(), WEBSVR_PORT);
+    log_i("Web server[%d] started", WEBSVR_PORT);
 
     this->cur_mode = MODE_AP_LOOP;
 
@@ -150,7 +147,7 @@ mode_t NetMgr::loop() {
     break;
 
   default:
-    log_i("%s> unknown mode ???", myname.c_str());
+    log_i("unknown mode ???");
     delay(1000);
     break;
   } // switch
@@ -286,7 +283,6 @@ unsigned int NetMgr::scan_ssid(SSIDent ssid_ent[]) {
  *
  */
 void NetMgr::handle_top() {
-  String   myname = "NetMgr::handle_top";
   ConfWifi conf_data;
   String   ssid, ssid_pw;
 
@@ -294,8 +290,7 @@ void NetMgr::handle_top() {
   ssid = conf_data.ssid;
   ssid_pw = conf_data.ssid_pw;
   
-  log_i("%s> ssid=%s, ssid_pw=%s\n",
-        myname.c_str(), ssid.c_str(), ssid_pw.c_str());
+  log_i("ssid=%s, ssid_pw=%s\n", ssid.c_str(), ssid_pw.c_str());
 
   String html = NetMgr::html_header("Current settings");
   html += "<span style='font-size: large;'>";

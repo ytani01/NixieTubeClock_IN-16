@@ -1,7 +1,9 @@
 /**
- * (c) Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #include "ModeSetClock.h"
+
+extern RTC_PCF8563 Rtc;
 
 /**
  *
@@ -37,7 +39,7 @@ mode_t ModeSetClock::change_mode(mode_t mode=ModeSetClock::MODE_NULL) {
     break;
     } // switch(mode)
   } // if
-  Serial.printf("ModeSetClock::change_mode> mode=0x%02X\n", this->_mode);
+  log_i("mode=0x%02X", this->_mode);
 
   int i_1, i_2;
   switch (this->_mode) {
@@ -57,7 +59,6 @@ mode_t ModeSetClock::change_mode(mode_t mode=ModeSetClock::MODE_NULL) {
     } else {
       this->_num[i] = this->_time_num[i];
     }
-    // Serial.printf("ModeSetClock::change_mode> num[%d]=%d\n", i, this->_num[i]);
 
     for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
       if ( e == this->_num[i] ) {
@@ -65,11 +66,9 @@ mode_t ModeSetClock::change_mode(mode_t mode=ModeSetClock::MODE_NULL) {
       } else {
         NxNumEl(i, e).set_brightness(0);
       }
-      // Serial.printf("[%d,%d]=%d\n", i, e, NxNumEl(i,e).get_brightness());
     } // for(e)
 
     if ( i == i_1 || i == i_2 ) {
-      // Serial.printf("[%d].blink_start(%d);\n", i, this->_num[i]);
       NxNum(i).blink_start(millis(), BLINK_TICK_MS);
     } // if
     
@@ -88,7 +87,7 @@ void ModeSetClock::init(unsigned long start_ms, DateTime& now,
   // initialize _date_num[]
   sprintf(disp_str, "%02d%02d%02d",
           now.year() % 100, now.month(), now.day());
-  Serial.printf("ModeSetClock::init> disp_str='%s'\n", disp_str);
+  log_i("disp_str='%s'", disp_str);
   for (int i=0; i < NIXIE_NUM_N; i++) {
     this->_date_num[i] = (int)(disp_str[i] - '0');
   } // for(i)
@@ -96,7 +95,7 @@ void ModeSetClock::init(unsigned long start_ms, DateTime& now,
   // initialize _time_num[]
   sprintf(disp_str, "%02d%02d%02d",
           now.hour(), now.minute(), 0);
-  Serial.printf("ModeSetClock::init> disp_str='%s'\n", disp_str);
+  log_i("disp_str='%s'", disp_str);
   for (int i=0; i < NIXIE_NUM_N; i++) {
     this->_time_num[i] = (int)(disp_str[i] - '0');
   } // for(i)
@@ -129,7 +128,7 @@ stat_t ModeSetClock::loop(unsigned long cur_ms, DateTime& now) {
 void ModeSetClock::count_up(int n=1, boolean repeat=false) {
   int num = 0;
 
-  Serial.printf("ModeSetClock::count_up> this->_mode=0x%02X\n", this->_mode);
+  log_i("this->_mode=0x%02X", this->_mode);
 
   switch (this->_mode) {
   case MODE_YEAR:
@@ -147,14 +146,14 @@ void ModeSetClock::count_up(int n=1, boolean repeat=false) {
     break;
   } // switch(mode)
 
-  Serial.printf("ModeSetClock::count_up> num=%d\n", num);
+  //log_i("num=%d", num);
   num += n;
-  Serial.printf("ModeSetClock::count_up> num=%d\n", num);
+  log_i("num=%d", num);
 
   switch (this->_mode) {
   case MODE_YEAR:
-    if ( num > 30 ) {
-      num = 21;
+    if ( num > YEAR_MAX ) {
+      num = YEAR_MIN;
     }
     this->_date_num[0] = num / 10 % 10;
     this->_date_num[1] = num % 10;
@@ -236,11 +235,10 @@ void ModeSetClock::btn_loop_hdr(unsigned long cur_ms, Button *btn) {
         int hour = this->_time_num[0] * 10 + this->_time_num[1];
         int minute = this->_time_num[2] * 10 + this->_time_num[3];
 
+        log_i("set the time manually: %04d/%02d/%02d,%02d:%02d",
+              year, month, day, hour, minute);
         DateTime now = DateTime(year, month, day, hour, minute, 0);
-        RTC_DS3231 rtc;
-
-        rtc.begin();
-        rtc.adjust(now);
+        Rtc.adjust(now);
                                 
         this->stat = STAT_BACK_MODE;
       }

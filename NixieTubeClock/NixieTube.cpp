@@ -1,5 +1,5 @@
 /**
- * (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #include "NixieTube.h"
 
@@ -24,6 +24,18 @@ void NixieTube::loop(unsigned long cur_ms) {
   // Effect is active
   this->_ef->loop(cur_ms);
 } // NixieTube::loop()
+
+void NixieTube::on() {
+  for (int i=0; i < NIXIE_COLON_DOT_N; i++) {
+    this->element[i].on();
+  }
+} // NixieTube::on()
+
+void NixieTube::off() {
+  for (int i=0; i < NIXIE_COLON_DOT_N; i++) {
+    this->element[i].off();
+  }
+} // NixieTube::off()
 
 Effect *NixieTube::init_effect(effect_id_t eid) {
   if ( this->_ef != (Effect *)NULL ) {

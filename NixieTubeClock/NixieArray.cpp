@@ -1,5 +1,5 @@
 /**
- * (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #include "NixieArray.h"
 
@@ -84,6 +84,7 @@ void NixieArray::set_onoff(unsigned long cur_ms) {
  *
  */
 static unsigned long disp_count=0;
+
 void IRAM_ATTR NixieArray::display(unsigned long cur_ms) {
   uint8_t pin_n = NIXIE_NUM_N * NIXIE_NUM_DIGIT_N;
   uint8_t val[pin_n];
@@ -97,6 +98,7 @@ void IRAM_ATTR NixieArray::display(unsigned long cur_ms) {
   this->set_onoff(disp_count); // 全エレメントの表示状態更新
   //this->set_onoff(cur_ms);
   //this->set_onoff(micros());
+
   //---------------------------------------------------------------------
   // 数字部の表示処理
   for (int p=0; p < pin_n; p++) {
@@ -126,6 +128,7 @@ void IRAM_ATTR NixieArray::display(unsigned long cur_ms) {
   delayMicroseconds(NixieArray::DISP_DELAY_US);
   digitalWrite(_pin_stobe, LOW);
   delayMicroseconds(NixieArray::DISP_DELAY_US);
+
   //--------------------------------------------------------------------
   // コロンの表示処理
   for (int c=0; c < NIXIE_COLON_N; c++) {

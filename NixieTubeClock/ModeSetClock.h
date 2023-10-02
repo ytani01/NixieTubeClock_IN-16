@@ -18,6 +18,9 @@ class ModeSetClock : public ModeBase {
   static const mode_t MODE_HOUR   = 0x21;
   static const mode_t MODE_MINUTE = 0x22;
 
+  static const int YEAR_MIN = 20;
+  static const int YEAR_MAX = YEAR_MIN + 20;
+
   static const mode_t TICK_MS = 10;        // ms
   static const mode_t BLINK_TICK_MS = 200; // ms
 

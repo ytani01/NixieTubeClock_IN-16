@@ -31,8 +31,8 @@ void ModeClock::init(unsigned long start_ms, DateTime& now,
                      int init_val[NIXIE_NUM_N]) {
   ModeBase::init(start_ms, now, init_val);
   this->mode_start_ms = millis();
-  Serial.printf("ModeClock::init> mode_start_ms=%ld, stat=0x%X\n",
-                this->mode_start_ms, (int)this->stat);
+  log_i("mode_start_ms=%ld, stat=0x%X",
+        this->mode_start_ms, (int)this->stat);
 
   Nx->brightness = this->brightness;
 }
@@ -41,7 +41,7 @@ void ModeClock::init(unsigned long start_ms, DateTime& now,
  *
  */
 stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
-  char disp_str[6 + 1];
+  char disp_str[2 * 3 + 1];
   int  prev_num[NIXIE_NUM_N];
   static unsigned long prev_mode = MODE_NULL;
 
@@ -50,7 +50,7 @@ stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
   }
 
   if ( this->stat != STAT_NONE && this->stat != STAT_DONE ) {
-    Serial.printf("ModeClock::loop> stat=0x%X\n", (int)this->stat);
+    log_i("stat=0x%X", (int)this->stat);
     return this->stat;
   }
 
@@ -94,6 +94,7 @@ stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
   for (int i=0; i < NIXIE_NUM_N; i++) {
     prev_num[i] = this->_num[i];
     this->_num[i] = int(disp_str[i] - '0');
+
     if ( this->_num[i] != prev_num[i] ) {
       NxNum(i).xfade_start(cur_ms, FADE_TICK_MS,
                            this->_num[i], prev_num[i]);
@@ -101,9 +102,14 @@ stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
   } // for(NUM)
 
   for (int i=0; i < NIXIE_COLON_N; i++) {
+    if ( this->mode == ModeClock::MODE_YMD ) {
+      NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(0);
+      continue;
+    }
+
     if ( prev_dt.second() != now.second() ) {
       NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(Nx->brightness);
-      if ( this->mode != ModeClock::MODE_YMD || wifiActive ) {
+      if ( wifiActive ) {
         NxCol(i).fadeout_start(cur_ms, cFadeTick,
                                NIXIE_COLON_DOT_DOWN);
         colon_fade_mode[i] = CL_FADE_OUT;
@@ -128,7 +134,7 @@ stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
 } // ModeClock::loop()
 
 void ModeClock::change_mode(unsigned long mode=ModeClock::MODE_NULL) {
-  Serial.printf("ModeClock::change_mode(%ld)> ", this->mode);
+  log_i("mode=%ld", this->mode);
 
   if ( mode != MODE_NULL ) {
     this->mode = mode;
@@ -149,7 +155,7 @@ void ModeClock::change_mode(unsigned long mode=ModeClock::MODE_NULL) {
     } // switch(mode)
   }
   this->mode_start_ms = millis();
-  Serial.printf("mode=%ld, mode_start_ms=%ld\n", this->mode, this->mode_start_ms);
+  log_i("mode=%ld, mode_start_ms=%ld", this->mode, this->mode_start_ms);
 }
 
 void ModeClock::btn_intr_hdr(unsigned long cur_ms, Button *btn) {
@@ -164,7 +170,7 @@ void ModeClock::btn_loop_hdr(unsigned long cur_ms, Button *btn) {
     // BTN0
     if ( btn->is_long_pressed() && ! btn->is_repeated() ) {
       this->stat = ModeBase::STAT_NEXT_MODE;
-      Serial.printf("ModeClock::btn_loop_hdr> stat=0x%X\n", (int)this->stat);
+      log_i("stat=0x%X", (int)this->stat);
       return;
     }
     return;
@@ -192,8 +198,7 @@ void ModeClock::btn_loop_hdr(unsigned long cur_ms, Button *btn) {
   
     Nx->brightness = bl;
     this->brightness = bl;
-    Serial.printf("ModeClock::btn_loop_hdr> Nx->brightness=%d\n",
-                  Nx->brightness);
+    log_i("Nx->brightness=%d\n", Nx->brightness);
     for (int i=0; i < NIXIE_NUM_N; i++) {
       NxNumEl(i, this->_num[i]).set_brightness(bl);
     } // for(NUM)

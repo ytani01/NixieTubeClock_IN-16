@@ -1,5 +1,5 @@
 /**
- * (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  *
  *----------------------------------------------------------------------------
  * [ Data structure ( not a class tree ) ]
@@ -34,6 +34,9 @@ class NixieTube {
 
   void setup(int element_n, uint8_t *pin);
   void loop(unsigned long cur_msec);
+
+  void on();
+  void off();
 
   Effect *init_effect(effect_id_t eid);
   void end_effect();
