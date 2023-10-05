@@ -295,6 +295,8 @@ void disableIntr() {
  */
 void setup() {
   Serial.begin(115200);
+  delay(1000);
+  
   log_i("begin");
   Serial.println("start");
   

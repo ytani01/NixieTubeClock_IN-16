@@ -30,7 +30,7 @@ NetMgr::NetMgr() {
  */
 mode_t NetMgr::loop() {
   ConfWifi conf_data;
-  String     ssid, ssid_pw;
+  String   ssid, ssid_pw;
   
   this->_loop_count++;
 
@@ -52,7 +52,8 @@ mode_t NetMgr::loop() {
     }
 
     WiFi.begin(ssid.c_str(), ssid_pw.c_str());
-    delay(100);
+    delay(WIFI_WAIT_FOR_CONNECT);
+
     this->cur_mode = MODE_TRY_WIFI;
     this->_loop_count = 0;
     break;
@@ -73,8 +74,18 @@ mode_t NetMgr::loop() {
       break;
     }
 
-    log_i("loop_count=%d", this->_loop_count);
+    log_w("loop_count=%d", this->_loop_count);
+
+    WiFi.disconnect();
     delay(WIFI_TRY_INTERVAL);
+
+    conf_data.load();
+    ssid = conf_data.ssid;
+    ssid_pw = conf_data.ssid_pw;
+    log_w("|%s|%s|", ssid.c_str(), ssid_pw.c_str());
+
+    WiFi.begin(ssid.c_str(), ssid_pw.c_str());
+    delay(WIFI_WAIT_FOR_CONNECT);
     break;
 
   case MODE_AP_INIT:
@@ -141,7 +152,7 @@ mode_t NetMgr::loop() {
 
   case MODE_WIFI_ON:
     if (WiFi.status() != WL_CONNECTED) {
-      this->cur_mode = MODE_WIFI_OFF;
+      this->cur_mode = MODE_START;
     }
     break;
 

@@ -43,10 +43,10 @@ int ConfWifi::load(const char* config_file) {
   }
 
   this->ssid = this->read_line(file);
-  log_i("SSID: %s", this->ssid.c_str());
+  log_d("SSID: %s", this->ssid.c_str());
   
   this->ssid_pw = this->read_line(file);
-  log_i("SSID PW: %s", this->ssid_pw.c_str());
+  log_d("SSID PW: %s", this->ssid_pw.c_str());
 
   file.close();
   enableIntr();
