@@ -46,6 +46,11 @@ mode_t NetMgr::loop() {
     ssid_pw = conf_data.ssid_pw;
     log_i("|%s|%s|", ssid.c_str(), ssid_pw.c_str());
 
+    if ( ssid == "" ) {
+      this->cur_mode = MODE_AP_INIT;
+      break;
+    }
+
     WiFi.begin(ssid.c_str(), ssid_pw.c_str());
     delay(100);
     this->cur_mode = MODE_TRY_WIFI;

@@ -311,21 +311,32 @@ void setup() {
   // グローバルオブジェクト・変数の初期化
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   NetMgr::myName = MY_NAME;
+
   nixieArray.brightness = BRIGHTNESS_RESOLUTION;
+
   ntpActive = false;
 
+  // RTC
   log_i("RTC begin");
   Wire.setPins(PIN_I2C_SDA, PIN_I2C_SCL);
   Rtc.begin(&Wire);
-  unsigned long sec = Rtc.now().second();
-  randomSeed(sec); // TBD
+  delay(100);
+  DateTime now = Rtc.now();
+  log_i("now=%04d/%02d/%02d(%s) %02d:%02d:%02d",
+        now.year(), now.month(), now.day(),
+        dayOfWeekStr[now.dayOfTheWeek()].c_str(),
+        now.hour(), now.minute(), now.second());
+
+  randomSeed(now.second()); // TBD
 
   prevMsec = millis();
   curMsec = prevMsec;
+
   //---------------------------------------------------------------------
   // 初期状態表示
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   nixieArray.display(curMsec);
+
   //---------------------------------------------------------------------
   // 割り込み初期化
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -388,7 +399,7 @@ void loop() {
   }
 
   //---------------------------------------------------------------------
-  if (loopCount % 3000 == 0) {
+  if (loopCount % 5000 == 0) {
     log_i("now=%04d/%02d/%02d(%s) %02d:%02d:%02d, brightness=%d/%d",
           now.year(), now.month(), now.day(),
           dayOfWeekStr[now.dayOfTheWeek()].c_str(),
