@@ -8,7 +8,7 @@ static const unsigned int CL_FADE_IN  = 1;
 static const unsigned int CL_FADE_OUT = 2;
 int colon_fade_mode[NIXIE_COLON_N] = {CL_FADE_OFF, CL_FADE_OFF};
 
-static const unsigned long CL_FADE_TICK0 = 20;
+static const unsigned long CL_FADE_TICK0 = 25;
 static const unsigned long CL_FADE_TICK1 = 120;
 static unsigned long cFadeTick = CL_FADE_TICK0;
 
@@ -107,24 +107,22 @@ stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
       continue;
     }
 
-    if ( prev_dt.second() != now.second() ) {
-      NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(Nx->brightness);
-      if ( wifiActive ) {
-        NxCol(i).fadeout_start(cur_ms, cFadeTick,
-                               NIXIE_COLON_DOT_DOWN);
-        colon_fade_mode[i] = CL_FADE_OUT;
-        continue;
+    if ( wifiActive ) {
+      if ( prev_dt.second() != now.second() ) {
+        if ( now.second() % 2 == 1 ) {
+          NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(Nx->brightness);
+          NxCol(i).fadeout_start(cur_ms, cFadeTick, NIXIE_COLON_DOT_DOWN);
+          colon_fade_mode[i] = CL_FADE_OUT;
+          continue;
+        } else {
+          NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(0);
+          NxCol(i).fadein_start(cur_ms, cFadeTick, NIXIE_COLON_DOT_DOWN);
+          colon_fade_mode[i] = CL_FADE_IN;
+          continue;
+        }
       }
-    }
-
-    if (NxCol(i).effect_is_active()) {
-      continue;
-    }
-
-    // effect is inactive
-    if(colon_fade_mode[i] == CL_FADE_OUT) {
-      NxCol(i).fadein_start(cur_ms, cFadeTick, NIXIE_COLON_DOT_DOWN);
-      colon_fade_mode[i] = CL_FADE_IN;
+    } else {
+      NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(Nx->brightness);
     }
   } // for(COLON)
   prev_dt = DateTime(now);
