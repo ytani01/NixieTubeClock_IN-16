@@ -142,7 +142,7 @@ https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32
 ``` text
 *USB CDC On Boot: Enabled
  CPU Frequencdy: 240MHz(WiFi)
-*Core Debug Level: Debug
+*Core Debug Level: Info
  USB DFU On Boot: Disabled
  Erase All Flash Befor Sketch Upload: Disabled
  Events Run On: Core 1
