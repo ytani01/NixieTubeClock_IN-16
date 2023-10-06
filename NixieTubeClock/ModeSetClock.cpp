@@ -4,13 +4,14 @@
 #include "ModeSetClock.h"
 
 extern RTC_PCF8563 Rtc;
+extern void disableIntr();
+extern void enableIntr();
 
 /**
  *
  */
-ModeSetClock::ModeSetClock(NixieArray *nxa): ModeBase::ModeBase(nxa,
-                                                                "SetClock",
-                                                                ModeSetClock::TICK_MS) {
+ModeSetClock::ModeSetClock(NixieArray *nxa)
+  : ModeBase::ModeBase(nxa, "SetClock", ModeSetClock::TICK_MS) {
 } // ModeSetClock::ModeSetClock()
 
 /**
@@ -238,7 +239,22 @@ void ModeSetClock::btn_loop_hdr(unsigned long cur_ms, Button *btn) {
         log_i("set the time manually: %04d/%02d/%02d,%02d:%02d",
               year, month, day, hour, minute);
         DateTime now = DateTime(year, month, day, hour, minute, 0);
+
+        // adjust RTC
+        disableIntr();
         Rtc.adjust(now);
+        enableIntr();
+
+        // adjust ESP32 clock
+        struct tm tm;
+        tm.tm_year = year - 1900;
+        tm.tm_mon = month - 1;
+        tm.tm_mday = day;
+        tm.tm_hour = hour;
+        tm.tm_min = minute;
+        tm.tm_sec = 0;
+        struct timeval tv = { mktime(&tm), 0 };
+        settimeofday(&tv, NULL);
                                 
         this->stat = STAT_BACK_MODE;
       }

@@ -134,9 +134,9 @@ const unsigned long BTN_N = sizeof(Btn) / sizeof(&Btn[0]);
 //======================================================================
 // global variables
 //----------------------------------------------------------------------
-unsigned long loopCount = 0;
-unsigned long curMsec   = 0; // msec
-unsigned long prevMsec  = 0; // msec
+unsigned long loopCount = 0; // XXX tobe local variable in loop()
+unsigned long curMsec   = 0; // msec XXX tobe local variable in loop()
+unsigned long prevMsec  = 0; // msec XXX tobe local variable in loop()
 
 //======================================================================
 /**
@@ -151,6 +151,9 @@ void ntp_adjust() {
   }
   
   disableIntr();
+
+  configTime(9 * 3600L, 0,
+             NTP_SVR[0].c_str(), NTP_SVR[1].c_str(), NTP_SVR[2].c_str());
   getLocalTime(&time_info); // NTP
   log_i("%04d/%02d/%02d(%s) %02d:%02d:%02d",
         time_info.tm_year + 1900,
@@ -168,7 +171,13 @@ void ntp_adjust() {
                             time_info.tm_hour,
                             time_info.tm_min,
                             time_info.tm_sec);
+    // Adjust RTC
     Rtc.adjust(now);
+
+    // Adjust ESP32 Clock
+    struct timeval tv = { mktime(&time_info), 0 };
+    settimeofday(&tv, NULL);
+    
   } else {
     log_i(" .. ignored !");
   }
@@ -217,7 +226,7 @@ void IRAM_ATTR btn_intr_hdr() {
       Mode[curMode]->btn_intr_hdr(curMsec, Btn[b]);
     }
   } // for(b)
-}
+} // btn_intr_hdr()
 
 
 /**
@@ -323,12 +332,24 @@ void setup() {
   Wire.setPins(PIN_I2C_SDA, PIN_I2C_SCL);
   Rtc.begin(&Wire);
   delay(100);
+
   DateTime now = Rtc.now();
   log_i("now=%04d/%02d/%02d(%s) %02d:%02d:%02d",
         now.year(), now.month(), now.day(),
         dayOfWeekStr[now.dayOfTheWeek()].c_str(),
         now.hour(), now.minute(), now.second());
 
+  // adjust ESP32 clock
+  struct tm tm;
+  tm.tm_year = now.year() - 1900;
+  tm.tm_mon = now.month() - 1;
+  tm.tm_mday = now.day();
+  tm.tm_hour = now.hour();
+  tm.tm_min = now.minute();
+  tm_tm_sec = now.second();
+  struct timeval tv = { mktime(&tm), 0 };
+  settimeofday(&tv, NULL);
+  
   randomSeed(now.second()); // TBD
 
   prevMsec = millis();
@@ -360,14 +381,17 @@ void setup() {
  */
 void loop() {
   mode_t   netmgr_mode;
-
-  disableIntr();
-  DateTime now = Rtc.now();
-  enableIntr();
-
+  DateTime now;
+  
   prevMsec = curMsec;
   curMsec = millis();
   loopCount++;
+
+  time_t t = time(NULL);
+  struct tm *tm;
+  tm = localtime(&t);
+  now = DateTime(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+                 tm->tm_hour, tm->tm_min, tm->tm_sec);
 
   //---------------------------------------------------------------------
   // NetMgr
@@ -378,10 +402,6 @@ void loop() {
     ntpActive = true;
     if ( wifiActive != prev_wifiActive ) {
       log_i("WiFi ON");
-      configTime(9 * 3600L, 0,
-                 NTP_SVR[0].c_str(),
-                 NTP_SVR[1].c_str(),
-                 NTP_SVR[2].c_str());
       ntp_adjust();
     }
   } else if ( netmgr_mode == NetMgr::MODE_WIFI_OFF ) {
@@ -397,11 +417,12 @@ void loop() {
   // NTP
   if ((curMsec - ntpLast) >= NTP_INTERVAL) {
     ntpLast = curMsec;
+
     ntp_adjust();
   }
 
   //---------------------------------------------------------------------
-  if (loopCount % 5000 == 0) {
+  if (loopCount % 10000 == 0) {
     log_i("now=%04d/%02d/%02d(%s) %02d:%02d:%02d, brightness=%d/%d",
           now.year(), now.month(), now.day(),
           dayOfWeekStr[now.dayOfTheWeek()].c_str(),
