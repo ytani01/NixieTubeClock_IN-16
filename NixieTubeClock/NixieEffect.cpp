@@ -124,9 +124,8 @@ void NixieEffectFadeIn::loop(unsigned long cur_ms) {
 //============================================================================
 // class NixieEffectFadeOut
 //----------------------------------------------------------------------------
-NixieEffectFadeOut::NixieEffectFadeOut(NixieElement *el,
-                             unsigned long el_n): NixieEffect::NixieEffect(EFFECT_FADEOUT,
-                                                                 el, el_n) {
+NixieEffectFadeOut::NixieEffectFadeOut(NixieElement *el, unsigned long el_n)
+  : NixieEffect::NixieEffect(EFFECT_FADEOUT, el, el_n) {
 }
 
 void NixieEffectFadeOut::start(unsigned long start_ms,

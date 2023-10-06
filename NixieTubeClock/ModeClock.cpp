@@ -8,7 +8,8 @@ static const unsigned int CL_FADE_IN  = 1;
 static const unsigned int CL_FADE_OUT = 2;
 int colon_fade_mode[NIXIE_COLON_N] = {CL_FADE_OFF, CL_FADE_OFF};
 
-static unsigned long cFadeTick = 50; // ticks
+static const unsigned int CL_FADE_TICK = 40;
+static unsigned long clFadeTick = CL_FADE_TICK; // ticks
 
 extern boolean wifiActive;
 
@@ -88,13 +89,16 @@ stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
     break;
   } // switch (mode)
 
+  clFadeTick = CL_FADE_TICK * ( BRIGHTNESS_RESOLUTION / Nx->brightness );
+  log_d("clFadeTick=%d", clFadeTick);
+
   for (int i=0; i < NIXIE_NUM_N; i++) {
     prev_num[i] = this->_num[i];
     this->_num[i] = int(disp_str[i] - '0');
 
     if ( this->_num[i] != prev_num[i] ) {
-      NxNum(i).xfade_start(cur_ms, FADE_TICK_MS,
-                           this->_num[i], prev_num[i]);
+      //NxNum(i).xfade_start(cur_ms, FADE_TICK_MS, this->_num[i], prev_num[i]);
+      NxNum(i).xfade_start(cur_ms, clFadeTick, this->_num[i], prev_num[i]);
     }
   } // for(NUM)
 
@@ -108,12 +112,12 @@ stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
       if ( prev_dt.second() != now.second() ) {
         if ( now.second() % 2 == 1 ) {
           NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(Nx->brightness);
-          NxCol(i).fadeout_start(cur_ms, cFadeTick, NIXIE_COLON_DOT_DOWN);
+          NxCol(i).fadeout_start(cur_ms, clFadeTick, NIXIE_COLON_DOT_DOWN);
           colon_fade_mode[i] = CL_FADE_OUT;
           continue;
         } else {
           NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(0);
-          NxCol(i).fadein_start(cur_ms, cFadeTick, NIXIE_COLON_DOT_DOWN);
+          NxCol(i).fadein_start(cur_ms, clFadeTick, NIXIE_COLON_DOT_DOWN);
           colon_fade_mode[i] = CL_FADE_IN;
           continue;
         }
