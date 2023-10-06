@@ -86,24 +86,18 @@ void NixieArray::set_onoff(unsigned long cur_ms) {
 static unsigned long disp_count=0;
 
 void IRAM_ATTR NixieArray::display(unsigned long cur_ms) {
-  uint8_t pin_n = NIXIE_NUM_N * NIXIE_NUM_DIGIT_N;
+  static uint8_t pin_n = NIXIE_NUM_N * NIXIE_NUM_DIGIT_N;
   uint8_t val[pin_n];
 
-  disp_count++;
-  disp_count %= BRIGHTNESS_RESOLUTION;
+  disp_count = ( disp_count + 1 ) % BRIGHTNESS_RESOLUTION;
   
   //---------------------------------------------------------------------
   this->loop(cur_ms); // ニキシー管 全て
   //---------------------------------------------------------------------
   this->set_onoff(disp_count); // 全エレメントの表示状態更新
-  //this->set_onoff(cur_ms);
-  //this->set_onoff(micros());
 
   //---------------------------------------------------------------------
   // 数字部の表示処理
-  for (int p=0; p < pin_n; p++) {
-    val[p] = HIGH;
-  }
 
   for (int t=0; t < NIXIE_NUM_N; t++) {
     for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
@@ -111,15 +105,15 @@ void IRAM_ATTR NixieArray::display(unsigned long cur_ms) {
 
       if ( this->num[t].element[e].is_on() ) {
         val[pin] = LOW;
+      } else {
+        val[pin] = HIGH;
       }
     } // for(e)
   } // for(t)
 
   digitalWrite(_pin_clk, LOW);
   for (int p=(pin_n - 1); p >=0; p--) {
-    //delayMicroseconds(NixieArray::DISP_DELAY_US);
     digitalWrite(_pin_data, val[p]);
-    //delayMicroseconds(NixieArray::DISP_DELAY_US);
     digitalWrite(_pin_clk, HIGH);
     delayMicroseconds(NixieArray::DISP_DELAY_US);
     digitalWrite(_pin_clk, LOW);
@@ -127,7 +121,7 @@ void IRAM_ATTR NixieArray::display(unsigned long cur_ms) {
   digitalWrite(_pin_stobe, HIGH);
   delayMicroseconds(NixieArray::DISP_DELAY_US);
   digitalWrite(_pin_stobe, LOW);
-  delayMicroseconds(NixieArray::DISP_DELAY_US);
+  //delayMicroseconds(NixieArray::DISP_DELAY_US);
 
   //--------------------------------------------------------------------
   // コロンの表示処理

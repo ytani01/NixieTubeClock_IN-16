@@ -1,5 +1,5 @@
 /**
- * (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #ifndef MODE_CLOCK_H
 #define MODE_CLOCK_H
@@ -18,8 +18,8 @@ class ModeClock : public ModeBase {
 
   static const unsigned long DISP_DATE_MS = 7000;  // ms
 
-  static const unsigned long TICK_MS      = 10;    // ms
-  static const unsigned long FADE_TICK_MS = 30;    // ms
+  static const unsigned long TICK_MS      = 10;    // ms ! 調整注意
+  static const unsigned long FADE_TICK_MS = 40;    // ms
 
   unsigned long mode = MODE_HMS;
   unsigned long mode_start_ms = 0;

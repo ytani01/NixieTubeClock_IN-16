@@ -8,9 +8,7 @@ static const unsigned int CL_FADE_IN  = 1;
 static const unsigned int CL_FADE_OUT = 2;
 int colon_fade_mode[NIXIE_COLON_N] = {CL_FADE_OFF, CL_FADE_OFF};
 
-static const unsigned long CL_FADE_TICK0 = 25;
-static const unsigned long CL_FADE_TICK1 = 120;
-static unsigned long cFadeTick = CL_FADE_TICK0;
+static unsigned long cFadeTick = 50; // ticks
 
 extern boolean wifiActive;
 
@@ -19,9 +17,8 @@ static DateTime prev_dt = DateTime(2000,1,1,0,0,0);
 /**
  *
  */
-ModeClock::ModeClock(NixieArray *nxa): ModeBase::ModeBase(nxa,
-                                                          "Clock",
-                                                          ModeClock::TICK_MS) {
+ModeClock::ModeClock(NixieArray *nxa)
+  : ModeBase::ModeBase(nxa, "Clock", ModeClock::TICK_MS) {
 } // ModeClock::ModeClock()
 
 /**

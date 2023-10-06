@@ -450,5 +450,5 @@ void loop() {
   nixieArray.display(curMsec);
 
   //---------------------------------------------------------------------
-  delayMicroseconds(LOOP_DELAY_US);
+  //delayMicroseconds(LOOP_DELAY_US);
 } // loop()
