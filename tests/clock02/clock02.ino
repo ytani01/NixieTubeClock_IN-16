@@ -71,7 +71,7 @@ uint8_t colonPins[NIXIE_COLON_N][NIXIE_COLON_DOT_N] =
 
 NixieTubeArray *nta = NULL;
 
-Task_NixieTubeArray *task_NixieTubeArray = NULL;
+Task_NixieTubeArray *taskNixieTubeArray = NULL;
 
 // OLED
 Display_t *Disp;
@@ -94,7 +94,7 @@ ButtonWatcher *btnWatcher_Mode = NULL;
 ButtonInfo_t btnInfo_Mode;
 
 // WiFi
-const String AP_SSID_HDR = "iot";
+const String AP_SSID_HDR = "clock";
 Task_NetMgr *netMgrTask = NULL;
 NetMgrInfo_t netMgrInfo;
 
@@ -311,8 +311,8 @@ void setup() {
 
   unsigned long task_interval = 10;
 
-  task_NixieTubeArray = new Task_NixieTubeArray(nta);
-  task_NixieTubeArray->start();
+  taskNixieTubeArray = new Task_NixieTubeArray(nta);
+  taskNixieTubeArray->start();
   delay(1000);
 
   netMgrTask = new Task_NetMgr("NetMgr", AP_SSID_HDR, &netMgrInfo);

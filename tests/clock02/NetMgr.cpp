@@ -26,6 +26,7 @@ NetMgr::NetMgr(String ap_ssid_hdr, unsigned int try_count_max) {
     this->try_count_max = try_count_max;
   }
 
+  // MAC address
   esp_read_mac(this->mac_addr, ESP_MAC_WIFI_STA);
   char mac_str[13];
   sprintf(mac_str, "%02X%02X%02X%02X%02X%02X",
@@ -33,6 +34,7 @@ NetMgr::NetMgr(String ap_ssid_hdr, unsigned int try_count_max) {
           this->mac_addr[3], this->mac_addr[4], this->mac_addr[5]);
   log_i("MacAddr=%s", mac_str);
 
+  // Access Point
   this->ap_ssid = this->ap_ssid_hdr + "_" + get_mac_addr_String();
   this->ap_ip = IPAddress(this->ap_ip_int[0],
                           this->ap_ip_int[1],
