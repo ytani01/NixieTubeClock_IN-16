@@ -10,6 +10,7 @@
 #include "ModeCount.h"
 #include "ModeTest1.h"
 #include "ModeTest2.h"
+#include "esp_sntp.h"
 
 static const String MY_NAME = "Nixie Tube Clock";
 /**
@@ -21,12 +22,12 @@ static const String MY_NAME = "Nixie Tube Clock";
  * Z = v3
  * v4, v5: 0 (always)
  */
-int                 initValVer[NIXIE_NUM_N] = {0,1, 0,2, 0,1};
+int                 initValVer[NIXIE_NUM_N] = {0,1, 0,3, 0,1};
 
 #define LOOP_DELAY_US   1   // micro sbeconds
 #define DEBOUNCE        300 // msec
 
-String dayOfWeekStr[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+String WDayStr[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 //======================================================================
 // pins
@@ -87,6 +88,11 @@ const String        NTP_SVR[]    = {"pool.ntp.org",
 const unsigned long NTP_INTERVAL = 1 * 60 * 1000; // msec
 unsigned long       ntpLast      = 0;
 boolean             ntpActive    = false;
+static const char *SNTP_SYNC_STATUS_STR[] = {
+  "RESET",
+  "COMPLETED",
+  "IN_PROGRESS"
+};
 
 //======================================================================
 // RTC DS3231
@@ -142,53 +148,91 @@ unsigned long prevMsec  = 0; // msec XXX tobe local variable in loop()
 /**
  *
  */
-void ntp_adjust() {
-  struct tm time_info;
+char *tm2str(struct tm *tm) {
+  static char str[64];
 
-  log_i("ntpActive = %s", ntpActive ? "true" : "false");
+  int res = strftime(str, sizeof(str), "%Y/%m/%d(%a) %H:%M:%S", tm);
+
+  return (char *)str;
+}
+
+char *datetime2str(DateTime *dt) {
+  static char str[64];
+
+  sprintf(str, "%04d/%02d/%02d(%s) %02d:%02d:%02d",
+          dt->year(), dt->month(), dt->day(),
+          WDayStr[dt->dayOfTheWeek()],
+          dt->hour(), dt->minute(), dt->second());
+
+  return (char *)str;
+}
+
+/**
+ *
+ */
+struct tm* get_internal_clock() {
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+
+    return tm;
+}
+
+/**
+ *
+ */
+void ntp_adjust() {
   if (! ntpActive) {
     return;
   }
-  
+
+  (void)get_internal_clock();
+
   disableIntr();
-
-  configTime(9 * 3600L, 0,
+  /*
+  configTime(9L * 3600L, 0,
              NTP_SVR[0].c_str(), NTP_SVR[1].c_str(), NTP_SVR[2].c_str());
-  getLocalTime(&time_info); // NTP
-  log_i("%04d/%02d/%02d(%s) %02d:%02d:%02d",
-        time_info.tm_year + 1900,
-        time_info.tm_mon + 1,
-        time_info.tm_mday,
-        dayOfWeekStr[time_info.tm_wday].c_str(),
-        time_info.tm_hour,
-        time_info.tm_min,
-        time_info.tm_sec);
-
-  if ( time_info.tm_year + 1900 > 2000 ) {
-    DateTime now = DateTime(time_info.tm_year + 1900,
-                            time_info.tm_mon + 1,
-                            time_info.tm_mday,
-                            time_info.tm_hour,
-                            time_info.tm_min,
-                            time_info.tm_sec);
-    // Adjust RTC
-    Rtc.adjust(now);
-
-    // Adjust ESP32 Clock
-    struct timeval tv = { mktime(&time_info), 0 };
-    settimeofday(&tv, NULL);
-    
-  } else {
-    log_i(" .. ignored !");
-  }
+  */
+  configTzTime("JST-9",
+               NTP_SVR[0].c_str(), NTP_SVR[1].c_str(), NTP_SVR[2].c_str());
   enableIntr();
+  log_i("configTzTime(%s, %s, %s, %s)",
+        "JST-9",
+        NTP_SVR[0].c_str(),
+        NTP_SVR[1].c_str(),
+        NTP_SVR[2].c_str());
+  log_i("SNTP_SYNC_STATUS=%s",
+        SNTP_SYNC_STATUS_STR[sntp_get_sync_status()]);
+
+  // adjust internal clock from RTC
+  //
+  // XXX
+  // configTime(), configTzTime()実行直後(NTP同期完了前)、
+  // 内部時計が狂うことがあるので(!?)、一旦 RTCに合わせる
+  //
+  DateTime now_rtc = Rtc.now();
+  
+  log_i("RTC :            %s", datetime2str(&now_rtc));
+
+  struct tm tm_rtc;
+  tm_rtc.tm_year = now_rtc.year() - 1900;
+  tm_rtc.tm_mon = now_rtc.month() - 1;
+  tm_rtc.tm_mday = now_rtc.day();
+  tm_rtc.tm_hour = now_rtc.hour();
+  tm_rtc.tm_min = now_rtc.minute();
+  tm_rtc.tm_sec = now_rtc.second();
+
+  struct timeval tv = { mktime(&tm_rtc), 0 };
+  settimeofday(&tv, NULL);
+
+  struct tm *tm_internal = get_internal_clock();
+  log_i("internal clock : %s", tm2str(tm_internal));
 } // ntp_adjust()
 
 /**
  *
  */
 unsigned long change_mode(unsigned long mode=MODE_N) {
-  // log_i("change_mode> mode=%d/%d\n", (int)mode, MODE_N);
+  log_i("change_mode> mode=%d/%d", (int)mode, MODE_N);
   prevMode = curMode;
   if (mode < MODE_N) {
     curMode = mode;
@@ -197,8 +241,8 @@ unsigned long change_mode(unsigned long mode=MODE_N) {
   } else {
     curMode = (curMode + MODE_N - 1) % MODE_N;
   }
-  //log_i("change_mode> curMode=%d:%s\n",
-  //                (int)curMode, Mode[curMode]->name().c_str());
+  log_i("change_mode> curMode=%d:%s",
+        (int)curMode, Mode[curMode]->name().c_str());
 
   nixieArray.end_all_effect();
 
@@ -333,24 +377,25 @@ void setup() {
   Rtc.begin(&Wire);
   delay(100);
 
-  DateTime now = Rtc.now();
-  log_i("now=%04d/%02d/%02d(%s) %02d:%02d:%02d",
-        now.year(), now.month(), now.day(),
-        dayOfWeekStr[now.dayOfTheWeek()].c_str(),
-        now.hour(), now.minute(), now.second());
+  DateTime now_rtc = Rtc.now();
+  log_i("RTC :            %s", datetime2str(&now_rtc));
 
-  // adjust ESP32 clock
-  struct tm tm;
-  tm.tm_year = now.year() - 1900;
-  tm.tm_mon = now.month() - 1;
-  tm.tm_mday = now.day();
-  tm.tm_hour = now.hour();
-  tm.tm_min = now.minute();
-  tm_tm_sec = now.second();
-  struct timeval tv = { mktime(&tm), 0 };
+  // adjust internal clock
+  struct tm tm_rtc;
+  tm_rtc.tm_year = now_rtc.year() - 1900;
+  tm_rtc.tm_mon = now_rtc.month() - 1;
+  tm_rtc.tm_mday = now_rtc.day();
+  tm_rtc.tm_hour = now_rtc.hour();
+  tm_rtc.tm_min = now_rtc.minute();
+  tm_rtc.tm_sec = now_rtc.second();
+
+  struct timeval tv = { mktime(&tm_rtc), 0 };
   settimeofday(&tv, NULL);
+
+  struct tm *tm_internal = get_internal_clock();
+  log_i("internal clock : %s", tm2str(tm_internal));
   
-  randomSeed(now.second()); // TBD
+  randomSeed(now_rtc.second()); // TBD
 
   prevMsec = millis();
   curMsec = prevMsec;
@@ -381,17 +426,18 @@ void setup() {
  */
 void loop() {
   mode_t   netmgr_mode;
-  DateTime now;
+
+  struct tm *tm_now = get_internal_clock();
+  DateTime now = DateTime(tm_now->tm_year + 1900, tm_now->tm_mon + 1,
+                          tm_now->tm_mday,
+                          tm_now->tm_hour, tm_now->tm_min, tm_now->tm_sec);
+
+  static sntp_sync_status_t prev_sntp_stat = SNTP_SYNC_STATUS_RESET;
+  sntp_sync_status_t sntp_stat = sntp_get_sync_status();
   
   prevMsec = curMsec;
   curMsec = millis();
   loopCount++;
-
-  time_t t = time(NULL);
-  struct tm *tm;
-  tm = localtime(&t);
-  now = DateTime(tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-                 tm->tm_hour, tm->tm_min, tm->tm_sec);
 
   //---------------------------------------------------------------------
   // NetMgr
@@ -417,17 +463,51 @@ void loop() {
   // NTP
   if ((curMsec - ntpLast) >= NTP_INTERVAL) {
     ntpLast = curMsec;
-
     ntp_adjust();
   }
 
+  if ( prev_sntp_stat != SNTP_SYNC_STATUS_COMPLETED &&
+       sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
+    log_i("SNTP_SYNC_STATUS: %s --> %s",
+          SNTP_SYNC_STATUS_STR[prev_sntp_stat],
+          SNTP_SYNC_STATUS_STR[sntp_stat]);
+
+    // get NTP time
+    static tm tm_ntp;
+    disableIntr();
+    bool res_getLocalTime = getLocalTime(&tm_ntp); // NTP
+    enableIntr();
+
+    // adjust RTC
+    DateTime now_rtc = DateTime(tm_ntp.tm_year + 1900,
+                                tm_ntp.tm_mon + 1,
+                                tm_ntp.tm_mday,
+                                tm_ntp.tm_hour,
+                                tm_ntp.tm_min,
+                                tm_ntp.tm_sec);
+    disableIntr();
+    Rtc.adjust(now_rtc);
+    now_rtc = Rtc.now();
+    enableIntr();
+    
+    // adjust internal clock
+    struct timeval tv = { mktime(&tm_ntp), 0 };
+    settimeofday(&tv, NULL);
+    struct tm *tm_internal = get_internal_clock();
+
+    log_i("  getLocalTime()>%s : %s",
+          res_getLocalTime ? "true ": "false", tm2str(&tm_ntp));
+    log_i("  RTC :                  %s", datetime2str(&now_rtc));
+    log_i("  internal clock :       %s", tm2str(tm_internal));
+  } // if (sntp_stat)
+
+  prev_sntp_stat = sntp_stat;
+
   //---------------------------------------------------------------------
-  if (loopCount % 10000 == 0) {
-    log_i("now=%04d/%02d/%02d(%s) %02d:%02d:%02d, brightness=%d/%d",
-          now.year(), now.month(), now.day(),
-          dayOfWeekStr[now.dayOfTheWeek()].c_str(),
-          now.hour(), now.minute(), now.second(),
-          nixieArray.brightness, BRIGHTNESS_RESOLUTION);
+  if (loopCount % 100000 == 0) {
+    log_i("NTP:%s, internal clock: %s",
+          SNTP_SYNC_STATUS_STR[sntp_stat],
+          tm2str(tm_now));
   }
 
   //---------------------------------------------------------------------

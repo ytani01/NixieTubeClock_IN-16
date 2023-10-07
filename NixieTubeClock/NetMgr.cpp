@@ -278,7 +278,7 @@ unsigned int NetMgr::scan_ssid(SSIDent ssid_ent[]) {
 
   int ssid_n = WiFi.scanNetworks();
 
-  log_i("NetMgr::scan_ssid> %d SSIDs found\n", ssid_n);
+  log_i("NetMgr::scan_ssid> %d SSIDs found", ssid_n);
 
   if (ssid_n <= 0) {
     return 0;
@@ -306,7 +306,7 @@ void NetMgr::handle_top() {
   ssid = conf_data.ssid;
   ssid_pw = conf_data.ssid_pw;
   
-  log_i("ssid=%s, ssid_pw=%s\n", ssid.c_str(), ssid_pw.c_str());
+  log_i("ssid=%s, ssid_pw=%s", ssid.c_str(), ssid_pw.c_str());
 
   String html = NetMgr::html_header("Current settings");
   html += "<span style='font-size: large;'>";

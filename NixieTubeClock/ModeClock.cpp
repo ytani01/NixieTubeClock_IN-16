@@ -197,7 +197,7 @@ void ModeClock::btn_loop_hdr(unsigned long cur_ms, Button *btn) {
   
     Nx->brightness = bl;
     this->brightness = bl;
-    log_i("Nx->brightness=%d\n", Nx->brightness);
+    log_i("Nx->brightness=%d", Nx->brightness);
     for (int i=0; i < NIXIE_NUM_N; i++) {
       NxNumEl(i, this->_num[i]).set_brightness(bl);
     } // for(NUM)

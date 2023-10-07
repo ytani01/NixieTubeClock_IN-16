@@ -245,7 +245,7 @@ void ModeSetClock::btn_loop_hdr(unsigned long cur_ms, Button *btn) {
         Rtc.adjust(now);
         enableIntr();
 
-        // adjust ESP32 clock
+        // adjust internal clock
         struct tm tm;
         tm.tm_year = year - 1900;
         tm.tm_mon = month - 1;
