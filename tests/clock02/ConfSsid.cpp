@@ -15,6 +15,7 @@ ConfSsid::ConfSsid()
  *
  */
 int ConfSsid::load() {
+  log_i("");
   if ( this->open_read() < 0 ) {
     return -1;
   }
@@ -23,7 +24,7 @@ int ConfSsid::load() {
   while ( this->file.available() ) {
     String ssid = this->read_line();
     String pw = this->read_line();
-    log_d("load|%s|%s|", ssid.c_str(), pw.c_str());
+    log_i("load|%s|%s|", ssid.c_str(), pw.c_str());
 
     this->ent[ssid.c_str()] = pw.c_str();
   } // while(this->file.available())

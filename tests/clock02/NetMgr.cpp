@@ -26,7 +26,6 @@ NetMgr::NetMgr(String ap_ssid_hdr, unsigned int try_count_max) {
     this->try_count_max = try_count_max;
   }
 
-  // MAC address
   esp_read_mac(this->mac_addr, ESP_MAC_WIFI_STA);
   char mac_str[13];
   sprintf(mac_str, "%02X%02X%02X%02X%02X%02X",
@@ -34,7 +33,6 @@ NetMgr::NetMgr(String ap_ssid_hdr, unsigned int try_count_max) {
           this->mac_addr[3], this->mac_addr[4], this->mac_addr[5]);
   log_i("MacAddr=%s", mac_str);
 
-  // Access Point
   this->ap_ssid = this->ap_ssid_hdr + "_" + get_mac_addr_String();
   this->ap_ip = IPAddress(this->ap_ip_int[0],
                           this->ap_ip_int[1],
@@ -55,7 +53,7 @@ NetMgrMode_t NetMgr::loop() {
   static NetMgrMode_t prev_mode = NETMGR_MODE_NULL;
   static String ssid = "";
   static String pw = "";
-  static int retry_count = 2; // XXX WiFiが頻繁に切れるのでリトライ
+  static int retry_count = 5; // XXX WiFiが頻繁に切れるのでリトライ
 
   if ( this->cur_mode != prev_mode ) {
     log_i("cur_mode: %s(%d) ==> %s(%d)",
@@ -91,10 +89,6 @@ NetMgrMode_t NetMgr::loop() {
     WiFi.mode(WIFI_OFF);
     log_i("WIFI_OFF");
     delay(100);
-
-    //eps_wifi_restore();
-    //log_i("esp_wifi_restore()");
-    //delay(5000);
 
     WiFi.mode(WIFI_STA);
     WiFi.disconnect(true, true);
@@ -190,7 +184,7 @@ NetMgrMode_t NetMgr::loop() {
           this->_loop_count, this->try_count_max,
           WL_STATUS_T_STR[wl_stat], wl_stat);
 
-    delay(TRY_INTERVAL);
+    delay(NetMgr::TRY_INTERVAL);
     break;
 
   case NETMGR_MODE_AP_INIT:
@@ -440,11 +434,15 @@ unsigned int NetMgr::async_scan_ssid_wait() {
  *
  */
 void NetMgr::handle_top() {
-  String   ssid, pw;
+  String   ssid = "", pw = "";
+
+  log_i("");
 
   confSsid->load();
-  ssid = confSsid->ent.begin()->first.c_str();
-  pw = confSsid->ent.begin()->second.c_str();
+  if ( confSsid->ent.size() > 0 ) {
+    ssid = confSsid->ent.begin()->first.c_str();
+    pw = confSsid->ent.begin()->second.c_str();
+  }
   log_i("ssid=%s, pw=%s", ssid.c_str(), pw.c_str());
 
   String html = NetMgr::html_header("Current settings");

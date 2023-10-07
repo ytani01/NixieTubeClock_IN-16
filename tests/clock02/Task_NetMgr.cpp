@@ -19,6 +19,13 @@ Task_NetMgr::Task_NetMgr(String name, String ap_ssid_hdr,
 /**
  *
  */
+void Task_NetMgr::set_mode(NetMgrMode_t mode) {
+  this->netMgr->cur_mode = mode;
+} // Task_NetMgr::set_mode()
+
+/**
+ *
+ */
 void Task_NetMgr::restart_wifi() {
   log_i("");
   this->netMgr->restart();

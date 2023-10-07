@@ -31,6 +31,7 @@ class Task_NetMgr: public Task {
                   NetMgrInfo_t *netmgr_info,
                   unsigned long wifi_try_count=NetMgr::DEF_TRY_COUNT_MAX);
 
+  void set_mode(NetMgrMode_t mode);
   void restart_wifi();
   void clear_ssid();
 

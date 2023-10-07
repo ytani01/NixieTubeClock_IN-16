@@ -71,7 +71,7 @@ uint8_t colonPins[NIXIE_COLON_N][NIXIE_COLON_DOT_N] =
 
 NixieTubeArray *nta = NULL;
 
-Task_NixieTubeArray *taskNixieTubeArray = NULL;
+Task_NixieTubeArray *task_NixieTubeArray = NULL;
 
 // OLED
 Display_t *Disp;
@@ -94,7 +94,7 @@ ButtonWatcher *btnWatcher_Mode = NULL;
 ButtonInfo_t btnInfo_Mode;
 
 // WiFi
-const String AP_SSID_HDR = "clock";
+const String AP_SSID_HDR = "iot";
 Task_NetMgr *netMgrTask = NULL;
 NetMgrInfo_t netMgrInfo;
 
@@ -187,6 +187,12 @@ void btnCb_Up(ButtonInfo_t *btn_info) {
     return;
   }
 
+  if ( btn_info->click_count >= 2 ) {
+    log_i("force AP mode");
+    netMgrTask->set_mode(NETMGR_MODE_AP_INIT);
+    return;
+  }
+
   Mode_t dst_mode = Mode[curMode]->btnCb_Up(btn_info);
   if ( dst_mode != MODE_N && dst_mode != curMode ) {
     change_mode(dst_mode);
@@ -274,12 +280,9 @@ void menu_cb(String text) {
  */
 void setup() {
   Serial.begin(115200);
-  do {
-    delay(500);
-    Serial.print('.');
-  } while (!Serial);  // Serial Init Wait
-
   delay(1000);
+  Serial.println("Start");
+
   log_i("===== start: %s =====", MYNAME);
   log_i("portTICK_PERIOD_MS=%d", portTICK_PERIOD_MS);
 
@@ -311,8 +314,8 @@ void setup() {
 
   unsigned long task_interval = 10;
 
-  taskNixieTubeArray = new Task_NixieTubeArray(nta);
-  taskNixieTubeArray->start();
+  task_NixieTubeArray = new Task_NixieTubeArray(nta);
+  task_NixieTubeArray->start();
   delay(1000);
 
   netMgrTask = new Task_NetMgr("NetMgr", AP_SSID_HDR, &netMgrInfo);
