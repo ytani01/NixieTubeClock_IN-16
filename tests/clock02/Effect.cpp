@@ -266,12 +266,6 @@ void EffectBlink::start(unsigned long start_ms,
 
   for (int i=0; i < this->_el_n; i++) {
     this->_brightness[i] = this->_el[i].get_brightness();
-#if 0
-    if ( this->_brightness[i] > 0 ) {
-      Serial.printf("EffectBlink::start> [%d]->brightness=%d\n",
-                    i, this->_brightness[i]);
-    }
-#endif
   } // for(i)
 } // EffectBlink::start()
 
