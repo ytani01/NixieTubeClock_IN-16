@@ -102,6 +102,7 @@ void Mode_Main::drawWiFi(Display_t *disp, int x, int y, NetMgrInfo_t *ni) {
   disp->setCursor(x, y);
 
   int interval, ms;
+
   switch ( ni->mode ) {
   case NETMGR_MODE_START:
     if ( millis() % 500 < 500 * 70 / 100 ) {
@@ -109,7 +110,7 @@ void Mode_Main::drawWiFi(Display_t *disp, int x, int y, NetMgrInfo_t *ni) {
     }
     break;
 
-  case NETMGR_MODE_TRY_WIFI:
+  case NETMGR_MODE_WAIT_CONNECT:
     if ( millis() % 500 < 500 * 70 / 100 ) {
       disp->printf("%s", ni->ssid.c_str());
     }

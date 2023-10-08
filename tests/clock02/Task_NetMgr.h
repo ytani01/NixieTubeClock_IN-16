@@ -27,9 +27,7 @@ class Task_NetMgr: public Task {
 
   static constexpr char *name = (char *)"Task:NetMgr";
   
-  Task_NetMgr(String name, String ap_ssid_hdr,
-              NetMgrInfo_t *netmgr_info,
-              unsigned long wifi_try_count=NetMgr::DEF_TRY_COUNT_MAX);
+  Task_NetMgr(String name, String ap_ssid_hdr, NetMgrInfo_t *netmgr_info);
 
   void set_mode(NetMgrMode_t mode);
   void restart_wifi();
