@@ -1,20 +1,19 @@
 /**
- * Copyright (c) 2022 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ConfSsid.h"
+#include "ConfFile_Ssid.h"
 
 /** constructor
  *
  */
-ConfSsid::ConfSsid()
-  : ConfBase(String(ConfSsid::FILE_NAME)) {
-
-} // ConfSsid::ConfSsid()
+ConfFile_Ssid::ConfFile_Ssid()
+  : ConfFile(String(ConfFile_Ssid::FILE_NAME)) {
+} // ConfFile_Ssid::ConfFile_Ssid()
 
 /** virtual
  *
  */
-int ConfSsid::load() {
+int ConfFile_Ssid::load() {
   log_i("");
   if ( this->open_read() < 0 ) {
     return -1;
@@ -35,12 +34,12 @@ int ConfSsid::load() {
     log_i("ent|%s|%s|", (it->first).c_str(), (it->second).c_str());
   }
   return this->line_count;
-} // ConfSsid::load()
+} // ConfFile_Ssid::load()
 
 /** virtual
  *
  */
-int ConfSsid::save() {
+int ConfFile_Ssid::save() {
   if ( this->open_write() < 0 ) {
     return -1;
   }
@@ -60,4 +59,4 @@ int ConfSsid::save() {
   this->close();
 
   return this->line_count;
-} // ConfSsid::save()
+} // ConfFile_Ssid::save()

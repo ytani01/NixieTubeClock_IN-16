@@ -1,22 +1,22 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "MenuMode.h"
+#include "Mode_Menu.h"
 
 /** constructor
  *
  */
-MenuMode::MenuMode(String name, CommonData_t *common_data,
+Mode_Menu::Mode_Menu(String name, CommonData_t *common_data,
                    void (*cb)(String text))
   : Mode(name, common_data) {
   this->cb = cb;
 
-} // MenuMode::MenuMode()
+} // Mode_Menu::Mode_Menu()
 
 /**
  *
  */
-void MenuMode::setup() {
+void Mode_Menu::setup() {
   this->topMenu = new OledMenu("Top Menu");
   this->clockMenu = new OledMenu("Clock");
   this->thermometerMenu = new OledMenu("Thermo");
@@ -24,7 +24,6 @@ void MenuMode::setup() {
   this->systemMenu = new OledMenu(String("System v") + String(VERSION_STR));
 
   OledMenuEnt *ment_mode_main = new OledMenuEnt("<< Exit Menu ", MODE_MAIN);
-  OledMenuEnt *ment_mode_sto = new OledMenuEnt(" * Temp Offset ", MODE_SET_TEMP_OFFSET);
   OledMenuEnt *ment_mode_scan_ssid = new OledMenuEnt(" = SSID and Password ", MODE_SCAN_SSID);
 
   OledMenuEnt *ment_menu_top = new OledMenuEnt(" < Top Menu ", topMenu);
@@ -36,7 +35,6 @@ void MenuMode::setup() {
   OledMenuEnt *ment_text_clear_ssid = new OledMenuEnt("!! clear SSID ", "clear_ssid");
   OledMenuEnt *ment_text_restart_wifi = new OledMenuEnt(" @ restart WiFi ", "restart_wifi");
   OledMenuEnt *ment_text_reboot = new OledMenuEnt(" @ reboot ", "reboot");  
-  OledMenuEnt *ment_text_dispfps = new OledMenuEnt(" i ON/OFF FPS ", "disp_fps");  
 
   OledMenuEnt *ment_line = new OledMenuEnt("--------------------");
 
@@ -54,7 +52,6 @@ void MenuMode::setup() {
   this->thermometerMenu->addEnt(ment_menu_top);
   this->thermometerMenu->addEnt(ment_mode_main);
   this->thermometerMenu->addEnt(ment_line);
-  this->thermometerMenu->addEnt(ment_mode_sto);
 
   this->wifiMenu->addEnt(ment_menu_top);
   this->wifiMenu->addEnt(ment_mode_main);
@@ -67,8 +64,6 @@ void MenuMode::setup() {
   this->systemMenu->addEnt(ment_menu_top);
   this->systemMenu->addEnt(ment_mode_main);
   this->systemMenu->addEnt(ment_line);
-  this->systemMenu->addEnt(ment_text_dispfps);
-  this->systemMenu->addEnt(ment_line);
   this->systemMenu->addEnt(ment_text_reboot);
 
   this->curMenu = this->topMenu;
@@ -78,7 +73,7 @@ void MenuMode::setup() {
 /**
  *
  */
-bool MenuMode::enter(Mode_t prev_mode) {
+bool Mode_Menu::enter(Mode_t prev_mode) {
   Mode::enter(prev_mode);
 
   if ( prev_mode == MODE_MAIN ) {
@@ -87,12 +82,12 @@ bool MenuMode::enter(Mode_t prev_mode) {
   }
   
   return true;
-} // MenuMode()
+} // Mode_Menu()
 
 /**
  * @return  destination mode
  */
-Mode_t MenuMode::reBtn_cb(ButtonInfo_t *bi) {
+Mode_t Mode_Menu::reBtn_cb(ButtonInfo_t *bi) {
   Mode_t dst_mode = MODE_N;
 
   if ( bi->click_count == 0 ) {
@@ -141,25 +136,25 @@ Mode_t MenuMode::reBtn_cb(ButtonInfo_t *bi) {
   } // switch
 
   return dst_mode;
-} // MenuMode::reBtn_cb()
+} // Mode_Menu::reBtn_cb()
 
 /**
  *
  */
-Mode_t MenuMode::obBtn_cb(ButtonInfo_t *bi) {
+Mode_t Mode_Menu::obBtn_cb(ButtonInfo_t *bi) {
   if ( bi->click_count > 0 ) {
     _cd->msg = " Onboard Btn\n";
     _cd->msg += " click:" + String(bi->click_count);
   }
   return MODE_N;
-} // MenuMode::obBtn_cb()
+} // Mode_Menu::obBtn_cb()
 
 /**
  *
  */
-void MenuMode::display(Display_t *disp) {
+void Mode_Menu::display(Display_t *disp) {
   this->curMenu->display(disp);
-} // MenuMode::display()
+} // Mode_Menu::display()
 
 /** protected
  *

@@ -1,58 +1,58 @@
 /**
- * Copyright (c) 2022 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "MainMode.h"
+#include "Mode_Main.h"
 
 /** constructor
  *
  */
-MainMode::MainMode(String name, CommonData_t *common_data)
+Mode_Main::Mode_Main(String name, CommonData_t *common_data)
   : Mode(name, common_data) {
 
   strcpy(this->mac_addr_str, get_mac_addr_String().c_str());
   log_i("mac_addr_str=\"%s\"", this->mac_addr_str);
-} // MainMode::MainMode()
+} // Mode_Main::Mode_Main()
 
 /**
  *
  */
-Mode_t MainMode::btnCb_Mode(ButtonInfo_t *bi) {
+Mode_t Mode_Main::btnCb_Mode(ButtonInfo_t *bi) {
   log_i("%s", this->name.c_str());
 
   if ( bi->click_count > 0 ) {
     _cd->msg = String(bi->name) + "> click:" + String(bi->click_count);
   }
   return MODE_N;
-} // MainMode::btnCb_Mode()
+} // Mode_Main::btnCb_Mode()
 
 /**
  *
  */
-Mode_t MainMode::btnCb_Up(ButtonInfo_t *bi) {
+Mode_t Mode_Main::btnCb_Up(ButtonInfo_t *bi) {
   log_i("%s", this->name.c_str());
   
   if ( bi->click_count > 0 ) {
     _cd->msg = String(bi->name) + "> click:" + String(bi->click_count);
   }
   return MODE_N;
-} // MainMode::btnCb_Up()
+} // Mode_Main::btnCb_Up()
 
 /**
  *
  */
-Mode_t MainMode::btnCb_Down(ButtonInfo_t *bi) {
+Mode_t Mode_Main::btnCb_Down(ButtonInfo_t *bi) {
   (void)Mode::btnCb_Down(bi);
 
   if ( bi->click_count > 0 ) {
     _cd->msg = String(bi->name) + "> click:" + String(bi->click_count);
   }
   return MODE_N;
-} // MainMode::btnCb_Down()
+} // Mode_Main::btnCb_Down()
 
 /**
  *
  */
-void MainMode::display(Display_t *disp) {
+void Mode_Main::display(Display_t *disp) {
   int x, y;
 
   //disp->drawRect(0,0, DISPLAY_W, DISPLAY_H, WHITE);
@@ -91,12 +91,12 @@ void MainMode::display(Display_t *disp) {
   disp->setTextSize(1);
   disp->setCursor(x, y);
   disp->printf("%s ", this->mac_addr_str);
-} // MainMode::display()
+} // Mode_Main::display()
 
 /**
  *
  */
-void MainMode::drawWiFi(Display_t *disp, int x, int y, NetMgrInfo_t *ni) {
+void Mode_Main::drawWiFi(Display_t *disp, int x, int y, NetMgrInfo_t *ni) {
   disp->setFont(NULL);
   disp->setTextSize(1);
   disp->setCursor(x, y);
@@ -136,12 +136,12 @@ void MainMode::drawWiFi(Display_t *disp, int x, int y, NetMgrInfo_t *ni) {
     }
     break;
   } // switch(ni->mode)
-} // MainMode::drawWiFi()
+} // Mode_Main::drawWiFi()
 
 /**
  *
  */
-void MainMode::drawDateTime(Display_t *disp, int x, int y, struct tm *ti) {
+void Mode_Main::drawDateTime(Display_t *disp, int x, int y, struct tm *ti) {
   if ( ti->tm_year + 1900 < 2000 ) {
     return;
   }
@@ -162,13 +162,13 @@ void MainMode::drawDateTime(Display_t *disp, int x, int y, struct tm *ti) {
                  ti->tm_mon + 1, ti->tm_mday, wday_str,
                  ti->tm_hour, ti->tm_min, ti->tm_sec);
   }
-} // MainMode::drawDateTime()
+} // Mode_Main::drawDateTime()
 
 /**
  *
  */
-void MainMode::drawNtp(Display_t *disp, int x, int y,
-                       NtpTaskInfo_t *ntp_info,
+void Mode_Main::drawNtp(Display_t *disp, int x, int y,
+                       Task_NtpInfo_t *ntp_info,
                        NetMgrInfo_t *netmgr_info) {
   unsigned long interval_ms = 500;
   unsigned long on_rate = 50;
@@ -203,4 +203,4 @@ void MainMode::drawNtp(Display_t *disp, int x, int y,
     disp->printf("NTP");
   }
 
-} // MainMode::drawNtp()  
+} // Mode_Main::drawNtp()  

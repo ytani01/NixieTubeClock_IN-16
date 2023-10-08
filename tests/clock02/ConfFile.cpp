@@ -1,23 +1,23 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ConfBase.h"
+#include "ConfFile.h"
 
 /** constructor
  *
  */
-ConfBase::ConfBase(String file_name) {
+ConfFile::ConfFile(String file_name) {
   this->file_name = file_name;
 
   if ( ! SPIFFS.begin(true) ) {
     log_e("%s: SPIFFS mount failed", this->file_name.c_str());
   }
-} // ConfBase::ConfBase()
+} // ConfFile::ConfFile()
 
 /** virtual
  *
  */
-int ConfBase::load() {
+int ConfFile::load() {
   // test code
   if ( ! this->open_read() ) {
     return -1;
@@ -30,12 +30,12 @@ int ConfBase::load() {
   this->file.close();
 
   return this->line_count;
-} // ConfBase::load()
+} // ConfFile::load()
 
 /** virtual
  *
  */
-int ConfBase::save() {
+int ConfFile::save() {
   // test code
   if ( ! this->open_write() ) {
     return -1;
@@ -47,12 +47,12 @@ int ConfBase::save() {
   this->file.close();
   
   return this->line_count;
-} // ConfBase::save()
+} // ConfFile::save()
   
 /** protected
  *
  */
-bool ConfBase::open_read() {
+bool ConfFile::open_read() {
   log_i("%s", this->file_name.c_str());
 
   this->file = SPIFFS.open(this->file_name, "r");
@@ -62,12 +62,12 @@ bool ConfBase::open_read() {
   }
   this->line_count = 0;
   return true;
-} // ConfBase::open_read()
+} // ConfFile::open_read()
 
 /** protected
  *
  */
-bool ConfBase::open_write() {
+bool ConfFile::open_write() {
   log_i("%s", this->file_name.c_str());
 
   this->file = SPIFFS.open(this->file_name, "w");
@@ -77,19 +77,19 @@ bool ConfBase::open_write() {
   }
   this->line_count = 0;
   return true;
-} // ConfBase::open_write()
+} // ConfFile::open_write()
 
 /** protected
  *
  */
-void ConfBase::close() {
+void ConfFile::close() {
   this->file.close();
-} // ConfBase::close()
+} // ConfFile::close()
 
 /** protected
  *
  */
-String ConfBase::read_line() {
+String ConfFile::read_line() {
   int ret = this->file.available();
   if ( ret <= 0 ) {
     log_w("ret=%d: EOF?", ret);
@@ -101,15 +101,15 @@ String ConfBase::read_line() {
   this->line_count++;
   log_i("%5d|%s|", line_count, line.c_str());
   return line;
-} // ConfBase::read_line()
+} // ConfFile::read_line()
 
 /** protected
  *
  */
-String ConfBase::write_line(String line) {
+String ConfFile::write_line(String line) {
   line.trim(); // XXX Important !!
   this->file.println(line);
   this->line_count++;
   log_i("%5d|%s|", line_count, line.c_str());
   return line;
-} // ConfBase::write_line()
+} // ConfFile::write_line()

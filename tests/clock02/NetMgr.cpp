@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #include "NetMgr.h"
 
 #undef CONFIG_LOG_MAXIMUM_LEVEL
 #define CONFIG_LOG_MAXIMUM_LEVEL 5
 
-static ConfSsid *confSsid;
+static ConfFile_Ssid *confSsid;
 /**
  * Initialize static variables
  */
@@ -43,7 +43,7 @@ NetMgr::NetMgr(String ap_ssid_hdr, unsigned int try_count_max) {
                                this->ap_netmask_int[2],
                                this->ap_netmask_int[3]);
 
-  confSsid = new ConfSsid;
+  confSsid = new ConfFile_Ssid;
 } // NetMgr::NetMgr()
 
 /**

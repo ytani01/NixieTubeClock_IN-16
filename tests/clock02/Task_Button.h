@@ -1,38 +1,38 @@
 /**
- * Copyright (c) 2022 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  *
-### Example1 (recommeded): ButtonWatcher ###
+### Example1 (recommeded): Task_ButtonWatcher ###
 ```
-#include "ButtonTask.h"
+#include "Task_Button.h"
 :
-ButtonWatcher *btnWatcher=NULL;
+Task_ButtonWatcher *taskBtnWatcher=NULL;
 :
 void cb(ButtonInfo *btn_info) {
   log_i("%s", Button::info2String(btn_info).c_str());
   :
 }
 :
-btnWatcher = new ButtonWatcher("Button name", pin, cb);
-btnWatcher.start();
+taskBtnWatcher = new Task_ButtonWatcher("Button name", pin, cb);
+taskBtnWatcher.start();
 :
 ```
 
-### Example2: ButtonTask ###
+### Example2: Task_Button ###
 ```
-#include "ButtonTask.h"
+#include "Task_Button.h"
 :
-NtpTask *btnTask = NULL;
+NtpTask *taskBtn = NULL;
 :
-btnTask = new ButtonTask("Button name", pin);
-btnTask->start();
+taskBtn = new Task_Button("Button name", pin);
+taskBtn->start();
 :
 whie (true) {
   ButtonInfo btn_info;
-  if ( btnTask == NULL ) { // other task
+  if ( taskBtn == NULL ) { // other task
     continue;
   }
 
-  portBASE_TYPE ret = btnTask->get(&btn_info);
+  portBASE_TYPE ret = taskBtn->get(&btn_info);
   if ( ret == pdPASS ) {
     log_i("%s", Button::info2String(&btn_info).c_str();
     :
@@ -41,8 +41,8 @@ whie (true) {
 :
 ```
  */
-#ifndef _BUTTON_TASK_H_
-#define _BUTTON_TASK_H_
+#ifndef _TASK_BUTTON_H_
+#define _TASK_BUTTON_H_
 
 #include "Task.h"
 #include "Button.h"
@@ -50,7 +50,7 @@ whie (true) {
 /**
  *
  */
-class ButtonTask: public Task {
+class Task_Button: public Task {
 public:
   static const UBaseType_t Q_SIZE = 16;
   static const uint32_t STACK_SIZE_DEF = 4 * 1024;
@@ -61,7 +61,7 @@ public:
   uint8_t pin;
   Button *btn = NULL;
 
-  ButtonTask(String btn_name, uint8_t pin,
+  Task_Button(String btn_name, uint8_t pin,
                   uint32_t stack_size=STACK_SIZE_DEF,
                   UBaseType_t priority=PRIORITY_DEF,
                   UBaseType_t core=CORE_DEF);
@@ -75,18 +75,18 @@ protected:
   QueueHandle_t _out_que;
 
   static void intr_hdr(void *btn_obj);
-}; // class ButtonTask
+}; // class Task_Button
 
 /**
  *
  */
-class ButtonWatcher: public Task {
+class Task_ButtonWatcher: public Task {
 public:
   static const uint32_t STACK_SIZE_DEF = 4 * 1024;
   static const UBaseType_t PRIORITY_DEF = 0;
   static const UBaseType_t CORE_DEF = APP_CPU_NUM;
 
-  ButtonWatcher(String btn_name,
+  Task_ButtonWatcher(String btn_name,
                      uint8_t pin,
                      void (*cb)(ButtonInfo_t *btn_info)=NULL,
                      uint32_t stack_size=STACK_SIZE_DEF,
@@ -101,11 +101,11 @@ protected:
 
   String _btn_name;
   uint8_t _pin;
-  ButtonTask *_btn_task;
+  Task_Button *_btn_task;
   void (*_cb)(ButtonInfo_t *btn_info);
 
   uint32_t _stack_size;
   UBaseType_t _priority;
   UBaseType_t _core;
-}; // class ButtonWatcher
-#endif // _BUTTON_TASK_H_
+}; // class Task_ButtonWatcher
+#endif // _TASK_BUTTON_H_

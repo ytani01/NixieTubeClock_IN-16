@@ -17,7 +17,7 @@
 //#include <Fonts/Org_01.h>
 
 #include "Task_NetMgr.h"
-#include "NtpTask.h"
+#include "Task_Ntp.h"
 #include "NixieTubeArray.h"
 
 #define VERSION_STR "0.xx"
@@ -26,20 +26,19 @@ typedef enum {
               MODE_MAIN,
               MODE_MENU,
               MODE_RESTART,
-              MODE_SET_TEMP_OFFSET,
               MODE_SCAN_SSID,
               MODE_SET_SSID,
               MODE_N
 } Mode_t;
 static const char *MODE_T_STR[] =
-  {"MAIN", "MENU", "RESTART", "SET_TEMP_OFFSET", "SCAN_SSID", "SET_SSID"};
+  {"MAIN", "MENU", "RESTART", "SCAN_SSID", "SET_SSID"};
 
 typedef struct {
   String msg;
   Mode_t cur_mode;
   // std::stack<Mode_t> mode_stack; // XXX
   NetMgrInfo_t *netmgr_info;
-  NtpTaskInfo_t *ntp_info;
+  Task_NtpInfo_t *ntp_info;
   NixieTubeArray *nta;
 } CommonData_t;
 

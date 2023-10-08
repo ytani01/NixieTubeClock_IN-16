@@ -1,19 +1,19 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "NtpTask.h"
+#include "Task_Ntp.h"
 
 /**
  * defulat callback
  */
-static void _ntp_cb(NtpTaskInfo_t *ntp_info) {
+static void _ntp_cb(Task_NtpInfo_t *ntp_info) {
   log_i("ntp_info.sntp_stat=%d", ntp_info->sntp_stat);
 } // _ntp_cb()
 
 /** static function
  *
  */
-char* NtpTask::get_time_str() {
+char* Task_Ntp::get_time_str() {
   struct tm ti; // time info
   const String day_str[] = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
   static char buf[4+1+2+1+2 +1+3+1 +1 +2+1+2+1+2 +1];
@@ -26,47 +26,47 @@ char* NtpTask::get_time_str() {
 /** constructor
  *
  */
-NtpTask::NtpTask(String ntp_svr[], Task_NetMgr **pTask_NetMgr,
-                           void (*cb)(NtpTaskInfo_t *ntp_info))
+Task_Ntp::Task_Ntp(String ntp_svr[], Task_NetMgr **pTaskNetMgr,
+                   void (*cb)(Task_NtpInfo_t *ntp_info))
   : Task("NTP_task") {
 
   this->ntp_svr = ntp_svr;
-  this->pTask_NetMgr = pTask_NetMgr;
+  this->pTaskNetMgr = pTaskNetMgr;
   this->_cb = cb;
   if ( cb == NULL ) {
     this->_cb = _ntp_cb;
   }
 
   this->info.sntp_stat = SNTP_SYNC_STATUS_RESET;
-} // NtpTask::NtpTask
+} // Task_Ntp::Task_Ntp
 
 /**
  *
  */
-void *NtpTask::get_info() {
+void *Task_Ntp::get_info() {
   return (void *)&(this->info);
-} // NtpTask::get_info()
+} // Task_Ntp::get_info()
 
 /**
  *
  */
-void NtpTask::setup() {
+void Task_Ntp::setup() {
   log_d("%s", this->conf.name);
 
   setenv("TZ", "JST-9", 1);
   tzset();
   //sntp_set_sync_mode(SNTP_SYNC_MODE_SMOOTH);
   sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
-} // NtpTask::setup()
+} // Task_Ntp::setup()
 
 /**
  *
  */
-void NtpTask::loop() {
+void Task_Ntp::loop() {
   bool wifi_available = false;
   unsigned long interval = INTERVAL_NO_WIFI;
 
-  Task_NetMgr *netMgrTask = *(this->pTask_NetMgr);
+  Task_NetMgr *netMgrTask = *(this->pTaskNetMgr);
   if ( netMgrTask != NULL ) {
     NetMgr *netMgr = netMgrTask->netMgr;
     if ( netMgr != NULL ) {
@@ -127,4 +127,4 @@ void NtpTask::loop() {
 
   prev_stat = this->info.sntp_stat;
   delay(interval);
-} // NtpTask::loop()
+} // Task_Ntp::loop()

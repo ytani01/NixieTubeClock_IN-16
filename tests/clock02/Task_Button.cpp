@@ -1,26 +1,25 @@
 /**
- * Copyright (c) 2022 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ButtonTask.h"
+#include "Task_Button.h"
 
 static QueueHandle_t outQue = (QueueHandle_t)NULL; // for static function
 
 /**
  *
  */
-ButtonTask::ButtonTask(String btn_name, uint8_t pin,
-                                 uint32_t stack_size,
-                                 UBaseType_t priority,
-                                 UBaseType_t core):
-  Task(btn_name + "Task", stack_size, priority, core) {
-
+Task_Button::Task_Button(String btn_name, uint8_t pin,
+                         uint32_t stack_size, UBaseType_t priority,
+                         UBaseType_t core)
+  : Task(btn_name + "Task", stack_size, priority, core)
+{
   this->btn_name = btn_name;
   this->pin = pin;
 
   this->btn = new Button(this->btn_name, this->pin, this->intr_hdr);
 
   if ( outQue == NULL ) {
-    this->_out_que = xQueueCreate(ButtonTask::Q_SIZE,
+    this->_out_que = xQueueCreate(Task_Button::Q_SIZE,
                                   sizeof(ButtonInfo_t));
     if ( this->_out_que == NULL ) {
       log_e("create out_que: failed .. HALT");
@@ -34,19 +33,19 @@ ButtonTask::ButtonTask(String btn_name, uint8_t pin,
     this->_out_que = outQue;
     log_i("reuse Que: %X", outQue);
   }
-} // ButtonTask::ButtonTask
+} // Task_Button::Task_Button
 
 /**
  *
  */
-void ButtonTask::setup() {
+void Task_Button::setup() {
   log_d("%s", this->btn_name.c_str());
-} // ButtonTask::setup()
+} // Task_Button::setup()
 
 /**
  *
  */
-void ButtonTask::loop() {
+void Task_Button::loop() {
   if ( this->btn->get() ) {
     portBASE_TYPE ret = xQueueSend(outQue,
                                    (void *)&(this->btn->info), 10);
@@ -57,15 +56,16 @@ void ButtonTask::loop() {
     }
   }
   delay(10);
-} // ButtonTask::loop()
+} // Task_Button::loop()
 
 /** [static]
  *
  */
-void IRAM_ATTR ButtonTask::intr_hdr(void *btn_obj) {
-  // check debounce
+void IRAM_ATTR Task_Button::intr_hdr(void *btn_obj) {
   static unsigned long __prev_ms = 0;
   unsigned long __cur_ms = millis();
+
+  // check debounce
   if ( __cur_ms - __prev_ms < Button::DEBOUNCE ) {
     return;
   }
@@ -94,12 +94,12 @@ void IRAM_ATTR ButtonTask::intr_hdr(void *btn_obj) {
     isr_log_d("portYIELD_FROM_ISR()");
     portYIELD_FROM_ISR();
   }
-} // ButtonTask::intr_hdr()
+} // Task_Button::intr_hdr()
 
 /**
  *
  */
-portBASE_TYPE ButtonTask::get(ButtonInfo_t *btn_info) {
+portBASE_TYPE Task_Button::get(ButtonInfo_t *btn_info) {
   portBASE_TYPE ret = xQueuePeek(outQue, (void *)btn_info, 1000);
   if ( ret == pdPASS ) {
     if ( String(btn_info->name) == this->btn_name ) {
@@ -114,7 +114,7 @@ portBASE_TYPE ButtonTask::get(ButtonInfo_t *btn_info) {
     }
   }
   return ret;
-} // ButtonTask::get()
+} // Task_Button::get()
 
 /**
  * defulat callback
@@ -126,13 +126,13 @@ static void _button_cb(ButtonInfo_t *btn_info) {
 /**
  *
  */
-ButtonWatcher::ButtonWatcher(String btn_name, uint8_t pin,
-                                       void (*cb)(ButtonInfo_t *btn_info),
-                                       uint32_t stack_size,
-                                       UBaseType_t priority,
-                                       UBaseType_t core):
-  Task(btn_name + "Watcher", stack_size, priority, core) {
-
+Task_ButtonWatcher::Task_ButtonWatcher(String btn_name, uint8_t pin,
+                             void (*cb)(ButtonInfo_t *btn_info),
+                             uint32_t stack_size,
+                             UBaseType_t priority,
+                             UBaseType_t core)
+  : Task(btn_name + "Watcher", stack_size, priority, core)
+{
   this->_btn_name = btn_name;
   this->_pin = pin;
   this->_cb = cb;
@@ -145,32 +145,33 @@ ButtonWatcher::ButtonWatcher(String btn_name, uint8_t pin,
   }
 
   this->_btn_task=NULL;
-} // ButtonWatcher::ButtonWatcher()
+} // Task_ButtonWatcher::Task_ButtonWatcher()
 
 /**
  *
  */
-ButtonInfo_t *ButtonWatcher::get_btn_info() {
+ButtonInfo_t *Task_ButtonWatcher::get_btn_info() {
   return &(this->_btn_task->btn->info);
-} // ButtonWatcher::get_btn_info()
+} // Task_ButtonWatcher::get_btn_info()
 
 /**
  *
  */
-void ButtonWatcher::setup() {
+void Task_ButtonWatcher::setup() {
   log_i("%s", this->conf.name);
 
-  this->_btn_task = new ButtonTask(this->_btn_name, this->_pin,
-                                        this->_stack_size,
-                                        this->_priority,
-                                        this->_core);
+  this->_btn_task = new Task_Button(this->_btn_name,
+                                    this->_pin,
+                                    this->_stack_size,
+                                    this->_priority,
+                                    this->_core);
   this->_btn_task->start();
-} // ButtonWatcher::setup()
+} // Task_ButtonWatcher::setup()
 
 /**
  *
  */
-void ButtonWatcher::loop() {
+void Task_ButtonWatcher::loop() {
   if ( this->_btn_task == NULL ) {
     return;
   }
@@ -180,4 +181,4 @@ void ButtonWatcher::loop() {
   if ( ret == pdPASS ) {
       (*(this->_cb))(&btn_info);
   }
-} // ButtonWatcher::loop()
+} // Task_ButtonWatcher::loop()

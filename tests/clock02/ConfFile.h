@@ -3,13 +3,13 @@
  *
  * simple usage:
 ```
-#include "ConfBase.h"
+#include "ConfFile.h"
 
-class ConfA: public ConfBase {
+class ConfA: public ConfFile {
   String data1;
   String data2;
 
-  ConfA(): ConfBase("file") {
+  ConfA(): ConfFile("file") {
   };
 
   virtual int load() {
@@ -35,28 +35,28 @@ class ConfA: public ConfBase {
   };
 };
 
-ConfA *conf;
+ConfA *confA;
 
 void setup() {
-  conf = new ConfA();
+  confA = new ConfA();
 }
 
 void loop() {
   String data1, data2;
   :
-  conf->load();
-  Serial.println("data1=" + conf->data1);
-  Serial.println("data2=" + conf->data2);
+  confA->load();
+  Serial.println("data1=" + confA->data1);
+  Serial.println("data2=" + confA->data2);
   :
-  conf->data1 = "abc";
-  conf->data2 = "xyz";
-  conf->save();
+  confA->data1 = "abc";
+  confA->data2 = "xyz";
+  confA->save();
   :
 }
 ```
  */
-#ifndef _CONF_BASE_H_
-#define _CONF_BASE_H_
+#ifndef _CONF_FILE_H_
+#define _CONF_FILE_H_
 
 #include "esp_spiffs.h"
 #include "SPIFFS.h"
@@ -64,11 +64,11 @@ void loop() {
 /**
  *
  */
-class ConfBase {
+class ConfFile {
  public:
   String file_name;
 
-  ConfBase(String file_name);
+  ConfFile(String file_name);
 
   virtual int load();
   virtual int save();
@@ -82,6 +82,6 @@ class ConfBase {
   void close();
   String read_line();
   String write_line(String line);
-}; // class ConfBase
+}; // class ConfFile
 
-#endif // _CONF_BASE_H_
+#endif // _CONF_FILE_H_

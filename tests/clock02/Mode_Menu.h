@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#ifndef _MENU_MODE_H_
-#define _MENU_MODE_H_
+#ifndef _MODE_MENU_H_
+#define _MODE_MENU_H_
 
 #include "Mode.h"
 #include "OledMenu.h"
@@ -10,9 +10,9 @@
 /**
  *
  */
-class MenuMode: public Mode {
+class Mode_Menu: public Mode {
 public:
-  MenuMode(String name, CommonData_t *common_data,
+  Mode_Menu(String name, CommonData_t *common_data,
            void (*cb)(String text)=NULL);
 
   virtual void setup();
@@ -27,6 +27,6 @@ protected:
   OledMenu *topMenu, *clockMenu, *thermometerMenu, *wifiMenu, *systemMenu;
   OledMenu *curMenu;
   void (*cb)(String text) = NULL;
-}; // class MenuMode
+}; // class Mode_Menu
 
-#endif // _MENU_MODE_H_
+#endif // _MODE_MENU_H_

@@ -11,7 +11,7 @@
 
 #include "commonlib.h"
 #include "SSIDent.h"
-#include "ConfSsid.h"
+#include "ConfFile_Ssid.h"
 
 typedef enum { NETMGR_MODE_NULL,
                NETMGR_MODE_START,

@@ -1,20 +1,20 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "RestartMode.h"
+#include "Mode_Restart.h"
 
 /** constructor
  *
  */
-RestartMode::RestartMode(String name, CommonData_t *common_data)
+Mode_Restart::Mode_Restart(String name, CommonData_t *common_data)
   : Mode(name, common_data) {
 
-} // RestartMode::RestartMode()
+} // Mode_Restart::Mode_Restart()
 
 /**
  *
  */
-bool RestartMode::enter(Mode_t prev_mode) {
+bool Mode_Restart::enter(Mode_t prev_mode) {
   Mode::enter(prev_mode);
 
   log_w("restart ..");
@@ -26,4 +26,4 @@ bool RestartMode::enter(Mode_t prev_mode) {
   delay(100);
 
   return true;
-} // RestartMode::enter()
+} // Mode_Restart::enter()
