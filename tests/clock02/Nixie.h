@@ -10,13 +10,13 @@
  *   |   |
  *   |   +- NixieElement element[NIXIE_NUM_DIGIT_N]
  *   |   |
- *   |   +- Effect
+ *   |   +- NixieEffect
  *   |
  *   +- NixieTube colon[NIXIE_COLON_N]
  *       |
  *       +- NixieElement element[NIXIE_COLON_DOT_N]
  *       |
- *       +- Effect
+ *       +- NixieEffect
  *----------------------------------------------------------------------------
  */
 #ifndef NIXIE_H

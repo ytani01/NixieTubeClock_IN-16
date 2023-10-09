@@ -10,20 +10,20 @@
  *   |   |
  *   |   +- NixieElement element[NIXIE_NUM_DIGIT_N]
  *   |   |
- *   |   +- Effect
+ *   |   +- NixieEffect
  *   |
  *   +- NixieTube colon[NIXIE_COLON_N]
  *       |
  *       +- NixieElement element[NIXIE_COLON_DOT_N]
  *       |
- *       +- Effect
+ *       +- NixieEffect
  *----------------------------------------------------------------------------
  */
 #ifndef NIXIE_TUBE_H
 #define NIXIE_TUBE_H
 
 #include "NixieElement.h"
-#include "Effect.h"
+#include "NixieEffect.h"
 
 class NixieTube {
  public:
@@ -35,7 +35,7 @@ class NixieTube {
   void setup(int element_n, uint8_t *pin);
   void loop(unsigned long cur_msec);
 
-  Effect *init_effect(effect_id_t eid);
+  NixieEffect *init_effect(effect_id_t eid);
   void end_effect();
 
   boolean effect_is_active();
@@ -50,6 +50,6 @@ class NixieTube {
   void randomOnOff_start(unsigned long start_ms, unsigned long ms, int el_i);
 
  private:
-  Effect *_ef;
+  NixieEffect *_ef;
 }; // class NixieTube
 #endif // NIXIE_TUBE_H

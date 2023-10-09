@@ -1,5 +1,5 @@
 /**
- * (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #include "NixieTubeArray.h"
 

@@ -10,13 +10,13 @@
  *   |   |
  *   |   +- NixieElement element[NIXIE_NUM_DIGIT_N]
  *   |   |
- *   |   +- Effect
+ *   |   +- NixieEffect
  *   |
  *   +- NixieTube colon[NIXIE_COLON_N]
  *       |
  *       +- NixieElement element[NIXIE_COLON_DOT_N]
  *       |
- *       +- Effect
+ *       +- NixieEffect
  *-----------------------------------------------------------------------
  */
 #ifndef _NIXIE_TUBE_ARRAY_H_
@@ -33,8 +33,8 @@ class NixieTubeArray {
   NixieTube  colon[NIXIE_COLON_N];
 
   NixieTubeArray(uint8_t clk, uint8_t stobe, uint8_t data, uint8_t blank,
-             uint8_t num[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N],
-             uint8_t colon[NIXIE_COLON_N][NIXIE_COLON_DOT_N]);
+                 uint8_t num[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N],
+                 uint8_t colon[NIXIE_COLON_N][NIXIE_COLON_DOT_N]);
   void loop(unsigned long cur_ms);
 
   void end_all_effect();
@@ -43,7 +43,7 @@ class NixieTubeArray {
   void display(unsigned long cur_ms);
 
  private:
-  uint8_t    _pin_clk, _pin_stobe, _pin_data, _pin_blank;
+  uint8_t _pin_clk, _pin_stobe, _pin_data, _pin_blank;
 };
 
 #endif // _NIXIE_TUBE_ARRAY_H_
