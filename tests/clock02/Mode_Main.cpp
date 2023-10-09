@@ -149,6 +149,8 @@ void Mode_Main::display(Display_t *disp) {
   // Date/Time
   time_t t_now = time(NULL);
   struct tm *ti = localtime(&t_now);
+  log_d("interval clock : %s", tm2str(ti));
+  
   x = 0;
   y = 0;
   this->drawDateTime(disp, x, y, ti);

@@ -53,8 +53,10 @@ void *Task_Ntp::get_info() {
 void Task_Ntp::setup() {
   log_d("%s", this->conf.name);
 
-  setenv("TZ", "JST-9", 1);
-  tzset();
+  // XXX ここでタイムゾーンの設定はしない！
+  //setenv("TZ", "JST-9", 1);
+  //tzset();
+
   //sntp_set_sync_mode(SNTP_SYNC_MODE_SMOOTH);
   sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
 } // Task_Ntp::setup()
@@ -87,18 +89,25 @@ void Task_Ntp::loop() {
   }
     
   // start sync
-  log_i("start sync ..");
+  /*
   configTime(9 * 3600L, 0,
              ntp_svr[0].c_str(), ntp_svr[1].c_str(), ntp_svr[2].c_str());
+  */
+  configTzTime("JST-9",
+               ntp_svr[0].c_str(),
+               ntp_svr[1].c_str(),
+               ntp_svr[2].c_str());
 
   /*
    * sntp_get_sync_status()
    *   同期未完了の場合、SNTP_SYNC_STATUS_RESET
-   *   動機が完了すると「一度だけ」、SNTP_SYNC_STATUS_COMPLETE
+   *   同期が完了すると「一度だけ」、SNTP_SYNC_STATUS_COMPLETE
    *   SNTP_SYNC_MODE_SMOOTHの同期中の場合は、SNTP_SYNC_STAUS_IN_PROGRESS)
    */
   static sntp_sync_status_t prev_stat = SNTP_SYNC_STATUS_RESET;
   this->info.sntp_stat = sntp_get_sync_status();
+  log_i("start sync [%s]..", SNTP_SYNC_STATUS_STR[this->info.sntp_stat]);
+
   if ( this->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
     interval = INTERVAL_NORMAL;
     if ( prev_stat != SNTP_SYNC_STATUS_COMPLETED ) {

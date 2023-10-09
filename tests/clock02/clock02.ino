@@ -37,6 +37,9 @@ Mode_Restart *restartMode;
 // common data
 CommonData_t commonData;
 
+// RTC
+Rtc_t Rtc;
+
 // Nixie Tube
 #define PIN_HV5812_CLK      7
 #define PIN_HV5812_STOBE    5
@@ -89,7 +92,7 @@ Task_ButtonWatcher *TaskBtnWatcher_Mode = NULL;
 ButtonInfo_t btnInfo_Mode;
 
 // WiFi
-const String AP_SSID_HDR = "iot";
+const String AP_SSID_HDR = "CLOCK";
 Task_NetMgr *TaskNetMgr = NULL;
 NetMgrInfo_t netMgrInfo;
 
@@ -143,9 +146,14 @@ void do_restart() {
  *
  */
 void ntp_cb(Task_NtpInfo_t *ntp_info) {
-  log_i("sntp_stat=%s(%d)",
-        SNTP_SYNC_STATUS_STR[ntp_info->sntp_stat], ntp_info->sntp_stat);
+  log_i("sntp_stat=%d:%s",
+        ntp_info->sntp_stat,
+        SNTP_SYNC_STATUS_STR[ntp_info->sntp_stat]);
   
+  {
+    DateTime now_rtc = Rtc.now();
+    log_i(" RTC : %s", datetime2str(&now_rtc));
+  }
   ntpInfo = *ntp_info;
 } // ntp_cb()
 
@@ -262,34 +270,99 @@ void menu_cb(String text) {
  */
 void setup() {
   Serial.begin(115200);
-  delay(500);
+  delay(2000);
   Serial.println("Start");
 
   log_i("===== start: %s =====", MYNAME);
   log_i("portTICK_PERIOD_MS=%d", portTICK_PERIOD_MS);
 
+  // init I2C
+  log_i("I2C SDA:%d, SCL:%d", PIN_I2C_SDA, PIN_I2C_SCL);
+  Wire.setPins(PIN_I2C_SDA, PIN_I2C_SCL);
+
+  // init RTC
+  log_i("init RTC");
+  Rtc.begin(&Wire);
+  delay(500);
+
+  DateTime now_rtc = Rtc.now();
+  log_i("RTC : %s", datetime2str(&now_rtc));
+
+  if ( now_rtc.year() > 2020 ) {
+
+    // set internal clock
+    struct tm tm;
+    tm.tm_year = now_rtc.year() - 1900;
+    tm.tm_mon = now_rtc.month() - 1;
+    tm.tm_mday = now_rtc.day();
+    tm.tm_hour = now_rtc.hour();
+    tm.tm_min = now_rtc.minute();
+    tm.tm_sec = now_rtc.second();
+    struct timeval tv = { mktime(&tm), 0 };
+    settimeofday(&tv, NULL);
+
+    // get internal clock
+    time_t t_internal = time(NULL);
+    struct tm *tm_internal = localtime(&t_internal);
+    log_i("adjust interval clock : %s", tm2str(tm_internal));
+
+  } else {
+
+    // get internal clock
+    time_t t_internal = time(NULL);
+    struct tm *tm_internal = localtime(&t_internal);
+    log_i("interval clock : %s", tm2str(tm_internal));
+    log_i("tm_year=%d", tm_internal->tm_year);
+
+    if ( tm_internal->tm_year + 1900 > 2000 ) {
+
+      // adjust RTC
+      DateTime now_internal = DateTime(tm_internal->tm_year + 1900,
+                                       tm_internal->tm_mon + 1,
+                                       tm_internal->tm_mday,
+                                       tm_internal->tm_hour,
+                                       tm_internal->tm_min,
+                                       tm_internal->tm_sec);
+      log_i("now_internal: %s", datetime2str(&now_internal));
+
+      Rtc.adjust(now_internal);
+      delay(100);
+
+      now_rtc = Rtc.now();
+      log_i("adjust RTC : %s", datetime2str(&now_rtc));
+
+    }
+  }
+
   // create Nixie Tube object
+  log_i("init Nixie Tube Array");
   nta = new NixieTubeArray(PIN_HV5812_CLK,  PIN_HV5812_STOBE,
                            PIN_HV5812_DATA, PIN_HV5812_BLANK,
                            nixiePins, colonPins);
 
-  // init commonData
-  commonData.netmgr_info = &netMgrInfo;
-  commonData.ntp_info = &ntpInfo;
-  commonData.nta = nta;
-
   // init OLED
-  Wire.setPins(PIN_I2C_SDA, PIN_I2C_SCL);
+  log_i("init OLED");
   Disp = new Display_t(DISPLAY_W, DISPLAY_H);
   Disp->DispBegin(0x3C);
   Disp->setRotation(0); // XXX
   Disp->clearDisplay();
   Disp->display();
 
+  // init commonData
+  commonData.netmgr_info = &netMgrInfo;
+  commonData.ntp_info = &ntpInfo;
+  commonData.nta = nta;
+  commonData.rtc = &Rtc;
+
   // Tasks
   delay(1000);
 
   unsigned long task_interval = 10;
+
+  {
+    DateTime now_rtc = Rtc.now();
+    log_i("AAA RTC : %s", datetime2str(&now_rtc));
+  }
 
   TaskNixieTubeArray = new Task_NixieTubeArray(nta);
   TaskNixieTubeArray->start();
@@ -339,6 +412,11 @@ void setup() {
   change_mode(MODE_MAIN);
 
   nta->display(0);
+
+  {
+    now_rtc = Rtc.now();
+    log_i("BBB RTC : %s", datetime2str(&now_rtc));
+  }
 
   idleStart = millis();
 } // setup()

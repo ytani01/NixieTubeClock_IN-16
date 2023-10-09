@@ -88,7 +88,6 @@ NetMgrMode_t NetMgr::loop() {
      * XXX TBD
      */
     WiFi.mode(WIFI_OFF);
-    log_i("WIFI_OFF");
     delay(100);
 
     WiFi.mode(WIFI_STA);
@@ -165,7 +164,7 @@ NetMgrMode_t NetMgr::loop() {
     
     // 未接続
     if ( wait_connect_count == 0 ) {
-      if ( try_connect_count >= 0 ) {
+      if ( try_connect_count > 0 ) {
         // retry connect
         log_w("Retry ..");
 
