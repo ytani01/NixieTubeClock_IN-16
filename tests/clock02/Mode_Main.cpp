@@ -102,28 +102,34 @@ bool Mode_Main::exit() {
  *
  */
 void Mode_Main::loop(unsigned long cur_ms) {
-  static int prev_num = 0;
-  int num = cur_ms / 3000 % 10;
-  int nixienum = 5;
   static unsigned long FADE_TICK = 30;
   unsigned long fade_tick
     = FADE_TICK * ( BRIGHTNESS_RESOLUTION / Nta->brightness );
-  
-  if ( num != prev_num ) {
-    NtaNum(nixienum).end_effect();
 
-    for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
-      if ( e == num ) {
-        NtaNumEl(nixienum, e).set_brightness(common_data->nta->brightness);
-      } else {
-        NtaNumEl(nixienum, e).set_brightness(0);
-      }
+  static int prev_num[] = {0, 0, 0, 0, 0, 0};
+
+  for ( int n=0; n < NIXIE_NUM_N; n++ ) {
+    if ( random(0, 100) > 10 ) {
+      continue;
     }
+    
+    int num = random(0, 10);
 
-    NtaNum(nixienum).xfade_start(millis(), fade_tick, num, prev_num);
+    if ( num != prev_num[n] ) {
+      NtaNum(n).end_effect();
 
-    prev_num = num;
-  }
+      if ( random(0, 100) >= 40 ) {
+        NtaNum(n).xfade_start(cur_ms, fade_tick, num, prev_num[n]);
+      } else {
+        NtaNumEl(n, prev_num[n]).set_brightness(0);
+        NtaNum(n).shuffle_start(millis(), 40, 10, num);
+      }
+
+      prev_num[n] = num;
+    }
+  } // for(n)
+  
+  delay(500);
 } // Mode_Main::loop()
 
 /**

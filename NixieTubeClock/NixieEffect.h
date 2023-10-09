@@ -65,7 +65,6 @@ class NixieEffect {
   unsigned long _tick_ms   = 1000;
   unsigned long _tick      = 0;
   unsigned long _prev_tick = 0;
-
 }; // class NixieEffect
 //============================================================================
 class NixieEffectOnly : public NixieEffect {

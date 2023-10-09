@@ -236,27 +236,27 @@ void NixieEffectShuffle::start(unsigned long start_ms,
 } // NixieEffectShuffle::start()
 
 void NixieEffectShuffle::loop(unsigned long cur_ms) {
-  static int el_random = 0;
-
   if ( ! this->tick(cur_ms) ) {
     return;
   }
 
-  this->_el[el_random].set_brightness(0);
+  this->_el[this->_el_random].set_brightness(0);
 
   if ( this->_tick >= this->_n ) {
     this->end();
     return;
   }
   
-  el_random = random(this->_el_n);
-  this->_el[el_random].set_brightness(BRIGHTNESS_RESOLUTION);
+  this->_el_random = random(this->_el_n);
+  this->_el[this->_el_random].set_brightness(nta->brightness);
+
 } // NixieEffectShuffle::loop()
 
 void NixieEffectShuffle::end() {
   NixieEffect::end();
 
-  this->_el[this->_el_i].set_brightness(BRIGHTNESS_RESOLUTION);
+  this->_el[this->_el_i].set_brightness(nta->brightness);
+
 } // NixieEffectShuffle::end()
 
 //============================================================================
