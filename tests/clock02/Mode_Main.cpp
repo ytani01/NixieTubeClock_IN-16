@@ -105,6 +105,9 @@ void Mode_Main::loop(unsigned long cur_ms) {
   static int prev_num = 0;
   int num = cur_ms / 3000 % 10;
   int nixienum = 5;
+  static unsigned long FADE_TICK = 30;
+  unsigned long fade_tick
+    = FADE_TICK * ( BRIGHTNESS_RESOLUTION / Nta->brightness );
   
   if ( num != prev_num ) {
     NtaNum(nixienum).end_effect();
@@ -117,7 +120,7 @@ void Mode_Main::loop(unsigned long cur_ms) {
       }
     }
 
-    NtaNum(nixienum).xfade_start(millis(), 100, num, prev_num);
+    NtaNum(nixienum).xfade_start(millis(), fade_tick, num, prev_num);
 
     prev_num = num;
   }
