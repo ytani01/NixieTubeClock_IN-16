@@ -20,6 +20,10 @@ class Mode_Main: public Mode {
   virtual Mode_t btnCb_Up(ButtonInfo_t *bi);
   virtual Mode_t btnCb_Down(ButtonInfo_t *bi);
 
+  virtual void setup();
+  virtual bool enter(Mode_t prev_mode);
+  virtual bool exit();
+  virtual void loop(unsigned long cur_ms);
   virtual void display(Display_t *disp);
 
  protected:

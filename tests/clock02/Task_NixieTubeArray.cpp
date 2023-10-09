@@ -20,13 +20,12 @@ void Task_NixieTubeArray::setup() {
 
   Nta->brightness = BRIGHTNESS_RESOLUTION / 4;
 
-  int init_val[NIXIE_NUM_N] = {0, 1, 2, 3, 4, 5};
+  int init_val[NIXIE_NUM_N] = {0, 0, 0, 0, 0, 0};
   for (int i = 0; i < NIXIE_NUM_N; i++) {
     for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
       if ( init_val[i] == e ) {
         //Nta->num[i].element[e].set_brightness(Nta->brightness);
         NtaNumEl(i,e).set_brightness(Nta->brightness);
-        NtaNum(i).blink_start(millis(), 500);
       } else {
         //Nta->num[i].element[e].set_brightness(0);
         NtaNumEl(i,e).set_brightness(0);

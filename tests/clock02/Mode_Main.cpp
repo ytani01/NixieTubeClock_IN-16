@@ -52,6 +52,80 @@ Mode_t Mode_Main::btnCb_Down(ButtonInfo_t *bi) {
 /**
  *
  */
+void Mode_Main::setup() {
+  log_i("%s", this->name.c_str());
+
+} // Mode_Main::setup()
+
+/**
+ *
+ */
+bool Mode_Main::enter(Mode_t prev_mode) {
+  log_i("%s: prev_mode=%s", this->name.c_str(), MODE_T_STR[prev_mode]);
+  this->prev_mode = prev_mode;
+
+  Nta->brightness = BRIGHTNESS_RESOLUTION / 4;
+
+  int init_val[NIXIE_NUM_N] = {0, 1, 2, 3, 4, 5};
+  for (int i = 0; i < NIXIE_NUM_N; i++) {
+    NtaNum(i).end_effect();
+
+    for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
+      if ( init_val[i] == e ) {
+        //Nta->num[i].element[e].set_brightness(Nta->brightness);
+        NtaNumEl(i,e).set_brightness(Nta->brightness);
+      } else {
+        //Nta->num[i].element[e].set_brightness(0);
+        NtaNumEl(i,e).set_brightness(0);
+      }
+    } // for(e)
+
+    NtaNum(i).blink_start(millis(), 1000);
+  } // for(i)
+
+  for (int i=0; i < NIXIE_COLON_N; i++) {
+    Nta->colon[i].element[0].set_brightness(Nta->brightness);
+  } // for(i)
+  
+  return true;
+}
+
+/**
+ * モード切替時に毎回実行
+ */
+bool Mode_Main::exit() {
+  log_i("%s", this->name.c_str());
+  return true;
+} // Mode::resume()
+
+/**
+ *
+ */
+void Mode_Main::loop(unsigned long cur_ms) {
+  static int prev_num = 0;
+  int num = cur_ms / 3000 % 10;
+  int nixienum = 5;
+  
+  if ( num != prev_num ) {
+    NtaNum(nixienum).end_effect();
+
+    for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
+      if ( e == num ) {
+        NtaNumEl(nixienum, e).set_brightness(common_data->nta->brightness);
+      } else {
+        NtaNumEl(nixienum, e).set_brightness(0);
+      }
+    }
+
+    NtaNum(nixienum).xfade_start(millis(), 100, num, prev_num);
+
+    prev_num = num;
+  }
+} // Mode_Main::loop()
+
+/**
+ *
+ */
 void Mode_Main::display(Display_t *disp) {
   int x, y;
 
@@ -60,10 +134,6 @@ void Mode_Main::display(Display_t *disp) {
   disp->setTextSize(1);
   disp->setTextColor(WHITE, BLACK);
   
-  // frame
-  //disp->drawFastHLine(0, 24, DISPLAY_W, WHITE);
-  //disp->drawFastHLine(0, 41, DISPLAY_W, WHITE);
-
   x = 0;
   y = 0;
 

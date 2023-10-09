@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #include "Mode.h"
 
@@ -23,7 +23,7 @@ String Mode::get_name() {
  * 最初の初期化
  */
 void Mode::setup() {
-  log_d("%s", this->name.c_str());
+  log_i("%s", this->name.c_str());
 } // Mode::setup()
 
 /**

@@ -278,7 +278,7 @@ void setup() {
   commonData.ntp_info = &ntpInfo;
   commonData.nta = nta;
 
-  // init Display
+  // init OLED
   Wire.setPins(PIN_I2C_SDA, PIN_I2C_SCL);
   Disp = new Display_t(DISPLAY_W, DISPLAY_H);
   Disp->DispBegin(0x3C);
