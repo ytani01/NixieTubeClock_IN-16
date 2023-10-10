@@ -10,14 +10,14 @@ Mode_Main::Mode_Main(String name, CommonData_t *common_data)
   : Mode(name, common_data) {
 
   strcpy(this->mac_addr_str, get_mac_addr_String().c_str());
-  log_i("mac_addr_str=\"%s\"", this->mac_addr_str);
+  log_d("mac_addr_str=\"%s\"", this->mac_addr_str);
 } // Mode_Main::Mode_Main()
 
 /**
  *
  */
 Mode_t Mode_Main::btnCb_Mode(ButtonInfo_t *bi) {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
 
   if ( bi->click_count > 0 ) {
     _cd->msg = String(bi->name) + "> click:" + String(bi->click_count);
@@ -29,7 +29,7 @@ Mode_t Mode_Main::btnCb_Mode(ButtonInfo_t *bi) {
  *
  */
 Mode_t Mode_Main::btnCb_Up(ButtonInfo_t *bi) {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
   
   if ( bi->click_count > 0 ) {
     _cd->msg = String(bi->name) + "> click:" + String(bi->click_count);
@@ -53,7 +53,7 @@ Mode_t Mode_Main::btnCb_Down(ButtonInfo_t *bi) {
  *
  */
 void Mode_Main::setup() {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
 
 } // Mode_Main::setup()
 
@@ -61,7 +61,7 @@ void Mode_Main::setup() {
  *
  */
 bool Mode_Main::enter(Mode_t prev_mode) {
-  log_i("%s: prev_mode=%s", this->name.c_str(), MODE_T_STR[prev_mode]);
+  log_d("%s: prev_mode=%s", this->name.c_str(), MODE_T_STR[prev_mode]);
   this->prev_mode = prev_mode;
 
   Nta->brightness = BRIGHTNESS_RESOLUTION / 4;
@@ -94,7 +94,7 @@ bool Mode_Main::enter(Mode_t prev_mode) {
  * モード切替時に毎回実行
  */
 bool Mode_Main::exit() {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
   return true;
 } // Mode::resume()
 
@@ -143,13 +143,10 @@ void Mode_Main::display(Display_t *disp) {
   disp->setTextSize(1);
   disp->setTextColor(WHITE, BLACK);
   
-  x = 0;
-  y = 0;
-
   // Date/Time
   time_t t_now = time(NULL);
   struct tm *ti = localtime(&t_now);
-  log_d("interval clock : %s", tm2str(ti));
+  log_v("interval clock : %s", tm2str(ti));
   
   x = 0;
   y = 0;
@@ -178,21 +175,22 @@ void Mode_Main::display(Display_t *disp) {
  *
  */
 void Mode_Main::drawWiFi(Display_t *disp, int x, int y, NetMgrInfo_t *ni) {
+  int interval, ms;
+  unsigned long cur_ms = millis();
+
   disp->setFont(NULL);
   disp->setTextSize(1);
   disp->setCursor(x, y);
 
-  int interval, ms;
-
   switch ( ni->mode ) {
   case NETMGR_MODE_START:
-    if ( millis() % 500 < 500 * 70 / 100 ) {
+    if ( cur_ms % 500 < 500 * 70 / 100 ) {
       disp->printf("Starting WiFi");
     }
     break;
 
   case NETMGR_MODE_WAIT_CONNECT:
-    if ( millis() % 500 < 500 * 70 / 100 ) {
+    if ( cur_ms % 500 < 500 * 70 / 100 ) {
       disp->printf("%s", ni->ssid.c_str());
     }
     break;
@@ -207,13 +205,13 @@ void Mode_Main::drawWiFi(Display_t *disp, int x, int y, NetMgrInfo_t *ni) {
 
   case NETMGR_MODE_AP_INIT:
   case NETMGR_MODE_AP_LOOP:
-    if ( millis() % 3000 < 3000 * 95 / 100 ) {
-      disp->printf("[%s]", ni->ap_ssid.c_str());
+    if ( cur_ms % 3000 < 3000 * 95 / 100 ) {
+      disp->printf("%s", ni->ap_ssid.c_str());
     }
     break;
 
   case NETMGR_MODE_WIFI_OFF:
-    if ( millis() % 500 < 500 * 50 / 100 ) {
+    if ( cur_ms % 500 < 500 * 50 / 100 ) {
       disp->printf("%s", ni->ssid.c_str());
     }
     break;
@@ -228,6 +226,8 @@ void Mode_Main::drawDateTime(Display_t *disp, int x, int y, struct tm *ti) {
     return;
   }
 
+  unsigned long cur_ms = millis();
+
   char wday_str[4];
   strftime(wday_str, sizeof(wday_str), "%a", ti);
 
@@ -235,7 +235,7 @@ void Mode_Main::drawDateTime(Display_t *disp, int x, int y, struct tm *ti) {
   disp->setTextSize(1);
   disp->setCursor(x, y);
 
-  if ( millis() % 1000 < 500 ) {
+  if ( cur_ms % 1000 < 500 ) {
     disp->printf("%02d/%02d %s %02d:%02d:%02d",
                  ti->tm_mon + 1, ti->tm_mday, wday_str,
                  ti->tm_hour, ti->tm_min, ti->tm_sec);
@@ -254,6 +254,7 @@ void Mode_Main::drawNtp(Display_t *disp, int x, int y,
                        NetMgrInfo_t *netmgr_info) {
   unsigned long interval_ms = 500;
   unsigned long on_rate = 50;
+  unsigned long cur_ms = millis();
 
   switch ( ntp_info->sntp_stat ) {
   case SNTP_SYNC_STATUS_RESET:
@@ -281,7 +282,7 @@ void Mode_Main::drawNtp(Display_t *disp, int x, int y,
   disp->setFont(&Picopixel);
   disp->setTextSize(1);
   disp->setCursor(x, y);
-  if ( millis() % interval_ms < interval_ms * on_rate / 100 ) {
+  if ( cur_ms % interval_ms < interval_ms * on_rate / 100 ) {
     disp->printf("NTP");
   }
 

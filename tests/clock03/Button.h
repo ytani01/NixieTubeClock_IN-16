@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  *
  *  ==========================================================================
  *  example1
@@ -20,7 +20,7 @@
  *    if ( ! btn->get() ) {
  *      return;
  *    }
- *    log_d("btn->info.name=%s", btn->info.name);
+ *    log_v("btn->info.name=%s", btn->info.name);
  *    // ここまで定形
  *
  *    app_btn_intr_hdr();

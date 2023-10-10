@@ -12,18 +12,20 @@ ConfFile_Ssid::ConfFile_Ssid()
 
 /** virtual
  *
+ * @return number of entries
  */
 int ConfFile_Ssid::load() {
-  log_i("");
+  log_d("");
   if ( this->open_read() < 0 ) {
     return -1;
   }
+
   this->ent.clear();
 
   while ( this->file.available() ) {
     String ssid = this->read_line();
     String pw = this->read_line();
-    log_i("load|%s|%s|", ssid.c_str(), pw.c_str());
+    log_d("load|%s|%s|", ssid.c_str(), pw.c_str());
 
     this->ent[ssid.c_str()] = pw.c_str();
   } // while(this->file.available())
@@ -31,13 +33,14 @@ int ConfFile_Ssid::load() {
   this->close();
 
   for (auto it=this->ent.begin(); it != ent.end(); it++) {
-    log_i("ent|%s|%s|", (it->first).c_str(), (it->second).c_str());
+    log_d("ent|%s|%s|", (it->first).c_str(), (it->second).c_str());
   }
-  return this->line_count;
+  return this->ent.size();
 } // ConfFile_Ssid::load()
 
 /** virtual
- *
+ * 
+ * @return num of entries
  */
 int ConfFile_Ssid::save() {
   if ( this->open_write() < 0 ) {
@@ -51,12 +54,12 @@ int ConfFile_Ssid::save() {
       log_w("|%s|%s| .. ignored", ssid.c_str(), pw.c_str());
       continue;
     }
-    log_i("|%s|%s|", ssid.c_str(), pw.c_str());
+    log_d("|%s|%s|", ssid.c_str(), pw.c_str());
     
     this->write_line(ssid);
     this->write_line(pw);
   }
   this->close();
 
-  return this->line_count;
+  return this->ent.size();
 } // ConfFile_Ssid::save()

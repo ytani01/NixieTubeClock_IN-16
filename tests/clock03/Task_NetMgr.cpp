@@ -25,7 +25,7 @@ void Task_NetMgr::set_mode(NetMgrMode_t mode) {
  *
  */
 void Task_NetMgr::restart_wifi() {
-  log_i("");
+  log_d("");
   this->netMgr->restart();
 } // Task_NetMgr::restart_wifi()
 
@@ -33,7 +33,7 @@ void Task_NetMgr::restart_wifi() {
  *
  */
 void Task_NetMgr::clear_ssid() {
-  log_i("");
+  log_d("");
   this->netMgr->save_ssid("", "");
 } // Task_NetMgr::clear_ssid()
 
@@ -41,7 +41,7 @@ void Task_NetMgr::clear_ssid() {
  *
  */
 void Task_NetMgr::setup() {
-  log_i("%s", this->conf.name);
+  log_d("%s", this->conf.name);
 
   this->netMgr = new NetMgr(this->ap_ssid_hdr);
 
@@ -63,7 +63,7 @@ void Task_NetMgr::loop() {
   if ( mode == NETMGR_MODE_WIFI_ON ) {
       this->netmgr_info->ip_addr = this->netMgr->ip_addr;
       if ( prev_mode != mode ) {
-        log_d("ip_addr:%s", this->netmgr_info->ip_addr.toString().c_str());
+        log_v("ip_addr:%s", this->netmgr_info->ip_addr.toString().c_str());
       }
   }
 

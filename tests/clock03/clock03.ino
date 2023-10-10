@@ -23,8 +23,8 @@
 #define PIN_I2C_SCL         9
 
 // ネット接続がなく、かつ、アイドル時間が経過したら、リセットする
-const unsigned long IDEL_RESET = 5 * 60 * 1000; // ms
-unsigned long idleStart = 0;
+const unsigned long IDLE_RESET = 5 * 60 * 1000; // ms
+unsigned long IdleStart = 0;
 
 // Modes
 #define curMode commonData.cur_mode
@@ -51,21 +51,19 @@ Rtc_t Rtc;
 #define PIN_COLON_L_TOP     1
 #define PIN_COLON_L_BOTTOM  1
 
-uint8_t nixiePins[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N] =
-  {
-   { 9,  0,  6,  2,  3,  4,  5,  1,  7,  8},
-   {15, 14, 18, 12, 11, 10, 19, 13, 17, 16},
-   {35, 20, 38, 22, 23, 24, 39, 21, 37, 36},
-   {29, 34, 26, 32, 31, 30, 25, 33, 27, 28},
-   {55, 54, 58, 52, 51, 50, 59, 53, 57, 56},
-   {49, 40, 46, 42, 43, 44, 45, 41, 47, 48}
-  };
+uint8_t PINS_NIXIE_NUM[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N] = {
+  { 9,  0,  6,  2,  3,  4,  5,  1,  7,  8},
+  {15, 14, 18, 12, 11, 10, 19, 13, 17, 16},
+  {35, 20, 38, 22, 23, 24, 39, 21, 37, 36},
+  {29, 34, 26, 32, 31, 30, 25, 33, 27, 28},
+  {55, 54, 58, 52, 51, 50, 59, 53, 57, 56},
+  {49, 40, 46, 42, 43, 44, 45, 41, 47, 48}
+};
 
-uint8_t colonPins[NIXIE_COLON_N][NIXIE_COLON_DOT_N] =
-  {
-   {PIN_COLON_R_TOP},
-   {PIN_COLON_L_TOP}
-  };
+uint8_t PINS_NIXIE_COLON[NIXIE_COLON_N][NIXIE_COLON_DOT_N] = {
+  {PIN_COLON_R_TOP},
+  {PIN_COLON_L_TOP}
+};
 
 NixieTubeArray *nta = NULL;
 
@@ -123,7 +121,7 @@ bool change_mode(Mode_t mode) {
 
   Mode_t prev_mode = curMode;
   curMode = mode;
-  log_i("mode: %s ==> %s",
+  log_d("mode: %s ==> %s",
         MODE_T_STR[prev_mode], MODE_T_STR[curMode]);
   return true;
 } // change_mode()
@@ -146,14 +144,10 @@ void do_restart() {
  *
  */
 void ntp_cb(Task_NtpInfo_t *ntp_info) {
-  log_i("sntp_stat=%d:%s",
+  log_d("sntp_stat=%d:%s",
         ntp_info->sntp_stat,
         SNTP_SYNC_STATUS_STR[ntp_info->sntp_stat]);
   
-  {
-    DateTime now_rtc = Rtc.now();
-    log_i(" RTC : %s", datetime2str(&now_rtc));
-  }
   ntpInfo = *ntp_info;
 } // ntp_cb()
 
@@ -164,15 +158,15 @@ void ntp_cb(Task_NtpInfo_t *ntp_info) {
  */
 void timer1_cb() {
   TickType_t tick1 = xTaskGetTickCount();
-  log_d("[%s] timer test: start(priority=%d)",
+  log_v("[%s] timer test: start(priority=%d)",
         Task_Ntp::get_time_str(), uxTaskPriorityGet(NULL));
 
   //  delay(TIMER_INTERVAL / 2);
 
   TickType_t tick2 = xTaskGetTickCount();
   TickType_t d_tick = tick2 - tick1;
-  log_d("%d %d", tick1, tick2);
-  log_d("[%s] timer test: end(d_tick=%d)",
+  log_v("%d %d", tick1, tick2);
+  log_v("[%s] timer test: end(d_tick=%d)",
         Task_Ntp::get_time_str(), d_tick);
 } // timer1_cb()
 
@@ -180,9 +174,9 @@ void timer1_cb() {
  *
  */
 void btnCb_Up(ButtonInfo_t *btn_info) {
-  idleStart = millis();
+  IdleStart = millis();
 
-  log_i("%s", Button::info2String(btn_info).c_str());
+  log_d("%s", Button::info2String(btn_info).c_str());
   btnInfo_Up = *btn_info;
 
   if ( btn_info->long_pressed && btn_info->repeat_count == 0 ) {
@@ -191,7 +185,7 @@ void btnCb_Up(ButtonInfo_t *btn_info) {
   }
 
   if ( btn_info->click_count >= 2 ) {
-    log_i("force AP mode");
+    log_d("force AP mode");
     TaskNetMgr->set_mode(NETMGR_MODE_AP_INIT);
     return;
   }
@@ -206,9 +200,9 @@ void btnCb_Up(ButtonInfo_t *btn_info) {
  *
  */
 void btnCb_Down(ButtonInfo_t *btn_info) {
-  idleStart = millis();
+  IdleStart = millis();
 
-  log_i("%s", Button::info2String(btn_info).c_str());
+  log_d("%s", Button::info2String(btn_info).c_str());
   btnInfo_Down = *btn_info;
 
   if ( btn_info->long_pressed && btn_info->repeat_count == 0 ) {
@@ -226,9 +220,9 @@ void btnCb_Down(ButtonInfo_t *btn_info) {
  *
  */
 void btnCb_Mode(ButtonInfo_t *btn_info) {
-  idleStart = millis();
+  IdleStart = millis();
 
-  log_i("%s", Button::info2String(btn_info).c_str());
+  log_d("%s", Button::info2String(btn_info).c_str());
   btnInfo_Mode = *btn_info;
 
   Mode_t dst_mode = Mode[curMode]->btnCb_Mode(btn_info);
@@ -244,7 +238,7 @@ void btnCb_Mode(ButtonInfo_t *btn_info) {
  *
  */
 void menu_cb(String text) {
-  log_i("text=%s", text.c_str());
+  log_d("text=%s", text.c_str());
 
   if ( text == "reboot" ) {
     do_restart();
@@ -270,23 +264,24 @@ void menu_cb(String text) {
  */
 void setup() {
   Serial.begin(115200);
-  delay(2000);
-  Serial.println("Start");
+  delay(500);
+  Serial.println("Start"); 
+  delay(3000);
 
   log_i("===== start: %s =====", MYNAME);
-  log_i("portTICK_PERIOD_MS=%d", portTICK_PERIOD_MS);
+  log_d("portTICK_PERIOD_MS=%d", portTICK_PERIOD_MS);
 
   // init I2C
-  log_i("I2C SDA:%d, SCL:%d", PIN_I2C_SDA, PIN_I2C_SCL);
+  log_d("I2C SDA:%d, SCL:%d", PIN_I2C_SDA, PIN_I2C_SCL);
   Wire.setPins(PIN_I2C_SDA, PIN_I2C_SCL);
 
   // init RTC
-  log_i("init RTC");
+  log_d("init RTC");
   Rtc.begin(&Wire);
   delay(500);
 
   DateTime now_rtc = Rtc.now();
-  log_i("RTC : %s", datetime2str(&now_rtc));
+  log_d("RTC : %s", datetime2str(&now_rtc));
 
   if ( now_rtc.year() > 2020 ) {
 
@@ -304,15 +299,15 @@ void setup() {
     // get internal clock
     time_t t_internal = time(NULL);
     struct tm *tm_internal = localtime(&t_internal);
-    log_i("adjust interval clock : %s", tm2str(tm_internal));
+    log_d("adjust interval clock : %s", tm2str(tm_internal));
 
   } else {
 
     // get internal clock
     time_t t_internal = time(NULL);
     struct tm *tm_internal = localtime(&t_internal);
-    log_i("interval clock : %s", tm2str(tm_internal));
-    log_i("tm_year=%d", tm_internal->tm_year);
+    log_d("interval clock : %s", tm2str(tm_internal));
+    log_d("tm_year=%d", tm_internal->tm_year);
 
     if ( tm_internal->tm_year + 1900 > 2000 ) {
 
@@ -323,25 +318,25 @@ void setup() {
                                        tm_internal->tm_hour,
                                        tm_internal->tm_min,
                                        tm_internal->tm_sec);
-      log_i("now_internal: %s", datetime2str(&now_internal));
+      log_d("now_internal: %s", datetime2str(&now_internal));
 
       Rtc.adjust(now_internal);
       delay(100);
 
       now_rtc = Rtc.now();
-      log_i("adjust RTC : %s", datetime2str(&now_rtc));
+      log_d("adjust RTC : %s", datetime2str(&now_rtc));
 
     }
   }
 
   // create Nixie Tube object
-  log_i("init Nixie Tube Array");
+  log_d("init Nixie Tube Array");
   nta = new NixieTubeArray(PIN_HV5812_CLK,  PIN_HV5812_STOBE,
                            PIN_HV5812_DATA, PIN_HV5812_BLANK,
-                           nixiePins, colonPins);
+                           PINS_NIXIE_NUM, PINS_NIXIE_COLON);
 
   // init OLED
-  log_i("init OLED");
+  log_d("init OLED");
   Disp = new Display_t(DISPLAY_W, DISPLAY_H);
   Disp->DispBegin(0x3C);
   Disp->setRotation(0); // XXX
@@ -361,7 +356,7 @@ void setup() {
 
   {
     DateTime now_rtc = Rtc.now();
-    log_i("AAA RTC : %s", datetime2str(&now_rtc));
+    log_d("AAA RTC : %s", datetime2str(&now_rtc));
   }
 
   TaskNixieTubeArray = new Task_NixieTubeArray(nta);
@@ -393,7 +388,7 @@ void setup() {
 
   // start timer1
   timer1.attach_ms(TIMER_INTERVAL, timer1_cb);
-  log_i("start Timer: %.1f sec", TIMER_INTERVAL / 1000.0);
+  log_d("start Timer: %.1f sec", TIMER_INTERVAL / 1000.0);
 
   // init Mode[]
   mainMode = new Mode_Main("Mode_Main", &commonData);
@@ -406,19 +401,14 @@ void setup() {
   Mode.push_back(restartMode);
 
   for (int i=0; i < Mode.size(); i++) {
-    log_i("%d:%s", i, Mode[i]->get_name().c_str());
+    log_d("%d:%s", i, Mode[i]->get_name().c_str());
     Mode[i]->setup();
   }
   change_mode(MODE_MAIN);
 
-  nta->display(0);
+  nta->display(millis());
 
-  {
-    now_rtc = Rtc.now();
-    log_i("BBB RTC : %s", datetime2str(&now_rtc));
-  }
-
-  idleStart = millis();
+  IdleStart = millis();
 } // setup()
 
 /**
@@ -441,7 +431,7 @@ void loop() {
   Disp->clearDisplay();
   
   if ( commonData.msg.length() > 0 ) {
-    log_i("msg:\"%s\"", commonData.msg.c_str());
+    log_d("msg:\"%s\"", commonData.msg.c_str());
 
     if ( commonData.msg == "restart_wifi" ) {
       TaskNetMgr->restart_wifi();
@@ -466,14 +456,15 @@ void loop() {
 
   Mode[curMode]->display(Disp);
 
-  // idle ms
-  unsigned long idle_ms = millis() - idleStart;
-  if ( idle_ms >= IDEL_RESET
-       && commonData.netmgr_info->mode != NETMGR_MODE_WIFI_ON ) {
-    log_i("idle_ms=%d .. reboot", idle_ms);
-    //ESP.restart();
-    ESP.deepSleep(100);
-    delay(500);
+  if ( commonData.netmgr_info->mode != NETMGR_MODE_WIFI_ON ) {
+    // idle ms
+    unsigned long idle_ms = cur_ms - IdleStart;
+    if ( idle_ms >= IDLE_RESET ) {
+      log_d("idle_ms=%u .. reboot", idle_ms);
+      //ESP.restart();
+      ESP.deepSleep(100);
+      delay(500);
+    }
   }
   
   //nta->display(cur_ms);

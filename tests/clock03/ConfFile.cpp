@@ -25,7 +25,7 @@ int ConfFile::load() {
 
   while ( int fsize = this->file.available() ) {
     String line = this->read_line();
-    log_i("%d: %d: \"%s\"", this->line_count, fsize, line.c_str());
+    log_d("%d: %d: \"%s\"", this->line_count, fsize, line.c_str());
   }
   this->file.close();
 
@@ -53,7 +53,7 @@ int ConfFile::save() {
  *
  */
 bool ConfFile::open_read() {
-  log_i("%s", this->file_name.c_str());
+  log_d("%s", this->file_name.c_str());
 
   this->file = SPIFFS.open(this->file_name, "r");
   if ( ! this->file ) {
@@ -68,7 +68,7 @@ bool ConfFile::open_read() {
  *
  */
 bool ConfFile::open_write() {
-  log_i("%s", this->file_name.c_str());
+  log_d("%s", this->file_name.c_str());
 
   this->file = SPIFFS.open(this->file_name, "w");
   if ( ! this->file ) {
@@ -99,7 +99,7 @@ String ConfFile::read_line() {
   String line = this->file.readStringUntil('\n');
   line.trim(); // XXX Important !!
   this->line_count++;
-  log_i("%5d|%s|", line_count, line.c_str());
+  log_d("%5d|%s|", line_count, line.c_str());
   return line;
 } // ConfFile::read_line()
 
@@ -110,6 +110,6 @@ String ConfFile::write_line(String line) {
   line.trim(); // XXX Important !!
   this->file.println(line);
   this->line_count++;
-  log_i("%5d|%s|", line_count, line.c_str());
+  log_d("%5d|%s|", line_count, line.c_str());
   return line;
 } // ConfFile::write_line()

@@ -16,7 +16,7 @@ Task_NixieTubeArray::Task_NixieTubeArray(NixieTubeArray *nta)
  * 
  */
 void Task_NixieTubeArray::setup() {
-  log_i("%s", this->conf.name);
+  log_d("%s", this->conf.name);
 
   Nta->brightness = BRIGHTNESS_RESOLUTION / 4;
 
@@ -43,7 +43,7 @@ void Task_NixieTubeArray::setup() {
  *
  */
 void Task_NixieTubeArray::loop() {
-  //log_i("%s", this->conf.name);
+  //log_d("%s", this->conf.name);
   unsigned long cur_ms = millis();
   
   Nta->display(cur_ms);

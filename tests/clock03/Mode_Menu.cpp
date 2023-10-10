@@ -102,30 +102,30 @@ Mode_t Mode_Menu::reBtn_cb(ButtonInfo_t *bi) {
    * bi->click_count == 1
    */
   OledMenuDst_t dst = this->curMenu->select();
-  log_i("dst.type=%s", OLED_MENU_DST_TYPE_STR[dst.type]);
+  log_d("dst.type=%s", OLED_MENU_DST_TYPE_STR[dst.type]);
 
   switch ( dst.type ) {
   case OLED_MENU_DST_TYPE_MENU:
-    log_i("dst.obj.menu=%s", dst.obj.menu->title_str());
+    log_d("dst.obj.menu=%s", dst.obj.menu->title_str());
     this->curMenu = dst.obj.menu;
     break;
 
   case OLED_MENU_DST_TYPE_MODE:
-    log_i("dst.obj.mode=%s", MODE_T_STR[dst.obj.mode]);
+    log_d("dst.obj.mode=%s", MODE_T_STR[dst.obj.mode]);
     dst_mode = dst.obj.mode;
     break;
 
   case OLED_MENU_DST_TYPE_FUNC:
-    log_i("call dst.obj.func(dst.param)");
+    log_d("call dst.obj.func(dst.param)");
     dst.obj.func(dst.param);
     dst_mode = MODE_MAIN;
     break;
 
   case OLED_MENU_DST_TYPE_TEXT:
-    log_i("dst.obj.text=\"%s\"", dst.obj.text);
+    log_d("dst.obj.text=\"%s\"", dst.obj.text);
 
     if ( this->cb != NULL  ) {
-      log_i("call this->cb(\"%s\")", dst.obj.text);
+      log_d("call this->cb(\"%s\")", dst.obj.text);
       (*(this->cb))(String(dst.obj.text));
     }
     break;

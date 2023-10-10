@@ -23,14 +23,14 @@ String Mode::get_name() {
  * 最初の初期化
  */
 void Mode::setup() {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
 } // Mode::setup()
 
 /**
  * モード切替時に毎回実行
  */
 bool Mode::enter(Mode_t prev_mode) {
-  log_i("%s: prev_mode=%s", this->name.c_str(), MODE_T_STR[prev_mode]);
+  log_d("%s: prev_mode=%s", this->name.c_str(), MODE_T_STR[prev_mode]);
   this->prev_mode = prev_mode;
   return true;
 } // Mode::resume()
@@ -39,7 +39,7 @@ bool Mode::enter(Mode_t prev_mode) {
  * モード切替時に毎回実行
  */
 bool Mode::exit() {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
   return true;
 } // Mode::resume()
 
@@ -54,7 +54,7 @@ void Mode::loop(unsigned long cur_ms) {
  *
  */
 Mode_t Mode::btnCb_Mode(ButtonInfo_t *bi) {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
   return MODE_N;
 } // Mode::btnCb_Mode()
 
@@ -62,7 +62,7 @@ Mode_t Mode::btnCb_Mode(ButtonInfo_t *bi) {
  *
  */
 Mode_t Mode::btnCb_Up(ButtonInfo_t *bi) {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
   return MODE_N;
 } // Mode::btnCb_Up()
 
@@ -70,7 +70,7 @@ Mode_t Mode::btnCb_Up(ButtonInfo_t *bi) {
  *
  */
 Mode_t Mode::btnCb_Down(ButtonInfo_t *bi) {
-  log_i("%s", this->name.c_str());
+  log_d("%s", this->name.c_str());
   return MODE_N;
 } // Mode::btnCb_Down()
 

@@ -12,7 +12,7 @@ Task::Task(String name,
   if ( nameString.length() > TASK_NAME_LEN ) {
     nameString = nameString.substring(0, TASK_NAME_LEN);
   }
-  log_d("nameString=%s", nameString.c_str());
+  log_v("nameString=%s", nameString.c_str());
   strcpy(this->conf.name, nameString.c_str());
 
   this->conf.handle = NULL;
@@ -37,7 +37,7 @@ void Task::start() {
                                         &(this->conf.handle),
                                         this->conf.core);
   delay(100);
-  log_i("Start:%s(Stack:%dB,Priority:%d,CPU:%d,handle:%X): ret=%d",
+  log_d("Start:%s(Stack:%dB,Priority:%d,CPU:%d,handle:%X): ret=%d",
         this->conf.name, this->conf.stack_size, this->conf.priority,
         this->conf.core, this->conf.handle,
         ret);
@@ -63,14 +63,14 @@ bool Task::is_active() {
  *
  */
 void Task::setup() {
-  log_d("%s", this->conf.name);
+  log_v("%s", this->conf.name);
 } // Task::setup()
 
 /**
  *
  */
 void Task::loop() {
-  log_d("%s", this->conf.name);
+  log_v("%s", this->conf.name);
   delay(1000);
 } // Task::loop()
 

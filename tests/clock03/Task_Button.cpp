@@ -28,10 +28,10 @@ Task_Button::Task_Button(String btn_name, uint8_t pin,
       }
     }
     outQue = this->_out_que;
-    log_i("new Que: %X", outQue);
+    log_d("new Que: %X", outQue);
   } else {
     this->_out_que = outQue;
-    log_i("reuse Que: %X", outQue);
+    log_d("reuse Que: %X", outQue);
   }
 } // Task_Button::Task_Button
 
@@ -39,7 +39,7 @@ Task_Button::Task_Button(String btn_name, uint8_t pin,
  *
  */
 void Task_Button::setup() {
-  log_d("%s", this->btn_name.c_str());
+  log_v("%s", this->btn_name.c_str());
 } // Task_Button::setup()
 
 /**
@@ -50,7 +50,7 @@ void Task_Button::loop() {
     portBASE_TYPE ret = xQueueSend(outQue,
                                    (void *)&(this->btn->info), 10);
     if ( ret == pdPASS ) {
-      log_d("que < %s", this->btn->toString().c_str());
+      log_v("que < %s", this->btn->toString().c_str());
     } else {
       log_w("que X< %s: ret=%d", this->btn->toString().c_str(), ret);
     }
@@ -76,7 +76,7 @@ void IRAM_ATTR Task_Button::intr_hdr(void *btn_obj) {
   if ( ! btn->get() ) {
     return;
   }
-  isr_log_d("btn->info.name=%s", btn->info.name);
+  isr_log_v("btn->info.name=%s", btn->info.name);
 
   // send to queue
   static BaseType_t xHigherPriorityTaskWoken;
@@ -85,13 +85,13 @@ void IRAM_ATTR Task_Button::intr_hdr(void *btn_obj) {
                                         (void *)&(btn->info),
                                         &xHigherPriorityTaskWoken);
   if ( ret == pdPASS) {
-    isr_log_d("que < %s", btn->toString().c_str());
+    isr_log_v("que < %s", btn->toString().c_str());
   } else {
     isr_log_e("send que failed: %s: ret=%d", btn->toString().c_str(), ret);
   }
   
   if ( xHigherPriorityTaskWoken ) {
-    isr_log_d("portYIELD_FROM_ISR()");
+    isr_log_v("portYIELD_FROM_ISR()");
     portYIELD_FROM_ISR();
   }
 } // Task_Button::intr_hdr()
@@ -104,10 +104,10 @@ portBASE_TYPE Task_Button::get(ButtonInfo_t *btn_info) {
   if ( ret == pdPASS ) {
     if ( String(btn_info->name) == this->btn_name ) {
       ret = xQueueReceive(outQue, (void *)btn_info, 0);
-      log_d("%s:que > %s", this->btn_name.c_str(),
+      log_v("%s:que > %s", this->btn_name.c_str(),
             Button::info2String(btn_info).c_str());
     } else {
-      log_d("%s:que >X %s", this->btn_name.c_str(), 
+      log_v("%s:que >X %s", this->btn_name.c_str(), 
             Button::info2String(btn_info).c_str());
       ret = pdFALSE;
       delay(2);
@@ -120,7 +120,7 @@ portBASE_TYPE Task_Button::get(ButtonInfo_t *btn_info) {
  * defulat callback
  */
 static void _button_cb(ButtonInfo_t *btn_info) {
-  log_i("%s", Button::info2String(btn_info).c_str());
+  log_d("%s", Button::info2String(btn_info).c_str());
 } // _button_cb()
 
 /**
@@ -158,7 +158,7 @@ ButtonInfo_t *Task_ButtonWatcher::get_btn_info() {
  *
  */
 void Task_ButtonWatcher::setup() {
-  log_i("%s", this->conf.name);
+  log_d("%s", this->conf.name);
 
   this->_btn_task = new Task_Button(this->_btn_name,
                                     this->_pin,

@@ -28,7 +28,7 @@ Button::Button(String name, uint8_t pin, void (*intr_hdr)(void *btn)) {
 
   if ( intr_hdr != NULL ) {
     uint8_t intrPin = digitalPinToInterrupt(this->info.pin);
-    log_i("%s: intrPin=%d", this->info.name, intrPin);
+    log_d("%s: intrPin=%d", this->info.name, intrPin);
     attachInterruptArg(intrPin, intr_hdr, this, CHANGE);
   }
 } // Button::Button()
@@ -57,7 +57,7 @@ boolean Button::get() {
         // click count is detected
         this->info.click_count = this->info.push_count;
         this->info.push_count = 0;
-        // log_i("[%s] click_count=%d", this->info.name, this->info.click_count);
+        // log_d("[%s] click_count=%d", this->info.name, this->info.click_count);
         ret = true;
       }
     }
@@ -69,10 +69,10 @@ boolean Button::get() {
 
     if ( this->info.prev_value == Button::ON) {
       // Released now !
-      // log_i("[%s] released", this->info.name);
+      // log_d("[%s] released", this->info.name);
       return true;
     }
-    // if ( ret ) log_i("[%s] ret=%d", this->info.name, ret);
+    // if ( ret ) log_d("[%s] ret=%d", this->info.name, ret);
     return ret;
   }
 
@@ -84,7 +84,7 @@ boolean Button::get() {
     if ( this->info.push_count == 1 ) {
       this->info.first_press_start = cur_msec;
     }
-    // log_i("[%s] pushed", this->info.name);
+    // log_d("[%s] pushed", this->info.name);
     return true;
   }
 
@@ -93,10 +93,10 @@ boolean Button::get() {
     if ( cur_msec - this->info.press_start > LONG_PRESS_MSEC ) {
       this->info.long_pressed = true;
       this->info.press_start = cur_msec;
-      // log_i("[%s] long", this->info.name);
+      // log_d("[%s] long", this->info.name);
       return true;
     } else {
-      // if ( ret ) log_i("[%s] ret=%d", this->info.name, ret);
+      // if ( ret ) log_d("[%s] ret=%d", this->info.name, ret);
       return ret;
     }
   }
@@ -105,11 +105,11 @@ boolean Button::get() {
   if ( cur_msec - this->info.press_start > REPEAT_MSEC ) {
     this->info.repeat_count++;
     this->info.press_start = cur_msec;
-    // log_i("[%s] repeat", this->info.name);
+    // log_d("[%s] repeat", this->info.name);
     return true;
   }
 
-  // if ( ret ) log_i("[%s] ret=%d", this->info.name, ret);
+  // if ( ret ) log_d("[%s] ret=%d", this->info.name, ret);
   return ret;
 } // Button::get()
 

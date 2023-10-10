@@ -7,7 +7,7 @@
  * defulat callback
  */
 static void _ntp_cb(Task_NtpInfo_t *ntp_info) {
-  log_i("ntp_info.sntp_stat=%d", ntp_info->sntp_stat);
+  log_d("ntp_info.sntp_stat=%d", ntp_info->sntp_stat);
 } // _ntp_cb()
 
 /** static function
@@ -106,12 +106,12 @@ void Task_Ntp::loop() {
    */
   static sntp_sync_status_t prev_stat = SNTP_SYNC_STATUS_RESET;
   this->info.sntp_stat = sntp_get_sync_status();
-  log_i("start sync [%s]..", SNTP_SYNC_STATUS_STR[this->info.sntp_stat]);
+  log_d("start sync [%s]..", SNTP_SYNC_STATUS_STR[this->info.sntp_stat]);
 
   if ( this->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
     interval = INTERVAL_NORMAL;
     if ( prev_stat != SNTP_SYNC_STATUS_COMPLETED ) {
-      log_i("%s: NTP sync done: sntp_stat=%s(%d), interval=%'d",
+      log_d("%s: NTP sync done: sntp_stat=%s(%d), interval=%'d",
             get_time_str(),
             SNTP_SYNC_STATUS_STR[this->info.sntp_stat], this->info.sntp_stat,
             interval);
@@ -119,14 +119,14 @@ void Task_Ntp::loop() {
 
   } else if ( this->info.sntp_stat == SNTP_SYNC_STATUS_IN_PROGRESS ) {
     interval = INTERVAL_PROGRESS;
-    log_i("%s: NTP sync progress: sntp_stat=%s(%d), interval=%'d",
+    log_d("%s: NTP sync progress: sntp_stat=%s(%d), interval=%'d",
           get_time_str(),
           SNTP_SYNC_STATUS_STR[this->info.sntp_stat], this->info.sntp_stat,
           interval);
 
   } else {
     interval = INTERVAL_NO_WIFI;
-    log_i("%s: NTP sync retry: sntp_stat=%s(%d), interval=%'d",
+    log_d("%s: NTP sync retry: sntp_stat=%s(%d), interval=%'d",
           get_time_str(),
           SNTP_SYNC_STATUS_STR[this->info.sntp_stat], this->info.sntp_stat,
           interval);

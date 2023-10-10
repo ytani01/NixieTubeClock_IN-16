@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #ifndef _NETMGR_H_
 #define _NETMGR_H_
@@ -19,7 +19,6 @@ typedef enum {
   NETMGR_MODE_WAIT_CONNECT,
   NETMGR_MODE_AP_INIT,
   NETMGR_MODE_AP_LOOP,
-  NETMGR_MODE_SCANNING_SSID,
   NETMGR_MODE_WIFI_ON,
   NETMGR_MODE_WIFI_OFF,
   NETMGR_MODE_N
@@ -31,7 +30,6 @@ static const char *NETMGR_MODE_STR[] = {
   "WAIT_CONNECT",
   "AP_INIT",
   "AP_LOOP",
-  "SCANNING_SSID",
   "WIFI_ON",
   "WIFI_OFF"
 };
@@ -52,7 +50,7 @@ static const char *WL_STATUS_T_STR[] = {
 class NetMgr {
 public:
   static const unsigned int WAIT_CONNECT_INTERVAL  = 1000; // ms
-  static const unsigned int WAIT_CONNECT_COUNT_MAX = 5;
+  static const unsigned int WAIT_CONNECT_COUNT_MAX = 10;
   static const unsigned int TRY_CONNECT_COUNT_MAX = 3;
   
   static const unsigned int SSID_N_MAX = 40;

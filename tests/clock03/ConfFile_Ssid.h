@@ -15,6 +15,7 @@ class ConfFile_Ssid: public ConfFile {
   static constexpr char *FILE_NAME = (char *)"/ssid";
 
   std::unordered_map<std::string, std::string> ent;
+  //std::unordered_map<String, String> ent2;
 
   ConfFile_Ssid();
   virtual int load();

@@ -8,7 +8,7 @@
 Task_ButtonWatcher *taskBtnWatcher=NULL;
 :
 void cb(ButtonInfo *btn_info) {
-  log_i("%s", Button::info2String(btn_info).c_str());
+  log_d("%s", Button::info2String(btn_info).c_str());
   :
 }
 :
@@ -34,7 +34,7 @@ whie (true) {
 
   portBASE_TYPE ret = taskBtn->get(&btn_info);
   if ( ret == pdPASS ) {
-    log_i("%s", Button::info2String(&btn_info).c_str();
+    log_d("%s", Button::info2String(&btn_info).c_str();
     :
   }
 }

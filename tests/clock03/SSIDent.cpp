@@ -69,6 +69,7 @@ String SSIDent::encType() {
  */
 String SSIDent::toString(boolean flag_ssid, boolean flag_dbm, boolean flag_enctype) {
   String str = "";
+
   if ( flag_ssid ) {
     str += this->_ssid + " ";
   }
