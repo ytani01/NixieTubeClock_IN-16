@@ -88,7 +88,8 @@ void IRAM_ATTR Task_ButtonWorker::intr_hdr(void *btn_obj) {
   } else {
     isr_log_e("send que failed: %s: ret=%d", btn->toString().c_str(), ret);
   }
-  
+
+  // XXX TBD
   if ( xHigherPriorityTaskWoken ) {
     isr_log_v("portYIELD_FROM_ISR()");
     portYIELD_FROM_ISR();
