@@ -3,23 +3,36 @@
  *
 ### Example1 (recommeded): Task_ButtonWatcher ###
 ```
+#include <map>
 #include "Task_ButtonWatcher.h"
 :
-static const uint8_t PIN_BTN0 = 10;
-static const uint8_t PIN_BTN1 = 11;
+static const std::map<const char *, uint8_t> PIN_BTN = {
+  {"Btn0", 10},
+  {"Btn1", 11},
+  {"Btn2", 12},
+};
 :
 Task_ButtonWatcher *taskBtnWatcher=NULL;
 :
-void cb(ButtonInfo *btn_info) {
-  log_d("%s", Button::info2String(btn_info).c_str());
+void cb(ButtonInfo *bi) {
+  log_d("%s", Button::info2String(bi).c_str());
+  :
+  if ( String(bi->name) == "Btn0" ) {
+    :
+  }
+  :
+  if ( bi->click_count >= 1 ) {
+    :
+  }
   :
 }
 :
 void setup() {
   :
   taskBtnWatcher = new Task_ButtonWatcher(cb);
-  taskBtnWatcher->addBtn("Button0", PIN_BTN0);
-  taskBtnWatcher->addBtn("Button1", PIN_BTN1);
+  for (auto btn: PIN_BTN) {
+    taskBtnWatcher->addBtn(String(btn.first), btn.second);
+  }
   taskBtnWatcher->start();
   :
 }
