@@ -4,6 +4,8 @@
 #include "ModeB.h"
 
 void ModeB::loop() {
-  log_d("name: %s", this->name.c_str());
-  delay(1000);
+  log_d("%s: name: %s",
+        SysClock::now_str(),
+        this->name.c_str());
+  delay(5000);
 }
