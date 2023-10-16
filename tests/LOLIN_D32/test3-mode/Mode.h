@@ -6,25 +6,31 @@
 
 #include <Arduino.h>
 #include <esp32-hal-log.h>
-#include <vector>
+#include <map>
+#include "commonlib.h"
 
 /**
  *
  */
 class Mode {
 public:
-  static std::vector<Mode *> mode;
-  static Mode *prev_mode;
+  static std::map<std::string, Mode *> Ent;
+  static Mode *Cur;
+  static Mode *Prev;
 
-  String name;
+  String name = "";
 
-  Mode(String name);
+  Mode();
+
+  static void add(String name, Mode *mode);
+  static void set(String name);
 
   virtual void setup();
   virtual bool enter();
-  virtual bool exit();
   virtual void loop();
+  virtual bool exit();
 
+protected:
 }; // class Mode
 
 #endif // _MODE_H_

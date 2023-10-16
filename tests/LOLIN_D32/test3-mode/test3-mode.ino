@@ -3,9 +3,14 @@
  */
 #include <map>
 #include <esp32-hal-log.h>
+
 #include "Task_ButtonWatcher.h"
 #include "SysClock.h"
 #include "MyRtc.h"
+
+#include "Mode.h"
+#include "ModeA.h"
+#include "ModeB.h"
 
 // Buttons
 static const std::map<const char *, uint8_t> PIN_BTN = {
@@ -17,6 +22,7 @@ Task_ButtonWatcher *taskBtnWatcher = NULL;
 
 // RTC
 MyRtc *Rtc;
+
 
 /**
  *
@@ -45,6 +51,19 @@ void cbBtn(ButtonInfo_t *bi) {
       DateTime dt_rtc = Rtc->now();
       log_i(" dt_rtc: %s", datetime2str(&dt_rtc));
       taskBtnWatcher->enable();
+
+      if ( ! Mode::Cur ) {
+        log_w("Mode::Cur is NULL !?");
+        return;
+      }
+      if ( Mode::Cur->name == "ModeA" ) {
+        Mode::set("ModeB");
+        return;
+      }
+      if ( Mode::Cur->name == "ModeB" ) {
+        Mode::set("ModeA");
+        return;
+      }
     }
 
     if (String(bi->name) == "Btn1") {
@@ -73,20 +92,35 @@ void setup() {
 
   log_i("SysClock : %s", SysClock::now_str());
 
+  // RTC
   Rtc = new MyRtc();
   Rtc->begin();
   DateTime dt_rtc = Rtc->now();
   log_i("RTC      : %s", datetime2str(&dt_rtc));
 
+  // SysClock
   SysClock::set(&dt_rtc);
   log_i("SysClock : %s", SysClock::now_str());
 
+  // Button
   taskBtnWatcher = new Task_ButtonWatcher(cbBtn);
+
   for (auto btn: PIN_BTN) {
-    log_i("{%s %d}", btn.first, btn.second);
+    log_v("{%s %d}", btn.first, btn.second);
     taskBtnWatcher->addBtn(String(btn.first), btn.second);
   }
+
   taskBtnWatcher->start();
+
+  // Mode
+  Mode::add("ModeA", new ModeA());
+  Mode::add("ModeB", new ModeB());
+
+  for (auto m: Mode::Ent) {
+    m.second->setup();
+  }
+
+  Mode::set("ModeA");
 
 } // setup()
 
@@ -94,5 +128,12 @@ void setup() {
  *
  */
 void loop() {
-  delay(5000);
+  log_v("class %s", __CLASS_NAME__.c_str());
+
+  if ( Mode::Cur ) {
+    Mode::Cur->loop();
+  } else {
+    log_e("Mode::Cur == NULL !?");
+    delay(2000);
+  }
 } // loop()

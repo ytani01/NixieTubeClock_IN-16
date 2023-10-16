@@ -14,12 +14,12 @@
 class Task_ButtonWorker: public Task {
 public:
   static const TickType_t DEF_RECV_QUE_TIMEOUT = 1000;
+  static const UBaseType_t Q_SIZE = 16;
 
   static const uint32_t STACK_SIZE_DEF = 4 * 1024;
   static const UBaseType_t PRIORITY_DEF = 0;
   static const UBaseType_t CORE_DEF = APP_CPU_NUM;
 
-  static const UBaseType_t Q_SIZE = 16;
   static QueueHandle_t BtnQue; // static for interrupt function
 
   Task_ButtonWorker(uint32_t stack_size=STACK_SIZE_DEF,

@@ -3,11 +3,62 @@
  */
 #include "Mode.h"
 
+std::map<std::string, Mode *> Mode::Ent;
+Mode *Mode::Cur = (Mode *)NULL;
+Mode *Mode::Prev = (Mode *)NULL;
+
+/** static
+ *
+ */
+void Mode::add(String name, Mode *mode) {
+  std::string name_string = name.c_str();
+
+  Mode::Ent.emplace(name_string, mode);
+
+  Mode::Ent.at(name_string)->name = name;
+
+  log_d("size: %d, name: %s, mode: 0x%X",
+        Mode::Ent.size(), name_string.c_str(), mode);
+} // Mode::add()
+
+/** static
+ *
+ */
+void Mode::set(String name) {
+  if ( Mode::Ent.size() == 0 ) {
+    log_e("Mode::Ent is empty");
+    return;
+  }
+
+  Mode::Prev = Mode::Cur;
+
+  String prev_name = "";
+  if ( Mode::Prev ) {
+    Mode::Prev->exit();
+
+    prev_name = Mode::Prev->name; // String --> std::string
+  }
+
+  std::string name_string = name.c_str();
+  try {
+    Mode::Cur = Mode::Ent.at(name_string);
+  }
+  catch (const std::out_of_range e) {
+    log_e("Mode:%s is not found", name_string.c_str());
+    return;
+  }
+
+  log_d("%s --> %s", prev_name, Mode::Cur->name.c_str());
+
+  Mode::Cur->enter();
+  
+} // Mode::set()
+
 /** constructor
  *
  */
-Mode::Mode(String name) {
-  this->name = name;
+Mode::Mode() {
+  log_v("");
 } // Mode::Mode()
 
 /**
@@ -21,7 +72,7 @@ void Mode::setup() {
  * モード切替時に毎回実行
  */
 bool Mode::enter() {
-  log_d("mode: %s --> %s", Mode::prev_mode->name.c_str(), this->name.c_str());
+  log_d("enter mode: %s", this->name.c_str());
   return true;
 } // Mode::resume()
 
@@ -29,7 +80,7 @@ bool Mode::enter() {
  * モード切替時に毎回実行
  */
 bool Mode::exit() {
-  log_d("%s", this->name.c_str());
+  log_d("exit mode %s", this->name.c_str());
   return true;
 } // Mode::resume()
 
