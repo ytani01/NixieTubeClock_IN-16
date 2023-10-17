@@ -10,4 +10,6 @@ class ModeA: public Mode {
   ModeA();
 
   virtual void loop();
+
+  virtual void cbBtn(ButtonInfo_t *bi);
 };

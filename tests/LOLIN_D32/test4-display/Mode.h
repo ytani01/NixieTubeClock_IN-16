@@ -9,6 +9,13 @@
 #include <map>
 #include "commonlib.h"
 #include "SysClock.h"
+#include "Button.h"
+#include "MyRtc.h"
+
+// from main ino
+extern MyRtc *Rtc;
+extern void enableIntr();
+extern void disableIntr();
 
 /**
  *
@@ -30,6 +37,8 @@ public:
   virtual bool enter();
   virtual void loop();
   virtual bool exit();
+
+  virtual void cbBtn(ButtonInfo_t *bi);
 
 protected:
 }; // class Mode

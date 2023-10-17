@@ -96,3 +96,10 @@ void Mode::loop() {
 
   return;
 } // Mode::resume()
+
+/**
+ *
+ */
+void Mode::cbBtn(ButtonInfo_t *bi) {
+  log_d("%s", Button::info2String(bi).c_str());
+} // Mode::cbBtn()

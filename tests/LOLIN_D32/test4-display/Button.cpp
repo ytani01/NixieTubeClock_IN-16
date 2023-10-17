@@ -183,8 +183,9 @@ ButtonCount_t Button::get_repeat_count() {
 /** [static]
  *
  */
-String Button::info2String(ButtonInfo_t *info, bool interrupted) {
-  char buf[128];
+char* Button::info2str(ButtonInfo_t *info, bool interrupted) {
+  static char buf[128];
+
   String intrString = interrupted ? "!" : "*";
   String valueString = info->value ? "H(OFF)" : "L(ON )";
   String longPressedString = info->long_pressed ? "L" : "-";
@@ -195,7 +196,14 @@ String Button::info2String(ButtonInfo_t *info, bool interrupted) {
           info->push_count, info->click_count,
           longPressedString.c_str(), info->repeat_count);
 
-  return String(buf);
+  return buf;
+} // Button::info2String()
+
+/** [static]
+ *
+ */
+String Button::info2String(ButtonInfo_t *info, bool interrupted) {
+  return Button::info2str(info, interrupted);
 } // Button::info2String()
 
 /**

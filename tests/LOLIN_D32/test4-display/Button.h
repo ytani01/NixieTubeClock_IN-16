@@ -98,6 +98,7 @@ class Button {
   bool is_long_pressed();
   ButtonCount_t get_repeat_count();
 
+  static char* info2str(ButtonInfo_t *info, bool interrupted=false);
   static String info2String(ButtonInfo_t *info, bool interrupted=false);
   String toString(bool interrupted=false);
 };

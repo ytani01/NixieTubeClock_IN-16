@@ -13,6 +13,7 @@ String get_mac_addr_String();
 
 static const int DATETIME_STR_LEN = 128;
 
+DateTime tm2datetime(struct tm *tm);
 char *tm2str(struct tm *tm, const char fmt[]="%Y/%m/%d(%a) %H:%M:%S");
 char *datetime2str(DateTime *dt);
 

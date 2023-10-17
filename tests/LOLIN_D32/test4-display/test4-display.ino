@@ -27,58 +27,22 @@ MyRtc *Rtc;
 /**
  *
  */
+void enableIntr() {
+  taskBtnWatcher->enable();
+}
+
+/**
+ *
+ */
+void disableIntr() {
+  taskBtnWatcher->disable();
+}
+
+/**
+ *
+ */
 void cbBtn(ButtonInfo_t *bi) {
-  if ( bi->click_count >= 1 ) {
-    log_d("%s", Button::info2String(bi).c_str());
-    return;
-  }
-  if ( bi->value == Button::ON ) {
-    log_i("%s", Button::info2String(bi).c_str());
-
-    struct tm *tm_sys = SysClock::now_tm();
-    log_i(" tm_sys: %s", tm2str(tm_sys));
-
-    if (String(bi->name) == "Btn0") {
-      DateTime dt_sys = DateTime(tm_sys->tm_year + 1900,
-                                 tm_sys->tm_mon + 1,
-                                 tm_sys->tm_mday,
-                                 tm_sys->tm_hour,
-                                 tm_sys->tm_min,
-                                 tm_sys->tm_sec);
-      
-      taskBtnWatcher->disable();
-      Rtc->adjust(dt_sys);
-      DateTime dt_rtc = Rtc->now();
-      log_i(" dt_rtc: %s", datetime2str(&dt_rtc));
-      taskBtnWatcher->enable();
-
-      if ( ! Mode::Cur ) {
-        log_w("Mode::Cur is NULL !?");
-        return;
-      }
-      if ( Mode::Cur->name == "ModeA" ) {
-        Mode::set("ModeB");
-        return;
-      }
-      if ( Mode::Cur->name == "ModeB" ) {
-        Mode::set("ModeA");
-        return;
-      }
-    }
-
-    if (String(bi->name) == "Btn1") {
-      tm_sys->tm_mon++;
-      log_i(">tm_sys: %s", tm2str(tm_sys));
-    }
-
-    if (String(bi->name) == "Btn2") {
-      tm_sys->tm_mon--;
-      log_i(">tm_sys: %s", tm2str(tm_sys));
-    }
-
-    SysClock::set(tm_sys);
-    return;
-  }
+  Mode::Cur->cbBtn(bi);
 } // cbBtn()
 
 /**

@@ -22,7 +22,17 @@ String get_mac_addr_String() {
 } // get_mac_addr_String()
 
 /**
- * struct tm --> string
+ * struct tm --> DateTime
+ */
+DateTime tm2datetime(struct tm *tm) {
+  return DateTime(tm->tm_year + 1900,
+                  tm->tm_mon + 1,
+                  tm->tm_mday,
+                  tm->tm_hour, tm->tm_min, tm->tm_sec);
+} // tm2datetime()
+
+/**
+ * @brief  struct tm --> string
  */
 char *tm2str(struct tm *tm, const char fmt[]) {
   static char buf[DATETIME_STR_LEN];
@@ -33,7 +43,7 @@ char *tm2str(struct tm *tm, const char fmt[]) {
 } // tm2str()
 
 /**
- * DateTime --> string
+ * @brief  DateTime --> string
  */
 char *datetime2str(DateTime *dt) {
   time_t t = (time_t)dt->unixtime();
