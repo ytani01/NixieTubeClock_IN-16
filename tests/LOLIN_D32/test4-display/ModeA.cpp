@@ -12,6 +12,25 @@ ModeA::ModeA(): Mode() {
 /**
  *
  */
+bool ModeA::enter() {
+  log_d("enter mode: %s", this->name.c_str());
+
+  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
+  Disp->setTextColor(WHITE, BLACK);
+
+  Disp->setFont(NULL);
+  Disp->setTextSize(1);
+  Disp->setCursor(0, 0);
+  Disp->setTextWrap(true);
+  Disp->printf("%s", this->name.c_str());
+  Disp->display();
+
+  return true;
+} // ModeA::en
+
+/**
+ *
+ */
 void ModeA::loop() {
   log_d("%s: class %s: name: %s",
         SysClock::now_str(),

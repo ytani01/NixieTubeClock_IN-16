@@ -7,10 +7,14 @@
 #include "Task_ButtonWatcher.h"
 #include "SysClock.h"
 #include "MyRtc.h"
+#include "Display.h"
 
 #include "Mode.h"
 #include "ModeA.h"
 #include "ModeB.h"
+
+// OLED Display
+Display_t *Disp;
 
 // Buttons
 static const std::map<const char *, uint8_t> PIN_BTN = {
@@ -55,6 +59,13 @@ void setup() {
   log_i("===== start %s =====", get_mac_addr_String().c_str());
 
   log_i("SysClock : %s", SysClock::now_str());
+
+  // Display
+  Disp = new Display_t(DISPLAY_W, DISPLAY_H);
+  Disp->DispBegin(DISP_ADDR);
+  Disp->setRotation(2);
+  Disp->clearDisplay();
+  Disp->display();
 
   // RTC
   Rtc = new MyRtc();

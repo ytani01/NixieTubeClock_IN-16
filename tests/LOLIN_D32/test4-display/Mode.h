@@ -9,10 +9,12 @@
 #include <map>
 #include "commonlib.h"
 #include "SysClock.h"
+#include "Display.h"
 #include "Button.h"
 #include "MyRtc.h"
 
 // from main ino
+extern Display_t *Disp;
 extern MyRtc *Rtc;
 extern void enableIntr();
 extern void disableIntr();
