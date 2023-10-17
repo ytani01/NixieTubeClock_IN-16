@@ -7,13 +7,16 @@
 #include <RTClib.h>
 #include "commonlib.h"
 
+#define MY_RTC RTC_DS3231
+
 /**
  * set Rename super class name
  */
-class MyRtc: public RTC_DS3231 {
+class MyRtc: public MY_RTC {
 public:
 
-  void adjust_tm(struct tm *tm);
+  void adjust(const DateTime &dt);
+  void adjust(struct tm *tm);
 }; // class MyRtc
 
 #endif // _MY_RTC_
