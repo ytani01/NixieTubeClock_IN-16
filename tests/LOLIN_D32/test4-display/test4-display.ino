@@ -13,6 +13,10 @@
 #include "ModeA.h"
 #include "ModeB.h"
 
+
+bool Flag_ReqModeChange = false;
+bool Flag_LoopRunning = false;
+
 // OLED Display
 Display_t *Disp;
 
@@ -106,7 +110,22 @@ void loop() {
   log_v("class %s", __CLASS_NAME__.c_str());
 
   if ( Mode::Cur ) {
+    Flag_LoopRunning = true;
     Mode::Cur->loop();
+    Flag_LoopRunning = false;
+
+    unsigned long wait_count = 0;
+    while ( Flag_ReqModeChange ) {
+      //delay(1);
+      //delayMicroseconds(1); // X
+      //ets_delay_us(1); // X
+      wait_count++;
+      auto xLastTime = xTaskGetTickCount();
+      vTaskDelayUntil(&xLastTime, 1);
+    }
+    if ( wait_count > 0 ) {
+      log_d("wait_count=%u", wait_count);
+    }
   } else {
     log_e("Mode::Cur == NULL !?");
     delay(2000);

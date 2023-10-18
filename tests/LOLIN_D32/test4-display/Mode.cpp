@@ -30,27 +30,49 @@ void Mode::set(String name) {
     return;
   }
 
+  // set Mode::Prev
   Mode::Prev = Mode::Cur;
-
-  String prev_name = "";
+  std::string prev_mode_name = "(NULL)";
   if ( Mode::Prev ) {
-    Mode::Prev->exit();
-
-    prev_name = Mode::Prev->name; // String --> std::string
+    prev_mode_name = Mode::Prev->name.c_str(); // String --> std::string
   }
+  log_d("%s --> %s ...", prev_mode_name.c_str(), name.c_str());
 
-  std::string name_string = name.c_str();
+  // set Mode::Cur
+  std::string cur_mode_name = name.c_str(); // String -> std::string
   try {
-    Mode::Cur = Mode::Ent.at(name_string);
-  }
-  catch (const std::out_of_range e) {
-    log_e("Mode:%s is not found", name_string.c_str());
+    Mode::Cur = Mode::Ent.at(cur_mode_name);
+  } catch (const std::out_of_range e) {
+    log_e("Mode:%s is not found", cur_mode_name.c_str());
+    Mode::Cur = Mode::Prev;
     return;
   }
 
-  log_d("%s --> %s", prev_name, Mode::Cur->name.c_str());
+  // wait prev-mode loop
+  Flag_ReqModeChange = true;
 
+  unsigned long wait_count = 0;
+  while ( Flag_LoopRunning ) {
+    //delay(1);
+    wait_count++;
+    auto xLastTime = xTaskGetTickCount();
+    vTaskDelayUntil(&xLastTime, 1);
+  }
+  if ( wait_count > 0 ) {
+    log_d("wait_count=%u", wait_count);
+  }
+
+  // exit prev-mode
+  if ( Mode::Prev ) {
+    Mode::Prev->exit();
+  }
+
+  log_d("%s --> %s", prev_mode_name.c_str(), Mode::Cur->name.c_str());
+
+  // enter cur-mode
   Mode::Cur->enter();
+
+  Flag_ReqModeChange = false;
   
 } // Mode::set()
 

@@ -14,9 +14,11 @@ bool ModeB::enter() {
 
   Disp->setFont(NULL);
   Disp->setTextSize(1);
-  Disp->setCursor(0, 0);
   Disp->setTextWrap(true);
+  Disp->setCursor(0, 0);
+
   Disp->printf("%s", this->name.c_str());
+
   Disp->display();
 
   return true;
@@ -26,10 +28,23 @@ bool ModeB::enter() {
  *
  */
 void ModeB::loop() {
-  log_d("%s: name: %s",
-        SysClock::now_str(),
-        this->name.c_str());
-  delay(5000);
+  struct tm *tm = SysClock::now_tm();
+  std::string fmt;
+
+  if ( (millis() % 1000 / 500) == 0 ) {
+    fmt ="%Y/%m/%d\n%H:%M:%S";
+  } else {
+    fmt ="%Y/%m/%d\n%H %M %S";
+  }
+
+  char *tm_str = tm2str(tm, fmt.c_str());
+
+  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, WHITE);
+  Disp->setCursor(0, 0);
+  Disp->printf("%s\n%s",  __CLASS_NAME__.c_str(), tm_str);
+  Disp->display();
+
+  delay(100);
 } // ModeB::loop()
 
 /**

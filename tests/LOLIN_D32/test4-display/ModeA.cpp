@@ -32,10 +32,24 @@ bool ModeA::enter() {
  *
  */
 void ModeA::loop() {
-  log_d("%s: class %s: name: %s",
-        SysClock::now_str(),
-        __CLASS_NAME__.c_str(), this->name.c_str());
+  struct tm *tm = SysClock::now_tm();
+  std::string fmt;
+
+  if ( (millis() % 1000 / 500) == 0 ) {
+    fmt ="%Y/%m/%d(%a)\n%H:%M:%S";
+  } else {
+    fmt ="%Y/%m/%d(%a)\n%H %M %S";
+  }
+
+  char *tm_str = tm2str(tm, fmt.c_str());
+
+  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
+  Disp->setCursor(0, 0);
+  Disp->printf("%s\n%s",  __CLASS_NAME__.c_str(), tm_str);
+  Disp->display();
+
   delay(5000);
+  log_d("%s", __CLASS_NAME__.c_str());
 } // ModeA::loop()
 
 /**

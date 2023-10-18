@@ -16,6 +16,10 @@
 // from main ino
 extern Display_t *Disp;
 extern MyRtc *Rtc;
+
+extern bool Flag_LoopRunning;
+extern bool Flag_ReqModeChange;
+
 extern void enableIntr();
 extern void disableIntr();
 
