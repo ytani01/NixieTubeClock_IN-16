@@ -35,7 +35,7 @@ void ModeA::loop() {
   struct tm *tm = SysClock::now_tm();
   std::string fmt;
 
-  if ( (millis() % 1000 / 500) == 0 ) {
+  if ( millis() % 1000 < 500 ) {
     fmt ="%Y/%m/%d(%a)\n%H:%M:%S";
   } else {
     fmt ="%Y/%m/%d(%a)\n%H %M %S";
@@ -48,8 +48,8 @@ void ModeA::loop() {
   Disp->printf("%s\n%s",  __CLASS_NAME__.c_str(), tm_str);
   Disp->display();
 
-  delay(5000);
-  log_d("%s", __CLASS_NAME__.c_str());
+  unsigned long delay_ms = delayOrChangeMode(5000);
+  log_d("%s: %u ms", __CLASS_NAME__.c_str(), delay_ms);
 } // ModeA::loop()
 
 /**

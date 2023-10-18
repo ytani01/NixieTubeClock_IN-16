@@ -44,7 +44,7 @@ void ModeB::loop() {
   Disp->printf("%s\n%s",  __CLASS_NAME__.c_str(), tm_str);
   Disp->display();
 
-  delay(100);
+  delayOrChangeMode(100);
 } // ModeB::loop()
 
 /**

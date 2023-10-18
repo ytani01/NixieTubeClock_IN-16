@@ -19,6 +19,7 @@ extern MyRtc *Rtc;
 
 extern bool Flag_LoopRunning;
 extern bool Flag_ReqModeChange;
+extern unsigned long delayOrChangeMode(unsigned long ms);
 
 extern void enableIntr();
 extern void disableIntr();

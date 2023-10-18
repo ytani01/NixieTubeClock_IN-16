@@ -106,6 +106,19 @@ void setup() {
 /**
  *
  */
+unsigned long delayOrChangeMode(unsigned long ms) {
+  unsigned long ms_count = 0;
+  unsigned long start_ms = millis();
+
+  for ( ms_count=0; ms_count < ms && ! Flag_ReqModeChange; ms_count++ ) {
+    delay(1);
+  }
+  return  millis() - start_ms;
+} // delayOrChangeMode()
+
+/**
+ *
+ */
 void loop() {
   log_v("class %s", __CLASS_NAME__.c_str());
 
@@ -114,6 +127,10 @@ void loop() {
     Mode::Cur->loop();
     Flag_LoopRunning = false;
 
+    /*
+      モード変更要求 ``Flag_ReqModeChange`` があった場合、
+      モード切替が完了するまで待つ
+    */
     unsigned long wait_count = 0;
     while ( Flag_ReqModeChange ) {
       //delay(1);
@@ -124,10 +141,10 @@ void loop() {
       vTaskDelayUntil(&xLastTime, 1);
     }
     if ( wait_count > 0 ) {
-      log_d("wait_count=%u", wait_count);
+      log_v("wait_count=%u", wait_count);
     }
   } else {
     log_e("Mode::Cur == NULL !?");
-    delay(2000);
+    delayOrChangeMode(2000);
   }
 } // loop()

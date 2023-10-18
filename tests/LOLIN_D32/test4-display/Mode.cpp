@@ -22,7 +22,7 @@ void Mode::add(String name, Mode *mode) {
 } // Mode::add()
 
 /** static
- *
+    @brief  set Mode
  */
 void Mode::set(String name) {
   if ( Mode::Ent.size() == 0 ) {
@@ -30,7 +30,9 @@ void Mode::set(String name) {
     return;
   }
 
-  // set Mode::Prev
+  /*
+    set Mode::Prev
+  */
   Mode::Prev = Mode::Cur;
   std::string prev_mode_name = "(NULL)";
   if ( Mode::Prev ) {
@@ -38,40 +40,48 @@ void Mode::set(String name) {
   }
   log_d("%s --> %s ...", prev_mode_name.c_str(), name.c_str());
 
-  // set Mode::Cur
+  /*
+    set Mode::Cur
+  */
   std::string cur_mode_name = name.c_str(); // String -> std::string
   try {
     Mode::Cur = Mode::Ent.at(cur_mode_name);
   } catch (const std::out_of_range e) {
-    log_e("Mode:%s is not found", cur_mode_name.c_str());
+    log_e("Mode:%s is invalid", cur_mode_name.c_str());
     Mode::Cur = Mode::Prev;
     return;
   }
 
-  // wait prev-mode loop
   Flag_ReqModeChange = true;
+  {
+    /*
+      wait prev-mode loop
+    */
+    unsigned long wait_count = 0;
+    while ( Flag_LoopRunning ) {
+      //delay(1);
+      wait_count++;
+      auto xLastTime = xTaskGetTickCount();
+      vTaskDelayUntil(&xLastTime, 1);
+    }
+    if ( wait_count > 0 ) {
+      log_d("wait_count=%u", wait_count);
+    }
 
-  unsigned long wait_count = 0;
-  while ( Flag_LoopRunning ) {
-    //delay(1);
-    wait_count++;
-    auto xLastTime = xTaskGetTickCount();
-    vTaskDelayUntil(&xLastTime, 1);
+    /*
+      exit prev-mode
+    */
+    if ( Mode::Prev ) {
+      Mode::Prev->exit();
+    }
+
+    /*
+      enter cur-mode
+    */
+    Mode::Cur->enter();
+
+    log_d("%s --> %s: done", prev_mode_name.c_str(), Mode::Cur->name.c_str());
   }
-  if ( wait_count > 0 ) {
-    log_d("wait_count=%u", wait_count);
-  }
-
-  // exit prev-mode
-  if ( Mode::Prev ) {
-    Mode::Prev->exit();
-  }
-
-  log_d("%s --> %s", prev_mode_name.c_str(), Mode::Cur->name.c_str());
-
-  // enter cur-mode
-  Mode::Cur->enter();
-
   Flag_ReqModeChange = false;
   
 } // Mode::set()
@@ -110,11 +120,9 @@ bool Mode::exit() {
  * 
  */
 void Mode::loop() {
-  unsigned long cur_ms = millis();
+  log_d("cur_ms=%u", millis());
 
-  log_d("cur_ms=%u", cur_ms);
-
-  delay(1000);
+  delayOrChangeMode(2000);
 
   return;
 } // Mode::resume()
