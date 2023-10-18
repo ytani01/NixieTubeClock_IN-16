@@ -22,7 +22,7 @@ String get_mac_addr_String() {
 } // get_mac_addr_String()
 
 /**
- * struct tm --> DateTime
+ * @brief struct tm --> DateTime
  */
 DateTime tm2datetime(struct tm *tm) {
   return DateTime(tm->tm_year + 1900,
@@ -33,8 +33,11 @@ DateTime tm2datetime(struct tm *tm) {
 
 /**
  * @brief  struct tm --> string
+ *
+ * buf が static なので危険！
+ * tm2string() を推奨
  */
-char *tm2str(struct tm *tm, const char fmt[]) {
+static char *tm2str(struct tm *tm, const char fmt[]) {
   static char buf[DATETIME_STR_LEN];
 
   int res = strftime(buf, sizeof(buf), fmt, tm);
@@ -43,12 +46,17 @@ char *tm2str(struct tm *tm, const char fmt[]) {
 } // tm2str()
 
 /**
+ *
+ */
+std::string tm2string(struct tm *tm, const char fmt[]) {
+  return std::string(tm2str(tm, fmt));
+}
+
+/**
  * @brief  DateTime --> string
  */
-char *datetime2str(DateTime *dt) {
+std::string datetime2string(DateTime *dt) {
   time_t t = (time_t)dt->unixtime();
-
   struct tm *tm = localtime(&t);
-
-  return tm2str(tm);
+  return tm2string(tm);
 } // datetime2str()

@@ -14,9 +14,9 @@ struct tm* SysClock::now_tm() {
 /** static
  *
  */
-char* SysClock::now_str(const char fmt[]) {
+std::string SysClock::now_string(const char fmt[]) {
   struct tm *tm = SysClock::now_tm();
-  return tm2str(tm, fmt);
+  return tm2string(tm, fmt);
 } // SysClock::now_str()
 
 /** static

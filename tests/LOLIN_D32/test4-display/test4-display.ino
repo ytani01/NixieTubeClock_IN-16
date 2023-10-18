@@ -57,29 +57,27 @@ void cbBtn(ButtonInfo_t *bi) {
  *
  */
 void setup() {
-  //Serial.begin(115200);
-  delay(2000); // 2000 ms 以上が安全
-  //Serial.println("start");
-  log_i("===== start %s =====", get_mac_addr_String().c_str());
-
-  log_i("SysClock : %s", SysClock::now_str());
+  delay(2000);
+  log_i("===== start %s SysClock: %s =====",
+        get_mac_addr_String().c_str(),
+        SysClock::now_string().c_str());
 
   // Display
   Disp = new Display_t(DISPLAY_W, DISPLAY_H);
   Disp->DispBegin(DISP_ADDR);
-  Disp->setRotation(2);
-  Disp->clearDisplay();
+  Disp->setRotation(0);
+  //Disp->clearDisplay();
   Disp->display();
 
   // RTC
   Rtc = new MyRtc();
   Rtc->begin();
   DateTime dt_rtc = Rtc->now();
-  log_i("RTC      : %s", datetime2str(&dt_rtc));
+  log_i("RTC      : %s", datetime2string(&dt_rtc).c_str());
 
   // SysClock
   SysClock::set(&dt_rtc);
-  log_i("SysClock : %s", SysClock::now_str());
+  log_i("SysClock : %s", SysClock::now_string().c_str());
 
   // Button
   taskBtnWatcher = new Task_ButtonWatcher(cbBtn);
@@ -90,6 +88,7 @@ void setup() {
   }
 
   taskBtnWatcher->start();
+  delay(100);
 
   // Mode
   Mode::add("ModeA", new ModeA());
@@ -125,6 +124,9 @@ void loop() {
   if ( Mode::Cur ) {
     Flag_LoopRunning = true;
     Mode::Cur->loop();
+    if ( Flag_ReqModeChange ) {
+      log_d("%s::loop(): done", Mode::Prev->name.c_str());
+    }
     Flag_LoopRunning = false;
 
     /*

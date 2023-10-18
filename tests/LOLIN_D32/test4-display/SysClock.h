@@ -10,7 +10,7 @@
 class SysClock {
  public:
   static struct tm* now_tm();
-  static char* now_str(const char fmt[]="%Y/%m/%d(%a) %H:%M:%S");
+  static std::string now_string(const char fmt[]="%Y/%m/%d(%a) %H:%M:%S");
 
   static void set(struct tm *tm);
   static void set(int year, int month, int day,

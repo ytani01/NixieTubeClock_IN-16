@@ -9,8 +9,8 @@
 bool ModeB::enter() {
   log_d("enter mode: %s", this->name.c_str());
 
-  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, WHITE);
-  Disp->setTextColor(BLACK, WHITE);
+  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
+  Disp->setTextColor(WHITE, BLACK);
 
   Disp->setFont(NULL);
   Disp->setTextSize(1);
@@ -29,19 +29,29 @@ bool ModeB::enter() {
  */
 void ModeB::loop() {
   struct tm *tm = SysClock::now_tm();
-  std::string fmt;
+  char *fmt_date, *fmt_time;
 
+  fmt_date = (char *)"%Y/%m/%d(%a)";
   if ( (millis() % 1000 / 500) == 0 ) {
-    fmt ="%Y/%m/%d\n%H:%M:%S";
+    fmt_time = (char *)"%H:%M:%S";
   } else {
-    fmt ="%Y/%m/%d\n%H %M %S";
+    fmt_time = (char *)"%H %M %S";
   }
 
-  char *tm_str = tm2str(tm, fmt.c_str());
-
-  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, WHITE);
+  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setCursor(0, 0);
-  Disp->printf("%s\n%s",  __CLASS_NAME__.c_str(), tm_str);
+  Disp->setTextSize(1);
+
+  Disp->printf("%s\n",  __CLASS_NAME__.c_str());
+  Disp->printf("%s\n",  tm2string(tm, fmt_date).c_str());
+
+  Disp->setTextSize(2);
+  Disp->setTextColor(BLACK, WHITE);
+
+  Disp->printf("%s",  tm2string(tm, fmt_time).c_str());
+
+  Disp->setTextColor(WHITE, BLACK);
+
   Disp->display();
 
   delayOrChangeMode(100);
@@ -88,7 +98,7 @@ void ModeB::cbBtn(ButtonInfo_t *bi) {
   } // if (Btn2)
 
   if ( flag_set_clock ) {
-    log_d(">tm_sys: %s", tm2str(tm_sys));
+    log_d(">tm_sys: %s", tm2string(tm_sys).c_str());
 
     SysClock::set(tm_sys);
     
@@ -100,6 +110,6 @@ void ModeB::cbBtn(ButtonInfo_t *bi) {
     
     enableIntr();
     
-    log_d(">dt_rtc: %s", datetime2str(&dt_rtc));
+    log_d(">dt_rtc: %s", datetime2string(&dt_rtc));
   }
 } // ModeB::cbBtn()
