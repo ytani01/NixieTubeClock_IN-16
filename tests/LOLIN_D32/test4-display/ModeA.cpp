@@ -107,18 +107,13 @@ void ModeA::cbBtn(ButtonInfo_t *bi) {
   } // if (Btn2)
 
   if ( flag_set_clock ) {
-    log_d(">tm_sys: %s", tm2string(tm_sys).c_str());
-
+    // adjust SysClock
     SysClock::set(tm_sys);
-
+    log_d("Sys : %s", tm2string(SysClock::now_tm()).c_str());
+    
     // adjust RTC
-    disableIntr();
-    
     Rtc->adjust(tm_sys);
-    DateTime dt_rtc = Rtc->now();
-    
-    enableIntr();
-    
-    log_d(">dt_rtc: %s", datetime2string(&dt_rtc));
+    DateTime dt = Rtc->now();
+    log_d("RTC : %s", datetime2string(&dt).c_str());
   }
 } // ModeA::cbBtn()

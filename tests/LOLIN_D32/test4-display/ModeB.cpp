@@ -63,9 +63,23 @@ void ModeB::loop() {
 void ModeB::cbBtn(ButtonInfo_t *bi) {
   log_d("%s", Button::info2String(bi).c_str());
 
+  struct tm *tm_sys = SysClock::now_tm();
+
   if ( String(bi->name) == "Btn0" ) {
     if ( bi->value == Button::ON ) {
       if ( ! bi->long_pressed ) {
+        // reset second
+        tm_sys->tm_sec = 0;
+
+        // adjust SysClock
+        SysClock::set(tm_sys);
+        log_d("Sys : %s", tm2string(SysClock::now_tm()).c_str());
+        
+        // adjust RTC
+        Rtc->adjust(tm_sys);
+        DateTime dt = Rtc->now();
+        log_d("RTC : %s", datetime2string(&dt).c_str());
+
         Mode::set("ModeA");
       }
     }
@@ -73,7 +87,6 @@ void ModeB::cbBtn(ButtonInfo_t *bi) {
   } // if (Btn0)
 
   bool flag_set_clock = false;
-  struct tm *tm_sys = SysClock::now_tm();
 
   if ( String(bi->name) == "Btn1" ) {
     if ( bi->value == Button::ON || bi->long_pressed ) {
@@ -98,18 +111,13 @@ void ModeB::cbBtn(ButtonInfo_t *bi) {
   } // if (Btn2)
 
   if ( flag_set_clock ) {
-    log_d(">tm_sys: %s", tm2string(tm_sys).c_str());
-
+    // adjust SysClock
     SysClock::set(tm_sys);
+    log_d("Sys : %s", tm2string(SysClock::now_tm()).c_str());
     
     // adjust RTC
-    disableIntr();
-    
     Rtc->adjust(tm_sys);
-    DateTime dt_rtc = Rtc->now();
-    
-    enableIntr();
-    
-    log_d(">dt_rtc: %s", datetime2string(&dt_rtc));
+    DateTime dt = Rtc->now();
+    log_d("RTC : %s", datetime2string(&dt).c_str());
   }
 } // ModeB::cbBtn()

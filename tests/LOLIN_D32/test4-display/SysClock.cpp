@@ -8,7 +8,9 @@
  */
 struct tm* SysClock::now_tm() {
   time_t now = time(NULL);
-  return localtime(&now);
+  struct tm *tm_now = localtime(&now);
+  // log_d("Sys : %s", tm2string(tm_now).c_str());
+  return tm_now;
 } // SysClock::get_tm()
 
 /** static

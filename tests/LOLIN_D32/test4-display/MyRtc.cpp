@@ -6,9 +6,22 @@
 /**
  *
  */
+DateTime MyRtc::now() {
+  disableIntr();
+  DateTime dt = MY_RTC::now();
+  enableIntr();
+
+  return dt;
+} // MyRtc::now()
+
+/**
+ *
+ */
 void MyRtc::adjust(const DateTime &dt) {
+  disableIntr();
   MY_RTC::adjust(dt);
-}
+  enableIntr();
+} // MyRtc::adjust()
 
 /**
  *

@@ -32,18 +32,22 @@ Task_ButtonWatcher *taskBtnWatcher = NULL;
 MyRtc *Rtc;
 
 
-/**
+/** global
  *
  */
 void enableIntr() {
-  taskBtnWatcher->enable();
+  if ( taskBtnWatcher ) {
+    taskBtnWatcher->enable();
+  }
 }
 
-/**
+/** global
  *
  */
 void disableIntr() {
-  taskBtnWatcher->disable();
+  if ( taskBtnWatcher ) {
+    taskBtnWatcher->disable();
+  }
 }
 
 /**

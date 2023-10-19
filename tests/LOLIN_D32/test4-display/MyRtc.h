@@ -7,6 +7,9 @@
 #include <RTClib.h>
 #include "commonlib.h"
 
+extern void enableIntr();
+extern void disableIntr();
+
 #define MY_RTC RTC_DS3231
 
 /**
@@ -14,6 +17,7 @@
  */
 class MyRtc: public MY_RTC {
 public:
+  DateTime now(); // override
 
   void adjust(const DateTime &dt);
   void adjust(struct tm *tm);
