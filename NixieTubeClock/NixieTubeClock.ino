@@ -22,7 +22,7 @@ static const String MY_NAME = "Nixie Tube Clock";
  * Z = v3
  * v4, v5: 0 (always)
  */
-int                 initValVer[NIXIE_NUM_N] = {0,1, 0,3, 0,2};
+int                 initValVer[NIXIE_NUM_N] = {0,1, 0,3, 0,3};
 
 #define LOOP_DELAY_US   1   // micro sbeconds
 #define DEBOUNCE        300 // msec
