@@ -123,7 +123,20 @@ stat_t ModeClock::loop(unsigned long cur_ms, DateTime& now) {
         }
       }
     } else {
-      NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(Nx->brightness);
+      if ( prev_dt.second() != now.second() ) {
+        if ( now.second() % 4 == 2 ) {
+          NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(Nx->brightness);
+          NxCol(i).fadeout_start(cur_ms, clFadeTick * 2, NIXIE_COLON_DOT_DOWN);
+          colon_fade_mode[i] = CL_FADE_OUT;
+          continue;
+        } else if ( now.second() % 4 == 0 ) {
+          NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(0);
+          NxCol(i).fadein_start(cur_ms, clFadeTick * 2, NIXIE_COLON_DOT_DOWN);
+          colon_fade_mode[i] = CL_FADE_IN;
+          continue;
+        }
+      }
+      //NxColEl(i, NIXIE_COLON_DOT_DOWN).set_brightness(Nx->brightness);
     }
   } // for(COLON)
   prev_dt = DateTime(now);
