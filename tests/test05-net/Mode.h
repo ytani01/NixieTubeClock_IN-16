@@ -12,10 +12,12 @@
 #include "Display.h"
 #include "Button.h"
 #include "MyRtc.h"
+#include "Task_NixieTubeArray.h"
 
 // from main ino
 extern Display_t *Disp;
 extern MyRtc *Rtc;
+extern NixieTubeArray *NxArray;
 
 extern bool Flag_LoopRunning;
 extern bool Flag_ReqModeChange;

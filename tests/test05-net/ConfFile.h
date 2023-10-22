@@ -3,6 +3,7 @@
  *
  * simple usage:
 ```
+#include <esp32-hal-log.h>
 #include "ConfFile.h"
 
 class ConfA: public ConfFile {
@@ -45,8 +46,8 @@ void loop() {
   String data1, data2;
   :
   confA->load();
-  Serial.println("data1=" + confA->data1);
-  Serial.println("data2=" + confA->data2);
+  log_i("data1=%s", conf->data1.c_str());
+  log_i("data2=%s", conf->data2.c_str());
   :
   confA->data1 = "abc";
   confA->data2 = "xyz";

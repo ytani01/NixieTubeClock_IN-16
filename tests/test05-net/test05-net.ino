@@ -4,10 +4,12 @@
 #include <map>
 #include <esp32-hal-log.h>
 
-#include "Task_ButtonWatcher.h"
 #include "SysClock.h"
 #include "MyRtc.h"
 #include "Display.h"
+
+#include "Task_ButtonWatcher.h"
+#include "Task_NixieTubeArray.h"
 
 #include "Mode.h"
 #include "ModeA.h"
@@ -24,6 +26,9 @@ bool Flag_LoopRunning = false;
 #define PIN_I2C_SDA 8
 #define PIN_I2C_SCL 9
 
+// RTC
+MyRtc *Rtc;
+
 // OLED Display
 Display_t *Disp;
 
@@ -35,9 +40,34 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
 };
 Task_ButtonWatcher *taskBtnWatcher = NULL;
 
-// RTC
-MyRtc *Rtc;
+// Nixie Tube
+#define PIN_HV5812_CLK      7
+#define PIN_HV5812_STOBE    5
+#define PIN_HV5812_DATA     6
+#define PIN_HV5812_BLANK    4
 
+#define PIN_COLON_R_TOP     2
+#define PIN_COLON_R_BOTTOM  2
+#define PIN_COLON_L_TOP     1
+#define PIN_COLON_L_BOTTOM  1
+
+uint8_t PINS_NIXIE_NUM[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N] = {
+  { 9,  0,  6,  2,  3,  4,  5,  1,  7,  8},
+  {15, 14, 18, 12, 11, 10, 19, 13, 17, 16},
+  {35, 20, 38, 22, 23, 24, 39, 21, 37, 36},
+  {29, 34, 26, 32, 31, 30, 25, 33, 27, 28},
+  {55, 54, 58, 52, 51, 50, 59, 53, 57, 56},
+  {49, 40, 46, 42, 43, 44, 45, 41, 47, 48}
+};
+
+uint8_t PINS_NIXIE_COLON[NIXIE_COLON_N][NIXIE_COLON_DOT_N] = {
+  {PIN_COLON_R_TOP},
+  {PIN_COLON_L_TOP}
+};
+
+NixieTubeArray *nta = NULL;
+
+Task_NixieTubeArray *taskNixieTubeArray = NULL;
 
 /** global
  *
@@ -109,6 +139,17 @@ void setup() {
   taskBtnWatcher->start();
   delay(100);
 
+  // NixieTube
+  log_i("=== Nixie Tube Array");
+  nta = new NixieTubeArray(PIN_HV5812_CLK,  PIN_HV5812_STOBE,
+                               PIN_HV5812_DATA, PIN_HV5812_BLANK,
+                               PINS_NIXIE_NUM, PINS_NIXIE_COLON);
+
+  taskNixieTubeArray = new Task_NixieTubeArray(nta);
+  taskNixieTubeArray->start();
+
+  nta->num[0].blink_start(millis(), 500);
+
   // Mode
   log_i("=== Init Modes");
   Mode::add("ModeA", new ModeA());
@@ -123,7 +164,6 @@ void setup() {
   //
   // XXX: Conf test
   //
-  
   ConfFileSsid = new ConfFile_Ssid();
 
   int conf_n;
