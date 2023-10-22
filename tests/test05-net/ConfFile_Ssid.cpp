@@ -25,7 +25,7 @@ int ConfFile_Ssid::load() {
   while ( this->file.available() ) {
     String ssid = this->read_line();
     String pw = this->read_line();
-    log_d("load|%s|%s|", ssid.c_str(), pw.c_str());
+    log_v("load|%s|%s|", ssid.c_str(), pw.c_str());
 
     this->ent[ssid.c_str()] = pw.c_str();
   } // while(this->file.available())
@@ -34,7 +34,7 @@ int ConfFile_Ssid::load() {
 
   for (auto it: this->ent) {
   //for (auto it=this->ent.begin(); it != ent.end(); it++) {
-    log_d("ent|%s|%s|", (it.first).c_str(), (it.second).c_str());
+    log_v("ent|%s|%s|", (it.first).c_str(), (it.second).c_str());
   }
   return this->ent.size();
 } // ConfFile_Ssid::load()

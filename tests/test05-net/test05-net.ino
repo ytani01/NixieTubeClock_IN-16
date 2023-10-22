@@ -8,19 +8,18 @@
 #include "MyRtc.h"
 #include "Display.h"
 
-#include "Task_ButtonWatcher.h"
 #include "Task_NixieTubeArray.h"
+#include "Task_ButtonWatcher.h"
+#include "Task_WifiMgr.h"
 
 #include "Mode.h"
 #include "ModeA.h"
 #include "ModeB.h"
 
-#include "ConfFile_Ssid.h"
-ConfFile_Ssid *ConfFileSsid;
 
-
-bool Flag_ReqModeChange = false;
-bool Flag_LoopRunning = false;
+// Mode
+bool Flag_ReqModeChange = false; // モード変更要求フラグ
+bool Flag_LoopRunning = false;   // モード内 loop() 実行中フラグ
 
 // I2C
 #define PIN_I2C_SDA 8
@@ -38,7 +37,11 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
   {"Btn1", 17},
   {"Btn2", 18},
 };
-Task_ButtonWatcher *taskBtnWatcher = NULL;
+Task_ButtonWatcher *TaskBtnWatcher = NULL;
+
+// WiFi
+static const std::string AP_HDR = "clock";
+Task_WifiMgr *TaskWifiMgr = NULL;
 
 // Nixie Tube
 #define PIN_HV5812_CLK      7
@@ -67,14 +70,14 @@ uint8_t PINS_NIXIE_COLON[NIXIE_COLON_N][NIXIE_COLON_DOT_N] = {
 
 NixieTubeArray *nta = NULL;
 
-Task_NixieTubeArray *taskNixieTubeArray = NULL;
+Task_NixieTubeArray *TaskNixieTubeArray = NULL;
 
 /** global
  *
  */
 void enableIntr() {
-  if ( taskBtnWatcher ) {
-    taskBtnWatcher->enable();
+  if ( TaskBtnWatcher ) {
+    TaskBtnWatcher->enable();
   }
 }
 
@@ -82,8 +85,8 @@ void enableIntr() {
  *
  */
 void disableIntr() {
-  if ( taskBtnWatcher ) {
-    taskBtnWatcher->disable();
+  if ( TaskBtnWatcher ) {
+    TaskBtnWatcher->disable();
   }
 }
 
@@ -102,6 +105,8 @@ void setup() {
   log_i("===== start %s SysClock: %s =====",
         get_mac_addr_String().c_str(),
         SysClock::now_string().c_str());
+
+  //log_i("ARDUINO_LOOP_STACK_SIZE=%d", ARDUINO_LOOP_STACK_SIZE);
 
   // I2C
   log_i("=== Init I2C: SDA=%d, SCL=%d", PIN_I2C_SDA, PIN_I2C_SCL);
@@ -122,6 +127,11 @@ void setup() {
   //Disp->clearDisplay();
   Disp->display();
 
+  // WiFi
+  log_i("=== Init WiFi");
+  TaskWifiMgr = new Task_WifiMgr(AP_HDR);
+  TaskWifiMgr->start();
+
   // SysClock
   log_i("=== Init System Clock");
   SysClock::set(&dt_rtc);
@@ -129,14 +139,14 @@ void setup() {
 
   // Button
   log_i("=== Init Buttons");
-  taskBtnWatcher = new Task_ButtonWatcher(cbBtn);
+  TaskBtnWatcher = new Task_ButtonWatcher(cbBtn);
 
   for (auto btn: PIN_BTN) {
     log_i("{%s %d}", btn.first, btn.second);
-    taskBtnWatcher->addBtn(String(btn.first), btn.second);
+    TaskBtnWatcher->addBtn(String(btn.first), btn.second);
   }
 
-  taskBtnWatcher->start();
+  TaskBtnWatcher->start();
   delay(100);
 
   // NixieTube
@@ -145,8 +155,8 @@ void setup() {
                                PIN_HV5812_DATA, PIN_HV5812_BLANK,
                                PINS_NIXIE_NUM, PINS_NIXIE_COLON);
 
-  taskNixieTubeArray = new Task_NixieTubeArray(nta);
-  taskNixieTubeArray->start();
+  TaskNixieTubeArray = new Task_NixieTubeArray(nta, BRIGHTNESS_RESOLUTION/2);
+  TaskNixieTubeArray->start();
 
   nta->num[0].blink_start(millis(), 500);
 
@@ -160,33 +170,6 @@ void setup() {
   }
 
   Mode::set("ModeA");
-
-  //
-  // XXX: Conf test
-  //
-  ConfFileSsid = new ConfFile_Ssid();
-
-  int conf_n;
-  if ( conf_n = ConfFileSsid->load() > 0 ) {
-    for (auto ent: ConfFileSsid->ent) {
-      log_d("%s:%s", ent.first.c_str(), ent.second.c_str());
-    }
-  }
-
-  //ConfFileSsid->remove();
-  
-  ConfFileSsid->ent["aaa"] = "AAA";
-  ConfFileSsid->ent["bbb"] = "DDD";
-
-  ConfFileSsid->ent.erase("aaa");
-  conf_n = ConfFileSsid->save();
-  log_d("conf_n = %d", conf_n);
-
-  if ( conf_n = ConfFileSsid->load() > 0 ) {
-    for (auto ent: ConfFileSsid->ent) {
-      log_d("%s:%s", ent.first.c_str(), ent.second.c_str());
-    }
-  }
 
 } // setup()
 
@@ -207,7 +190,7 @@ unsigned long delayOrChangeMode(unsigned long ms) {
  *
  */
 void loop() {
-  log_v("class %s", __CLASS_NAME__.c_str());
+  //log_v("class %s", __CLASS_NAME__.c_str());
 
   if ( Mode::Cur ) {
     Flag_LoopRunning = true;

@@ -84,7 +84,7 @@ void Task::call_task_main(void *this_instance) {
  *
  */
 void Task::__task_main() {
-  delay(1);
+  delay(10);
   this->_active = false;
   this->setup();
   delay(1);

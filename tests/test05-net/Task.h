@@ -37,7 +37,7 @@ typedef struct {
  */
 class Task {
 public:
-  static const uint32_t STACK_SIZE_DEF = 4 * 1024; // bytes
+  static const uint32_t STACK_SIZE_DEF = 8 * 1024; // bytes
   static const UBaseType_t PRIORITY_DEF = 2;
   static const UBaseType_t CORE_DEF = APP_CPU_NUM; // PRO_CPU_NUM|APP_CPU_NUM
   
