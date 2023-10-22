@@ -8,7 +8,7 @@ static String WDayStr[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 /**
  * get MAC address String
  */
-String get_mac_addr_String() {
+std::string get_mac_addr_string() {
   uint8_t mac_addr[6];
   char mac_str[13];
 
@@ -18,8 +18,8 @@ String get_mac_addr_String() {
           mac_addr[3], mac_addr[4], mac_addr[5]);
   log_d("MacAddr=%s", mac_str);
 
-  return String(mac_str);
-} // get_mac_addr_String()
+  return std::string(mac_str);
+} // get_mac_addr_string()
 
 /**
  * @brief struct tm --> DateTime

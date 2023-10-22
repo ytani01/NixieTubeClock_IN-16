@@ -32,7 +32,7 @@ NetMgr::NetMgr(String ap_ssid_hdr) {
           this->mac_addr[3], this->mac_addr[4], this->mac_addr[5]);
   log_d("MacAddr=%s", mac_str);
 
-  this->ap_ssid = this->ap_ssid_hdr + "_" + get_mac_addr_String();
+  this->ap_ssid = this->ap_ssid_hdr + "_" + String(get_mac_addr_string().c_str());
   this->ap_ip = IPAddress(this->ap_ip_int[0],
                           this->ap_ip_int[1],
                           this->ap_ip_int[2],

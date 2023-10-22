@@ -52,8 +52,12 @@ void ModeA::loop() {
   Disp->printf("%s\n", tm2string(tm, fmt_date).c_str());
   Disp->setTextColor(WHITE, BLACK);
 
-  Disp->setTextSize(2);
+  Disp->setTextSize(1);
   Disp->printf("%s", tm2string(tm, fmt_time).c_str());
+
+  Disp->setCursor(0, DISPLAY_H - DISPLAY_CH_H);
+  Disp->setTextSize(1);
+  Disp->printf("%s", get_mac_addr_string().c_str());
 
   Disp->display();
 

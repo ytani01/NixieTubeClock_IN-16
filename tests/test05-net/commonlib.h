@@ -9,7 +9,7 @@
 #include <esp32-hal-log.h>
 #include <RTClib.h>
 
-String get_mac_addr_String();
+std::string get_mac_addr_string();
 
 static const int DATETIME_STR_LEN = 128;
 

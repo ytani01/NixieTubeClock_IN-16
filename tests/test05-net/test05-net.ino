@@ -40,7 +40,7 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
 Task_ButtonWatcher *TaskBtnWatcher = NULL;
 
 // WiFi
-static const std::string AP_HDR = "clock";
+static const std::string AP_HDR = "Nixie_";
 Task_WifiMgr *TaskWifiMgr = NULL;
 
 // Nixie Tube
@@ -103,7 +103,7 @@ void cbBtn(ButtonInfo_t *bi) {
 void setup() {
   delay(2000);
   log_i("===== start %s SysClock: %s =====",
-        get_mac_addr_String().c_str(),
+        get_mac_addr_string().c_str(),
         SysClock::now_string().c_str());
 
   //log_i("ARDUINO_LOOP_STACK_SIZE=%d", ARDUINO_LOOP_STACK_SIZE);
