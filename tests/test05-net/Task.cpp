@@ -6,15 +6,11 @@
 /**
  *
  */
-Task::Task(String name,
+Task::Task(std::string name,
            uint32_t stack_size, UBaseType_t priority, UBaseType_t core) {
-  String nameString = name;
-  if ( nameString.length() > TASK_NAME_LEN ) {
-    nameString = nameString.substring(0, TASK_NAME_LEN);
-  }
-  log_d("new Task: %s", nameString.c_str());
-  strcpy(this->conf.name, nameString.c_str());
+  log_i("name=%s", name.c_str());
 
+  this->conf.name = name;
   this->conf.handle = NULL;
   this->conf.stack_size = stack_size;
   this->conf.priority = priority;
@@ -30,14 +26,16 @@ Task::Task(String name,
  */
 void Task::start() {
   BaseType_t ret = xTaskCreateUniversal(Task::call_task_main,
-                                        this->conf.name,
+                                        this->conf.name.c_str(),
                                         this->conf.stack_size,
                                         this,
                                         this->conf.priority,
                                         &(this->conf.handle),
                                         this->conf.core);
   log_d("Start:%s(Stack:%dB,Priority:%d,CPU:%d,handle:%X): ret=%d",
-        this->conf.name, this->conf.stack_size, this->conf.priority,
+        this->conf.name.c_str(),
+        this->conf.stack_size,
+        this->conf.priority,
         this->conf.core, this->conf.handle,
         ret);
   delay(50);
@@ -60,14 +58,14 @@ bool Task::is_active() {
  *
  */
 void Task::setup() {
-  log_v("%s", this->conf.name);
+  log_v("%s", this->conf.name.c_str());
 } // Task::setup()
 
 /**
  *
  */
 void Task::loop() {
-  log_v("%s", this->conf.name);
+  log_v("%s", this->conf.name.c_str());
   delay(1000);
 } // Task::loop()
 

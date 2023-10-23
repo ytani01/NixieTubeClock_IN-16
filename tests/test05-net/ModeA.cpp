@@ -32,8 +32,33 @@ bool ModeA::enter() {
  *
  */
 void ModeA::loop() {
+  unsigned long cur_ms = millis();
   struct tm *tm = SysClock::now_tm();
   char *fmt_date, *fmt_time;
+
+  static wifi_mgr_mode_t prev_wifimgr_mode = WIFI_MGR_MODE_NONE;
+  wifi_mgr_mode_t wifimgr_mode = TaskWifiMgr->mode;
+
+  if ( wifimgr_mode != prev_wifimgr_mode ) {
+    log_i("wifimgr_mode = %d:%s",
+          wifimgr_mode, WIFI_MGR_MODE_T_STR[wifimgr_mode]);
+
+    prev_wifimgr_mode = wifimgr_mode;
+  }
+
+  static wl_status_t prev_wl_stat = WL_IDLE_STATUS;
+  wl_status_t wl_stat = TaskWifiMgr->wl_stat;
+
+  if ( wl_stat != prev_wl_stat ) {
+    log_i("wl_stat = %d:%s",
+          wl_stat, WL_STATUS_T_STR2(wl_stat));
+
+    if ( wl_stat == WL_CONNECTED ) {
+      log_i("SSID: %s", TaskWifiMgr->cur_ssid.c_str());
+    }
+
+    prev_wl_stat = wl_stat;
+  }
 
   fmt_date = (char *)"%Y/%m/%d(%a)";
   if ( (millis() % 1000 / 500) == 0 ) {
@@ -46,15 +71,33 @@ void ModeA::loop() {
   Disp->setCursor(0, 0);
   Disp->setTextSize(1);
 
-  Disp->printf("%s\n",  __CLASS_NAME__.c_str());
+  //Disp->printf("%s\n",  __CLASS_NAME__.c_str());
 
   Disp->setTextColor(BLACK, WHITE);
   Disp->printf("%s\n", tm2string(tm, fmt_date).c_str());
   Disp->setTextColor(WHITE, BLACK);
 
   Disp->setTextSize(1);
-  Disp->printf("%s", tm2string(tm, fmt_time).c_str());
+  Disp->printf("%s\n", tm2string(tm, fmt_time).c_str());
 
+  if ( wifimgr_mode == WIFI_MGR_MODE_STA ) {
+    if ( wl_stat == WL_CONNECTED ) {
+      Disp->printf("%s", TaskWifiMgr->cur_ssid.c_str());
+    } else {
+      if ( cur_ms % 1000 > 500 ) {
+        Disp->printf(">%s\n", WL_STATUS_T_STR2(wl_stat));
+      } else {
+        Disp->printf("\n");
+      }
+    }
+  } else {
+    if ( cur_ms % 2000 > 200 ) {
+      Disp->printf("AP:%s\n", TaskWifiMgr->ap_ssid.c_str());
+    } else {
+      Disp->printf("\n");
+    }
+  }
+  
   Disp->setCursor(0, DISPLAY_H - DISPLAY_CH_H);
   Disp->setTextSize(1);
   Disp->printf("%s", get_mac_addr_string().c_str());

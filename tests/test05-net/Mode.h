@@ -13,11 +13,13 @@
 #include "Button.h"
 #include "MyRtc.h"
 #include "Task_NixieTubeArray.h"
+#include "Task_WifiMgr.h"
 
 // from main ino
 extern Display_t *Disp;
 extern MyRtc *Rtc;
 extern NixieTubeArray *NxArray;
+extern Task_WifiMgr *TaskWifiMgr;
 
 extern bool Flag_LoopRunning;
 extern bool Flag_ReqModeChange;

@@ -16,6 +16,7 @@ class task1: public Task {
 
 #include <Arduino.h>
 #include <esp32-hal-log.h>
+#include "commonlib.h"
 //#include <freertos/FreeRTOS.h>
 //#include <freertos/task.h>
 
@@ -25,7 +26,7 @@ static const unsigned long TASK_NAME_LEN = 64;
  *
  */
 typedef struct {
-  char name[TASK_NAME_LEN + 1];
+  std::string name;
   TaskHandle_t handle;
   uint32_t stack_size;
   UBaseType_t priority;
@@ -43,7 +44,7 @@ public:
   
   TaskConf_t conf;
   
-  Task(String name="[NO_NAME_TASK]",
+  Task(std::string name="[NO_NAME_TASK]",
        uint32_t stack_size=STACK_SIZE_DEF,
        UBaseType_t priority=PRIORITY_DEF,
        UBaseType_t core=CORE_DEF);

@@ -40,7 +40,7 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
 Task_ButtonWatcher *TaskBtnWatcher = NULL;
 
 // WiFi
-static const std::string AP_HDR = "Nixie_";
+static const std::string AP_HDR = "NxClk_";
 Task_WifiMgr *TaskWifiMgr = NULL;
 
 // Nixie Tube
@@ -102,7 +102,7 @@ void cbBtn(ButtonInfo_t *bi) {
  */
 void setup() {
   delay(2000);
-  log_i("===== start %s SysClock: %s =====",
+  log_i("-=-=-=-=-= start %s SysClock: %s =-=-=-=-=-",
         get_mac_addr_string().c_str(),
         SysClock::now_string().c_str());
 
@@ -126,11 +126,6 @@ void setup() {
   Disp->setRotation(0);
   //Disp->clearDisplay();
   Disp->display();
-
-  // WiFi
-  log_i("=== Init WiFi");
-  TaskWifiMgr = new Task_WifiMgr(AP_HDR);
-  TaskWifiMgr->start();
 
   // SysClock
   log_i("=== Init System Clock");
@@ -157,8 +152,14 @@ void setup() {
 
   TaskNixieTubeArray = new Task_NixieTubeArray(nta, BRIGHTNESS_RESOLUTION/2);
   TaskNixieTubeArray->start();
+  delay(100);
 
   nta->num[0].blink_start(millis(), 500);
+
+  // WiFi
+  log_i("=== Init WiFi");
+  TaskWifiMgr = new Task_WifiMgr(AP_HDR);
+  TaskWifiMgr->start();
 
   // Mode
   log_i("=== Init Modes");

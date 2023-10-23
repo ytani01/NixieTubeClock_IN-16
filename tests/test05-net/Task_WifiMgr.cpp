@@ -10,6 +10,7 @@ ConfFile_Ssid *Task_WifiMgr::Obj_ConfFile_Ssid = NULL;
 WiFiMulti *Task_WifiMgr::Obj_WiFiMulti = NULL;
 
 WiFiEvent_t Task_WifiMgr::LastEvId = (WiFiEvent_t)NULL;
+char Task_WifiMgr::LastEvStr[128];
 WiFiEventInfo_t Task_WifiMgr::LastEvInfo;
 
 WebServer Task_WifiMgr::web_svr;
@@ -18,10 +19,11 @@ WebServer Task_WifiMgr::web_svr;
  *
  */
 Task_WifiMgr::Task_WifiMgr(std::string ap_ssid_hdr)
-  : Task(Task_WifiMgr::NAME)
+  : Task(__CLASS_NAME__)
 {
   this->ap_ssid = ap_ssid_hdr + get_mac_addr_string();
-  log_i("ap_ssid = \"%s\"", this->ap_ssid.c_str());
+  log_i("[WifiMgr] %s: ap_ssid = \"%s\"",
+        this->conf.name.c_str(), this->ap_ssid.c_str());
 
   WiFi.onEvent(Task_WifiMgr::on_wifi_event);
 
@@ -29,23 +31,137 @@ Task_WifiMgr::Task_WifiMgr(std::string ap_ssid_hdr)
   Task_WifiMgr::Obj_WiFiMulti = new WiFiMulti();
 } // Task_WifiMgr::Task_WifiMgr
 
+/** static
+ *
+ */
+void Task_WifiMgr::on_wifi_event(WiFiEvent_t ev_id, WiFiEventInfo_t ev_info) {
+  log_d("[WifiMgr] ev_id = %d", ev_id);
+
+  Task_WifiMgr::LastEvId = ev_id;
+  Task_WifiMgr::LastEvInfo = ev_info;
+  
+  switch (ev_id) {
+  case ARDUINO_EVENT_WIFI_READY: 
+    sprintf(Task_WifiMgr::LastEvStr, "WiFi interface ready");
+    break;
+  case ARDUINO_EVENT_WIFI_SCAN_DONE:
+    sprintf(Task_WifiMgr::LastEvStr, "Completed scan for access points");
+    break;
+  case ARDUINO_EVENT_WIFI_STA_START:
+    sprintf(Task_WifiMgr::LastEvStr, "WiFi client started");
+    break;
+  case ARDUINO_EVENT_WIFI_STA_STOP:
+    sprintf(Task_WifiMgr::LastEvStr, "WiFi clients stopped");
+    break;
+  case ARDUINO_EVENT_WIFI_STA_CONNECTED:
+    sprintf(Task_WifiMgr::LastEvStr, "Connected to access point");
+    break;
+  case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+    sprintf(Task_WifiMgr::LastEvStr,
+            "Disconnected from WiFi access point: %u",
+            ev_info.wifi_sta_disconnected.reason);
+    break;
+  case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
+    sprintf(Task_WifiMgr::LastEvStr,
+            "Authentication mode of access point has changed");
+    break;
+  case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+    sprintf(Task_WifiMgr::LastEvStr,
+            "Obtained IP address: %s", WiFi.localIP().toString().c_str());
+    break;
+  case ARDUINO_EVENT_WIFI_STA_LOST_IP:
+    sprintf(Task_WifiMgr::LastEvStr,
+            "Lost IP address and IP address is reset to 0");
+    break;
+  case ARDUINO_EVENT_WPS_ER_SUCCESS:
+    sprintf(Task_WifiMgr::LastEvStr,
+            "WiFi Protected Setup (WPS): succeeded in enrollee mode");
+    break;
+  case ARDUINO_EVENT_WPS_ER_FAILED:
+    sprintf(Task_WifiMgr::LastEvStr,
+            "WiFi Protected Setup (WPS): failed in enrollee mode");
+    break;
+  case ARDUINO_EVENT_WPS_ER_TIMEOUT:
+    sprintf(Task_WifiMgr::LastEvStr,
+            "WiFi Protected Setup (WPS): timeout in enrollee mode");
+    break;
+  case ARDUINO_EVENT_WPS_ER_PIN:
+    sprintf(Task_WifiMgr::LastEvStr,
+            "WiFi Protected Setup (WPS): pin code in enrollee mode");
+    break;
+  case ARDUINO_EVENT_WIFI_AP_START:
+    sprintf(Task_WifiMgr::LastEvStr, "WiFi access point started");
+    break;
+  case ARDUINO_EVENT_WIFI_AP_STOP:
+    sprintf(Task_WifiMgr::LastEvStr, "WiFi access point  stopped");
+    break;
+  case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
+    sprintf(Task_WifiMgr::LastEvStr, "Client connected");
+    break;
+  case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:
+    sprintf(Task_WifiMgr::LastEvStr, "Client disconnected");
+    break;
+  case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
+    sprintf(Task_WifiMgr::LastEvStr, "Assigned IP address to client");
+    break;
+  case ARDUINO_EVENT_WIFI_AP_PROBEREQRECVED:
+    sprintf(Task_WifiMgr::LastEvStr, "Received probe request");
+    break;
+  case ARDUINO_EVENT_WIFI_AP_GOT_IP6:
+    sprintf(Task_WifiMgr::LastEvStr, "AP IPv6 is preferred");
+    break;
+  case ARDUINO_EVENT_WIFI_STA_GOT_IP6:
+    sprintf(Task_WifiMgr::LastEvStr, "STA IPv6 is preferred");
+    break;
+  case ARDUINO_EVENT_ETH_GOT_IP6:
+    sprintf(Task_WifiMgr::LastEvStr, "Ethernet IPv6 is preferred");
+    break;
+  case ARDUINO_EVENT_ETH_START:
+    sprintf(Task_WifiMgr::LastEvStr, "Ethernet started");
+    break;
+  case ARDUINO_EVENT_ETH_STOP:
+    sprintf(Task_WifiMgr::LastEvStr, "Ethernet stopped");
+    break;
+  case ARDUINO_EVENT_ETH_CONNECTED:
+    sprintf(Task_WifiMgr::LastEvStr, "Ethernet connected");
+    break;
+  case ARDUINO_EVENT_ETH_DISCONNECTED:
+    sprintf(Task_WifiMgr::LastEvStr, "Ethernet disconnected");
+    break;
+  case ARDUINO_EVENT_ETH_GOT_IP:
+    sprintf(Task_WifiMgr::LastEvStr, "Obtained IP address");
+    break;
+  default:
+    sprintf(Task_WifiMgr::LastEvStr, "(Unknown Event)");
+    break;
+  } // switch
+
+  log_i("[WifiMgr] %d:%s", ev_id, Task_WifiMgr::LastEvStr);
+} // Task_WifiMgr::on_wifi_event()
 
 /** protected virtual
  *
  */
 void Task_WifiMgr::setup() {
-  log_d("%s", this->conf.name);
+  log_d("[WifiMgr] %s", this->conf.name);
 
   int conf_n;
   if ( conf_n = Task_WifiMgr::Obj_ConfFile_Ssid->load() > 0 ) {
     for (auto ent: Task_WifiMgr::Obj_ConfFile_Ssid->ent) {
-      log_d("ent|%s|%s|", ent.first.c_str(), ent.second.c_str());
+      log_i("[WifiMgr] ent|%s|%s|", ent.first.c_str(), ent.second.c_str());
+      Task_WifiMgr::Obj_WiFiMulti->addAP(ent.first.c_str(),
+                                         ent.second.c_str());
     }
   }
 
-  Task_WifiMgr::Obj_WiFiMulti->addAP("ytnet_a1x", "a1@ytnet");
-  Task_WifiMgr::Obj_WiFiMulti->addAP("ytnet_ip", "ip@ytnet");
+  if ( conf_n > 0 ) {
+    this->mode = WIFI_MGR_MODE_STA;
+  } else {
+    this->mode = WIFI_MGR_MODE_AP;
+  }
 
+  log_i("[WifiMgr] conf_n = %d, mode = %d:%s",
+        conf_n, this->mode, WIFI_MGR_MODE_T_STR[this->mode]);
 } // Task_WifiMgr::setup()
 
 /** protected virtual
@@ -74,16 +190,13 @@ void Task_WifiMgr::loop_sta_mode() {
     //
     // failed
     //
-    log_e("retry fail");
+    log_e("[WifiMgr:STA] retry fail");
 
     retry_count = Task_WifiMgr::STA_RETRY_MAX;
 
     this->mode = WIFI_MGR_MODE_AP;
     return;
   }
-
-  log_i("%d/%d Task_WifiMgr::Obj_WiFiMulti->run()",
-        retry_count, Task_WifiMgr::STA_RETRY_MAX);
 
   this->wl_stat = (wl_status_t)Task_WifiMgr::Obj_WiFiMulti->run();
 
@@ -92,22 +205,33 @@ void Task_WifiMgr::loop_sta_mode() {
     // connected
     //
     if ( ! prev_connected ) {
-      log_i("WiFi connected (%d)", Task_WifiMgr::LastEvId);
+      log_i("[WifiMgr:STA] %d/%d Task_WifiMgr::Obj_WiFiMulti->run() --> %d:%s",
+            retry_count, Task_WifiMgr::STA_RETRY_MAX,
+            this->wl_stat, WL_STATUS_T_STR2(this->wl_stat));
+
+      log_d("[WifiMgr:STA] WiFi connected (%d:%s)",
+            Task_WifiMgr::LastEvId, Task_WifiMgr::LastEvStr);
+
+      this->cur_ssid = WiFi.SSID().c_str();
 
       prev_connected = true;
-
       retry_count = Task_WifiMgr::STA_RETRY_MAX;
     }
-    delay(2000);
+    delay(5000);
     return;
   }
 
+  log_w("[WifiMgr:STA] %d/%d Task_WifiMgr::Obj_WiFiMulti->run() --> %d:%s",
+        retry_count, Task_WifiMgr::STA_RETRY_MAX,
+        this->wl_stat, WL_STATUS_T_STR2(this->wl_stat));
   //
   // not connected
   //
-  log_e("wl_stat = %d:%s (LastEvent:%d)",
-        wl_stat, WL_STATUS_T_STR[wl_stat],
-        Task_WifiMgr::LastEvId);
+  this->cur_ssid = "";
+
+  log_e("[WifiMgr:STA] wl_stat = %d:%s (LastEvent:%d:%s)",
+        wl_stat, WL_STATUS_T_STR2(wl_stat),
+        Task_WifiMgr::LastEvId, Task_WifiMgr::LastEvStr);
 
   prev_connected = false;
 
@@ -122,10 +246,10 @@ void Task_WifiMgr::loop_sta_mode() {
  */
 void Task_WifiMgr::loop_ap_mode() {
   if ( Task_WifiMgr::LastEvId != ARDUINO_EVENT_WIFI_AP_START ) {
-    log_i("ap_ssid=%s", this->ap_ssid.c_str());
+    log_i("[WifiMgr:AP] ap_ssid=%s", this->ap_ssid.c_str());
 
     if ( ! WiFi.softAP(this->ap_ssid.c_str()) ) {
-      log_e("softAP(\"%s\") ... failed !?", this->ap_ssid);
+      log_e("[WifiMgr:AP] softAP(\"%s\") ... failed !?", this->ap_ssid);
 
       this->mode = WIFI_MGR_MODE_STA;
       delay(2000);
@@ -134,12 +258,13 @@ void Task_WifiMgr::loop_ap_mode() {
 
     this->ap_ip = WiFi.softAPIP();
     this->ap_netmask = WiFi.softAPSubnetMask();
-    log_i("my_ip: %s/%s",
+    log_i("[WifiMgr:AP] my_ip: %s/%s",
           this->ap_ip.toString().c_str(),
           this->ap_netmask.toString().c_str());
 
     this->wl_stat = WiFi.status();
-    log_i("wl_stat = %d:%s", this->wl_stat, WL_STATUS_T_STR[this->wl_stat]);
+    log_i("[WifiMgr:AP] wl_stat = %d:%s",
+          this->wl_stat, WL_STATUS_T_STR2(this->wl_stat));
 
   }
 
@@ -148,126 +273,220 @@ void Task_WifiMgr::loop_ap_mode() {
   // DNS server
   this->dns_svr.setErrorReplyCode(DNSReplyCode::NoError);
   this->dns_svr.start(Task_WifiMgr::DNS_PORT, "*", this->ap_ip);
-  log_i("DNS Server[%d] started", Task_WifiMgr::DNS_PORT);
+  log_i("[WifiMgr:AP] DNS Server[%d] started", Task_WifiMgr::DNS_PORT);
   
   // Web server
   Task_WifiMgr::web_svr.enableDelay(false); // Importand !!
 
   Task_WifiMgr::web_svr.on("/", Task_WifiMgr::handle_top);
+  Task_WifiMgr::web_svr.on("/select_ssid", Task_WifiMgr::handle_select_ssid);
+  Task_WifiMgr::web_svr.on("/save_ssid", Task_WifiMgr::handle_save_ssid);
+  Task_WifiMgr::web_svr.on("/scan_ssid", Task_WifiMgr::handle_do_scan);
+  Task_WifiMgr::web_svr.on("/confirm_reboot", Task_WifiMgr::handle_confirm_reboot);
+  Task_WifiMgr::web_svr.on("/do_reboot", Task_WifiMgr::handle_do_reboot);
+  //Task_WifiMgr::web_svr.onNotFound(Task_WifiMgr::handle_not_found);
   Task_WifiMgr::web_svr.onNotFound(Task_WifiMgr::handle_top);
 
   Task_WifiMgr::web_svr.begin();
-  log_i("Web Server[%d] started", Task_WifiMgr::WEB_PORT);
+  log_i("[WifiMgr:AP] Web Server[%d] started", Task_WifiMgr::WEB_PORT);
 
   // AP loop T.B.D.
   while ( true ) {
     this->dns_svr.processNextRequest();
     Task_WifiMgr::web_svr.handleClient();
-    delay(100);
+    delay(1000);
   }
   
   this->mode = WIFI_MGR_MODE_STA;
 } // Task_WifiMgr::loop_ap_mode()
 
-/**
+/** static
  *
  */
-void Task_WifiMgr::on_wifi_event(WiFiEvent_t ev_id, WiFiEventInfo_t ev_info) {
-  log_d("ev_id = %d", ev_id);
-
-  Task_WifiMgr::LastEvId = ev_id;
-  Task_WifiMgr::LastEvInfo = ev_info;
+void Task_WifiMgr::handle_not_found() {
+  log_i("[WifiMgr:AP]");
+  Task_WifiMgr::web_svr.send(404, "text/plain", "NotFound");
+} // Task_WifiMgr::handle_not_found()
   
-  char buf[128];
+/** static
+ *
+ */
+void Task_WifiMgr::handle_top() {
+  std::string ssid = "", pw = "";
+  
+  if ( Task_WifiMgr::Obj_ConfFile_Ssid->load() > 0 ) {
+    ssid = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->first.c_str();
+    pw = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->second.c_str();
+  }
+  log_i("[WiFiMgr:AP] ssid=%s, pw=%s", ssid.c_str(), pw.c_str());
 
-  switch (ev_id) {
-  case ARDUINO_EVENT_WIFI_READY: 
-    sprintf(buf, "WiFi interface ready");
-    break;
-  case ARDUINO_EVENT_WIFI_SCAN_DONE:
-    sprintf(buf, "Completed scan for access points");
-    break;
-  case ARDUINO_EVENT_WIFI_STA_START:
-    sprintf(buf, "WiFi client started");
-    break;
-  case ARDUINO_EVENT_WIFI_STA_STOP:
-    sprintf(buf, "WiFi clients stopped");
-    break;
-  case ARDUINO_EVENT_WIFI_STA_CONNECTED:
-    sprintf(buf, "Connected to access point");
-    break;
-  case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-    sprintf(buf, "Disconnected from WiFi access point: %u",
-            ev_info.wifi_sta_disconnected.reason);
-    break;
-  case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
-    sprintf(buf, "Authentication mode of access point has changed");
-    break;
-  case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-    sprintf(buf, "Obtained IP address: %s", WiFi.localIP().toString().c_str());
-    break;
-  case ARDUINO_EVENT_WIFI_STA_LOST_IP:
-    sprintf(buf, "Lost IP address and IP address is reset to 0");
-    break;
-  case ARDUINO_EVENT_WPS_ER_SUCCESS:
-    sprintf(buf, "WiFi Protected Setup (WPS): succeeded in enrollee mode");
-    break;
-  case ARDUINO_EVENT_WPS_ER_FAILED:
-    sprintf(buf, "WiFi Protected Setup (WPS): failed in enrollee mode");
-    break;
-  case ARDUINO_EVENT_WPS_ER_TIMEOUT:
-    sprintf(buf, "WiFi Protected Setup (WPS): timeout in enrollee mode");
-    break;
-  case ARDUINO_EVENT_WPS_ER_PIN:
-    sprintf(buf, "WiFi Protected Setup (WPS): pin code in enrollee mode");
-    break;
-  case ARDUINO_EVENT_WIFI_AP_START:
-    sprintf(buf, "WiFi access point started");
-    break;
-  case ARDUINO_EVENT_WIFI_AP_STOP:
-    sprintf(buf, "WiFi access point  stopped");
-    break;
-  case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
-    sprintf(buf, "Client connected");
-    break;
-  case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:
-    sprintf(buf, "Client disconnected");
-    break;
-  case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
-    sprintf(buf, "Assigned IP address to client");
-    break;
-  case ARDUINO_EVENT_WIFI_AP_PROBEREQRECVED:
-    sprintf(buf, "Received probe request");
-    break;
-  case ARDUINO_EVENT_WIFI_AP_GOT_IP6:
-    sprintf(buf, "AP IPv6 is preferred");
-    break;
-  case ARDUINO_EVENT_WIFI_STA_GOT_IP6:
-    sprintf(buf, "STA IPv6 is preferred");
-    break;
-  case ARDUINO_EVENT_ETH_GOT_IP6:
-    sprintf(buf, "Ethernet IPv6 is preferred");
-    break;
-  case ARDUINO_EVENT_ETH_START:
-    sprintf(buf, "Ethernet started");
-    break;
-  case ARDUINO_EVENT_ETH_STOP:
-    sprintf(buf, "Ethernet stopped");
-    break;
-  case ARDUINO_EVENT_ETH_CONNECTED:
-    sprintf(buf, "Ethernet connected");
-    break;
-  case ARDUINO_EVENT_ETH_DISCONNECTED:
-    sprintf(buf, "Ethernet disconnected");
-    break;
-  case ARDUINO_EVENT_ETH_GOT_IP:
-    sprintf(buf, "Obtained IP address");
-    break;
-  default: break;
-  } // switch
+  std::string html = Task_WifiMgr::html_header("Current settings");
 
-  log_i("%d:%s", ev_id, buf);
-} // Task_WifiMgr::on_wifi_event()
+  html += "<span style='font-size: large;'>";
+  html += "SSID: ";
+  html += "</span>";
+  html += "<span style='font-size: x-large; font-weight: bold'>";
+  if ( pw.size() == 0 ) {
+    html += "(none)";
+  } else {
+    html += ssid;
+  }
+  html += "</span>";
+  html += "<br />";
+  html += "<span style='font-size: large;'>";
+  html += "Passphrase: ";
+  html += "</span>";
+  html += "<span style='font-size: large; font-weight: bold'>";
+  if ( ssid.size() == 0 ) {
+    html += "(none)";
+  } else {
+    html += pw[0];
+    for (int i=0; i < pw.size() - 1; i++) {
+      html += "*";
+    }
+  }
+  html += "</span>";
+  html += "<hr />";
+  html += "<a href='/select_ssid'>Change</a>\n";
+  html += "or\n";
+  html += "<a href='/do_reboot'>OK (Reboot)</a>\n";
+  html += Task_WifiMgr::html_footer();
+
+  Task_WifiMgr::web_svr.send(200, "text/html", String(html.c_str()));
+} // Task_WifiMgr::handle_top()
+
+/** static
+ *
+ */
+void Task_WifiMgr::handle_select_ssid() {
+  std::string ssid = "", pw = "";
+  
+  if ( Task_WifiMgr::Obj_ConfFile_Ssid->load() > 0 ) {
+    ssid = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->first.c_str();
+    pw = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->second.c_str();
+  }
+  log_i("[WifiMgr:AP] ssid=%s, pw=%s", ssid.c_str(), pw.c_str());
+  
+  log_d("[WifiMgr:AP] scan SSIDs ...");
+  int16_t ssid_n = WiFi.scanNetworks();
+  log_d("[WifiMgr:AP] ssid_n=%s", ssid_n);
+
+  if ( ssid_n < 0 ) {
+    ssid_n = 0;
+    log_e("[WifiMgr:AP] ssid_n = %d", ssid_n);
+  }
+
+  std::string html = Task_WifiMgr::html_header("Please change settings and save");
+
+  html += "<form action='/save_ssid' method='GET'>";
+  html += "<div class='ssid'>";
+  html += "SSID ";
+  html += "<select name='ssid' id='ssid' style='font-size:large;'>";
+
+  for(int i=0; i < ssid_n; i++){
+    html += "<option value=" + std::string(WiFi.SSID(i).c_str());
+    for ( auto ent: Task_WifiMgr::Obj_ConfFile_Ssid->ent ) {
+      if ( std::string(WiFi.SSID(i).c_str()) == ent.first ) {
+        html += " selected";
+      }
+    }
+    html += ">";
+    html += std::string(WiFi.SSID(i).c_str());
+    html += "</option>\n";
+  } // for(i)
+
+  html += "<option value="">(clear)</option>\n";
+  html += "</select><br />\n";
+
+  html += "Password ";
+  html += "<span style='font-size: xx-large'>";
+  html += "<input type='text'";
+  html += " name='passwd'";
+  html += " value='" + pw + "'";
+  html += " />";
+  html += "</span>";
+  html += "</div>\n";
+  html += "<hr />\n";
+
+  html += "<input type='submit' value='Save' />\n";
+  html += "<a href='/scan_ssid'>Rescan</a>\n";
+  html += "<a href='/'>Cancel</a>\n";
+
+  html += "</form>";
+  html += Task_WifiMgr::html_footer();
+  
+  WiFi.scanDelete();
+
+  Task_WifiMgr::web_svr.send(200, "text/html", html.c_str());
+} // Task_WifiMgr::handle_select_ssid()
+
+/** static
+ *
+ */
+void Task_WifiMgr::handle_save_ssid() {
+  std::string ssid = Task_WifiMgr::web_svr.arg("ssid").c_str();
+  std::string pw = Task_WifiMgr::web_svr.arg("passwd").c_str();
+  
+  log_i("[WifiMgr:AP] |%s|%s|", ssid.c_str(), pw.c_str());
+
+  Task_WifiMgr::Obj_ConfFile_Ssid->ent.clear(); // T.B.D.
+
+  Task_WifiMgr::Obj_ConfFile_Ssid->ent[ssid.c_str()] = pw.c_str();
+  Task_WifiMgr::Obj_ConfFile_Ssid->save();
+
+  // 自動転送
+  Task_WifiMgr::web_svr.sendHeader("Location", String("/"), true);
+  Task_WifiMgr::web_svr.send(302, "text/plain", "");
+} // Task_WifiMgr::handle_save_ssid()
+
+/** static
+ *
+ */
+void Task_WifiMgr::handle_confirm_reboot() {
+  log_i("[WifiMgr:AP]");
+
+  std::string html = Task_WifiMgr::html_header("Reboot confirmation");
+
+  html += "<p>Are you sure to reboot ";
+  html += "WiFiMgr";
+  html += " ?</p>\n";
+  html += "<a href='/do_reboot'>Yes</a>";
+  html += " or ";
+  html += "<a href='/'>No</a>";
+  html += Task_WifiMgr::html_footer();
+
+  Task_WifiMgr::web_svr.send(200, "text/html", html.c_str());
+} // Task_WifiMgr::handle_confirm_reboot()
+
+/** static
+ *
+ */
+void Task_WifiMgr::handle_do_scan() {
+  log_i("[WifiMgr:AP]");
+
+  // 自動転送
+  Task_WifiMgr::web_svr.sendHeader("Location", String("/select_ssid"), true);
+  Task_WifiMgr::web_svr.send(302, "text/plain", "");
+} // Task_WifiMgr::handle_do_rescan()
+
+/** static
+ *
+ */
+void Task_WifiMgr::handle_do_reboot() {
+  log_i("[WifiMgr:AP]");
+
+  std::string html = Task_WifiMgr::html_header("Rebooting ..");
+
+  html += "Please reconnect WiFi ..";
+  html += "<hr />";
+  html += Task_WifiMgr::html_footer();
+
+  Task_WifiMgr::web_svr.send(200, "text/html", html.c_str());
+
+  log_w("[WifiMgr:AP] reboot esp32 ..");
+  delay(2000);
+  ESP.restart();
+} // Task_WifiMgr::handle_do_reboot()
 
 /** static
  *
@@ -325,7 +544,7 @@ std::string Task_WifiMgr::html_header(std::string title) {
   html += "<body style='background: linear-gradient(to right, #9FF, #5DD);'>";
   html += "<br />";
   html += "<div class='myname'>";
-  html += "WifiMgr";
+  html += WEB_NAME;
   html += "</div>";
   html += "<div style='font-size:x-large; color:#00F; background-color: #DDD;'>";
   html += title;
@@ -334,7 +553,7 @@ std::string Task_WifiMgr::html_header(std::string title) {
   return html;
 } // Task_WifiMgr::html_header()
 
-/**
+/** static
  *
  */
 std::string Task_WifiMgr::html_footer() {
@@ -343,186 +562,3 @@ std::string Task_WifiMgr::html_footer() {
   html += "</html>\n";
   return html;
 } // Task_WifiMgr::html_footer();
-
-/**
- *
- */
-void Task_WifiMgr::handle_top() {
-  std::string ssid = "", pw = "";
-  
-  log_i("");
-
-#if 0
-  if ( Task_WifiMgr::Obj_ConfFile_Ssid->load() > 0 ) {
-    ssid = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->first.c_str();
-    pw = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->second.c_str();
-  }
-  log_d("ssid=%s, pw=%s", ssid.c_str(), pw.c_str());
-#endif
-
-  std::string html = Task_WifiMgr::html_header("Current settings");
-
-  html += "<span style='font-size: large;'>";
-  html += "SSID: ";
-  html += "</span>";
-  html += "<span style='font-size: x-large; font-weight: bold'>";
-  html += ssid;
-  html += "</span>";
-  html += "<hr />";
-  html += "<a href='/select_ssid'>Change</a>\n";
-  html += "or\n";
-  html += "<a href='/confirm_reboot'>OK</a>\n";
-  html += Task_WifiMgr::html_footer();
-
-  Task_WifiMgr::web_svr.send(200, "text/html", String(html.c_str()));
-} // Task_WifiMgr::handle_top()
-
-/**
- *
- */
-void Task_WifiMgr::handle_select_ssid() {
-  std::string ssid = "", pw = "";
-  
-  if ( Task_WifiMgr::Obj_ConfFile_Ssid->load() > 0 ) {
-    ssid = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->first.c_str();
-    pw = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->second.c_str();
-  }
-  log_d("ssid=%s, pw=%s", ssid.c_str(), pw.c_str());
-  
-#if 0
-  log_d("scan SSIDs ...");
-  uint16_t ssid_n = WiFi.scanNetworks();
-  log_d("ssid_n=%s", ssid_n);
-
-  if (ssid_n <= 0) {
-    log_d("rescan SSID..");
-    uint16_t ssid_n = WiFi.scanNetworks();
-    log_d("ssid_n = %s", ssid_n);
-  }
-
-  if ( ssid_n > Task_WifiMgr::SSID_N_MAX ) {
-    ssid_n = Task_WifiMgr::SSID_N_MAX;
-    log_d("ssid_n = %d", ssid_n);
-  }
-  if ( ssid_n < 0 ) {
-    ssid_n = 0;
-    log_d("ssid_n = %d", ssid_n);
-  }
-
-  SSIDent ssid_ent[Task_WifiMgr::SSID_N_MAX];
-
-  for (int i=0; i < ssid_n; i++) {
-    ssid_ent[i].set(WiFi.SSID(i), WiFi.RSSI(i), WiFi.encryptionType(i));
-    log_d("  %s", ssid_ent[i].toString().c_str());
-  }
-  WiFi.scanDelete();
-#endif
-  
-  std::string html = Task_WifiMgr::html_header("Please change settings and save");
-
-  html += "<form action='/save_ssid' method='GET'>";
-  html += "<div class='ssid'>";
-  html += "SSID ";
-  html += "<select name='ssid' id='ssid' style='font-size:large;'>";
-
-#if 0
-  for(int i=0; i < ssid_n; i++){
-    html += "<option value=" + ssid_ent[i].ssid();
-    if ( ssid_ent[i].ssid() == ssid ) {
-      html += " selected";
-    }
-    html += ">";
-    html += ssid_ent[i].ssid();
-    /*
-    html += " (";
-    html += String(ssid_ent[i].dbm());
-    html += ", ";
-    html += ssid_ent[i].encType();
-    html += ")";
-    */
-    html += "</option>\n";
-  } // for(i)
-#endif
-  
-  html += "<option value="">(clear)</option>\n";
-  html += "</select><br />\n";
-
-  html += "Password ";
-  html += "<span style='font-size: xx-large'>";
-  html += "<input type='text'";
-  html += " name='passwd'";
-  html += " value='" + pw + "'";
-  html += " />";
-  html += "</span>";
-  html += "</div>\n";
-  html += "<hr />\n";
-
-  html += "<input type='submit' value='Save' />\n";
-  html += "<a href='/scan_ssid'>Rescan</a>\n";
-  html += "<a href='/'>Cancel</a>\n";
-
-  html += "</form>";
-  html += Task_WifiMgr::html_footer();
-
-  Task_WifiMgr::web_svr.send(200, "text/html", html.c_str());
-} // Task_WifiMgr::handle_select_ssid()
-
-/**
- *
- */
-void Task_WifiMgr::handle_save_ssid(){
-  std::string ssid = Task_WifiMgr::web_svr.arg("ssid").c_str();
-  std::string pw = Task_WifiMgr::web_svr.arg("passwd").c_str();
-  
-  log_d("save_ssid> |%s|%s|", ssid.c_str(), pw.c_str());
-
-  Task_WifiMgr::Obj_ConfFile_Ssid->ent[ssid.c_str()] = pw.c_str();
-  Task_WifiMgr::Obj_ConfFile_Ssid->save();
-
-  // 自動転送
-  Task_WifiMgr::web_svr.sendHeader("Location", String("/"), true);
-  Task_WifiMgr::web_svr.send(302, "text/plain", "");
-} // Task_WifiMgr::handle_save_ssid()
-
-/**
- *
- */
-void Task_WifiMgr::handle_confirm_reboot() {
-  std::string html = Task_WifiMgr::html_header("Reboot confirmation");
-
-  html += "<p>Are you sure to reboot ";
-  html += "WiFiMgr";
-  html += " ?</p>\n";
-  html += "<a href='/do_reboot'>Yes</a>";
-  html += " or ";
-  html += "<a href='/'>No</a>";
-  html += Task_WifiMgr::html_footer();
-
-  Task_WifiMgr::web_svr.send(200, "text/html", html.c_str());
-} // Task_WifiMgr::handle_confirm_reboot()
-
-/**
- *
- */
-void Task_WifiMgr::handle_do_scan() {
-  // 自動転送
-  Task_WifiMgr::web_svr.sendHeader("Location", String("/select_ssid"), true);
-  Task_WifiMgr::web_svr.send(302, "text/plain", "");
-} // Task_WifiMgr::handle_do_rescan()
-
-/**
- *
- */
-void Task_WifiMgr::handle_do_reboot() {
-  std::string html = Task_WifiMgr::html_header("Rebooting ..");
-
-  html += "Please reconnect WiFi ..";
-  html += "<hr />";
-  html += Task_WifiMgr::html_footer();
-
-  Task_WifiMgr::web_svr.send(200, "text/html", html.c_str());
-
-  log_w("reboot esp32 ..");
-  delay(2000);
-  ESP.restart();
-} // Task_WifiMgr::handle_do_reboot()

@@ -65,14 +65,14 @@ void loop() {
  */
 class Task_ButtonWatcher: public Task {
 public:
-  static const uint32_t STACK_SIZE_DEF = 4 * 1024;
-  static const UBaseType_t PRIORITY_DEF = 0;
-  static const UBaseType_t CORE_DEF = APP_CPU_NUM;
+  static const uint32_t STACK_SIZE = 4 * 1024;
+  static const UBaseType_t PRIORITY = 0;
+  static const UBaseType_t CORE = APP_CPU_NUM;
 
   Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi)=NULL,
-                     uint32_t stack_size=STACK_SIZE_DEF,
-                     UBaseType_t priority=PRIORITY_DEF,
-                     UBaseType_t core=CORE_DEF);
+                     uint32_t stack_size=STACK_SIZE,
+                     UBaseType_t priority=PRIORITY,
+                     UBaseType_t core=CORE);
 
   virtual bool addBtn(String name, uint8_t pin);
 

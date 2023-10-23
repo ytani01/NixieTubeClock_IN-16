@@ -12,7 +12,7 @@ QueueHandle_t Task_ButtonWorker::BtnQue = (QueueHandle_t)NULL;
 Task_ButtonWorker::Task_ButtonWorker(uint32_t stack_size,
                                      UBaseType_t priority,
                                      UBaseType_t core)
-  : Task("ButtonWorker", stack_size, priority, core)
+  : Task(__CLASS_NAME__, stack_size, priority, core)
 {
   Task_ButtonWorker::BtnQue = xQueueCreate(Task_ButtonWorker::Q_SIZE,
                                            sizeof(ButtonInfo_t));

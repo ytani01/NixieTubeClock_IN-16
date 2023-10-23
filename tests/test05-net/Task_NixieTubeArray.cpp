@@ -14,7 +14,7 @@ int Task_NixieTubeArray::INIT_VAL[] = {0, 0, 0, 0, 0, 0};
 Task_NixieTubeArray::Task_NixieTubeArray(NixieTubeArray *nta,
                                          brightness_t brightness,
                                          int *init_val)
-  : Task(String(Task_NixieTubeArray::name)) {
+  : Task(__CLASS_NAME__) {
 
   this->_nta = nta;
   this->_nta->brightness = brightness;

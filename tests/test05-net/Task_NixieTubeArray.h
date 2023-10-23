@@ -14,7 +14,6 @@
 class Task_NixieTubeArray
   : public Task {
 public:
-  static constexpr char *name = (char *)"Task_NixieTubeArray";
   static int INIT_VAL[];
 
   Task_NixieTubeArray(NixieTubeArray *nta,

@@ -16,7 +16,7 @@ std::string get_mac_addr_string() {
   sprintf(mac_str, "%02x%02x%02x%02x%02x%02x",
           mac_addr[0], mac_addr[1], mac_addr[2],
           mac_addr[3], mac_addr[4], mac_addr[5]);
-  log_d("MacAddr=%s", mac_str);
+  //log_v("MacAddr=%s", mac_str);
 
   return std::string(mac_str);
 } // get_mac_addr_string()

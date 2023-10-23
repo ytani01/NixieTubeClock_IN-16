@@ -10,7 +10,7 @@ Task_ButtonWatcher::Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi),
                                        uint32_t stack_size,
                                        UBaseType_t priority,
                                        UBaseType_t core)
-  : Task("ButtonWatcher", stack_size, priority, core)
+  : Task(__CLASS_NAME__, stack_size, priority, core)
 {
   this->_cb = cb;
   if ( cb == NULL ) {
