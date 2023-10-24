@@ -40,14 +40,14 @@ static const char *WL_STATUS_T_STR[] = {
   "WL_STATUS_SIZE"
 };
 
-#define WL_STATUS_T_STR2(s)  (s <= WL_DISCONNECTED ? WL_STATUS_T_STR[s] : "--")
+#define WL_STATUS_T_STR2(s) (s <= WL_DISCONNECTED ? WL_STATUS_T_STR[s] : std::to_string(s).c_str())
 
 /**
  *
  */
 class Task_WifiMgr: public Task {
  public:
-  static const int STA_RETRY_MAX = 7;
+  static const int STA_RETRY_MAX = 5;
   static constexpr char* WEB_NAME = (char *)"WiFi Manager";
 
   static const int DNS_PORT = 53;

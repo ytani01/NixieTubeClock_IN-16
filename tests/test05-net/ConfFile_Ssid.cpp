@@ -50,7 +50,7 @@ int ConfFile_Ssid::save() {
   for (auto ent: this->ent ) {
     std::string ssid = ent.first.c_str();
     std::string pw = ent.second.c_str();
-    if ( pw.length() == 0 ) {
+    if ( ssid.length() == 0 || pw.length() == 0 ) {
       log_w("|%s|%s| .. ignored", ssid.c_str(), pw.c_str());
       continue;
     }

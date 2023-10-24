@@ -28,7 +28,6 @@ Task_WifiMgr::Task_WifiMgr(std::string ap_ssid_hdr)
   WiFi.onEvent(Task_WifiMgr::on_wifi_event);
 
   Task_WifiMgr::Obj_ConfFile_Ssid = new ConfFile_Ssid();
-  Task_WifiMgr::Obj_WiFiMulti = new WiFiMulti();
 } // Task_WifiMgr::Task_WifiMgr
 
 /** static
@@ -144,24 +143,6 @@ void Task_WifiMgr::on_wifi_event(WiFiEvent_t ev_id, WiFiEventInfo_t ev_info) {
  */
 void Task_WifiMgr::setup() {
   log_d("[WifiMgr] %s", this->conf.name);
-
-  int conf_n;
-  if ( conf_n = Task_WifiMgr::Obj_ConfFile_Ssid->load() > 0 ) {
-    for (auto ent: Task_WifiMgr::Obj_ConfFile_Ssid->ent) {
-      log_i("[WifiMgr] ent|%s|%s|", ent.first.c_str(), ent.second.c_str());
-      Task_WifiMgr::Obj_WiFiMulti->addAP(ent.first.c_str(),
-                                         ent.second.c_str());
-    }
-  }
-
-  if ( conf_n > 0 ) {
-    this->mode = WIFI_MGR_MODE_STA;
-  } else {
-    this->mode = WIFI_MGR_MODE_AP;
-  }
-
-  log_i("[WifiMgr] conf_n = %d, mode = %d:%s",
-        conf_n, this->mode, WIFI_MGR_MODE_T_STR[this->mode]);
 } // Task_WifiMgr::setup()
 
 /** protected virtual
@@ -184,61 +165,107 @@ void Task_WifiMgr::loop() {
  */
 void Task_WifiMgr::loop_sta_mode() {
   static bool prev_connected = false;
-  static int retry_count = Task_WifiMgr::STA_RETRY_MAX;
 
-  if ( retry_count <= 0 ) {
-    //
-    // failed
-    //
-    log_e("[WifiMgr:STA] retry fail");
+  log_i("[WifiMgr:%s]", WIFI_MGR_MODE_T_STR[this->mode]);
 
-    retry_count = Task_WifiMgr::STA_RETRY_MAX;
+  //
+  // Init STA
+  //
+  this->cur_ssid = "";
+  
+  Task_WifiMgr::Obj_WiFiMulti = new WiFiMulti();
 
+  // add saved SSIDs
+  int conf_n;
+  if ( conf_n = Task_WifiMgr::Obj_ConfFile_Ssid->load() > 0 ) {
+    for (auto ent: Task_WifiMgr::Obj_ConfFile_Ssid->ent) {
+      log_i("[WifiMgr] ent|%s|%s|", ent.first.c_str(), ent.second.c_str());
+
+      Task_WifiMgr::Obj_WiFiMulti->addAP(ent.first.c_str(),
+                                         ent.second.c_str());
+    } // for
+  } // if
+
+  log_i("[WifiMgr:%s] conf_n = %d",
+        WIFI_MGR_MODE_T_STR[this->mode], conf_n);
+
+  if ( conf_n <= 0 ) {
     this->mode = WIFI_MGR_MODE_AP;
     return;
   }
 
-  this->wl_stat = (wl_status_t)Task_WifiMgr::Obj_WiFiMulti->run();
+  //
+  // try to connect
+  //
+  for (int count=1; count <= Task_WifiMgr::STA_RETRY_MAX; count++) {
+    this->wl_stat = WiFi.status();
+    
+    log_i("[WifiMgr:%s] %d/%d Task_WifiMgr::Obj_WiFiMulti->run() <-- %d:%s",
+          WIFI_MGR_MODE_T_STR[this->mode],
+          count, Task_WifiMgr::STA_RETRY_MAX,
+          this->wl_stat, WL_STATUS_T_STR2(this->wl_stat));
 
-  if ( this->wl_stat == WL_CONNECTED ) {
-    //
-    // connected
-    //
-    if ( ! prev_connected ) {
-      log_i("[WifiMgr:STA] %d/%d Task_WifiMgr::Obj_WiFiMulti->run() --> %d:%s",
-            retry_count, Task_WifiMgr::STA_RETRY_MAX,
-            this->wl_stat, WL_STATUS_T_STR2(this->wl_stat));
+    this->wl_stat = (wl_status_t)Task_WifiMgr::Obj_WiFiMulti->run();
 
-      log_d("[WifiMgr:STA] WiFi connected (%d:%s)",
-            Task_WifiMgr::LastEvId, Task_WifiMgr::LastEvStr);
+    log_i("[WifiMgr:%s] %d/%d Task_WifiMgr::Obj_WiFiMulti->run() --> %d:%s",
+          WIFI_MGR_MODE_T_STR[this->mode],
+          count, Task_WifiMgr::STA_RETRY_MAX,
+          this->wl_stat, WL_STATUS_T_STR2(this->wl_stat));
 
-      this->cur_ssid = WiFi.SSID().c_str();
-
-      prev_connected = true;
-      retry_count = Task_WifiMgr::STA_RETRY_MAX;
+    if ( this->wl_stat == WL_CONNECTED ) {
+      break;
     }
+
+    if ( count >= Task_WifiMgr::STA_RETRY_MAX ) {
+      break;
+    }
+
+#if 0
+    if ( this->wl_stat == WL_NO_SSID_AVAIL ||
+         this->wl_stat == WL_DISCONNECTED     ) {
+      delay(10000);
+    }
+    delay(1000);
+#endif
+
     delay(5000);
-    return;
   }
 
-  log_w("[WifiMgr:STA] %d/%d Task_WifiMgr::Obj_WiFiMulti->run() --> %d:%s",
-        retry_count, Task_WifiMgr::STA_RETRY_MAX,
-        this->wl_stat, WL_STATUS_T_STR2(this->wl_stat));
-  //
-  // not connected
-  //
-  this->cur_ssid = "";
+  delete Task_WifiMgr::Obj_WiFiMulti;
 
-  log_e("[WifiMgr:STA] wl_stat = %d:%s (LastEvent:%d:%s)",
-        wl_stat, WL_STATUS_T_STR2(wl_stat),
+  if ( this->wl_stat != WL_CONNECTED ) {
+    // not connected
+    this->mode = WIFI_MGR_MODE_AP;
+    return;
+  }
+  
+  //
+  // connected
+  //
+  this->cur_ssid = WiFi.SSID().c_str();
+
+  log_d("[WifiMgr:%s] WiFi connected (%d:%s)",
+        WIFI_MGR_MODE_T_STR[this->mode],
         Task_WifiMgr::LastEvId, Task_WifiMgr::LastEvStr);
 
-  prev_connected = false;
+  while ( (this->wl_stat = WiFi.status()) == WL_CONNECTED ) {
+    log_d("[WifiMgr:%s] wl_stat = %d:%s, last event = %d:%s",
+          WIFI_MGR_MODE_T_STR[this->mode],
+          this->wl_stat, WL_STATUS_T_STR2(this->wl_stat),
+          Task_WifiMgr::LastEvId, Task_WifiMgr::LastEvStr);
 
-  --retry_count;
+    delay(3000);
+  }
 
-  delay(1000);
-  return;
+  // disconnected !?
+  this->cur_ssid = "";
+
+  log_w("[WifiMgr:%s] wl_stat = %d:%s, last event = %d:%s",
+        WIFI_MGR_MODE_T_STR[this->mode],
+        this->wl_stat, WL_STATUS_T_STR2(this->wl_stat),
+        Task_WifiMgr::LastEvId, Task_WifiMgr::LastEvStr);
+
+  return; // retry
 } // Task_WifiMgr::loop_sta_mode() {
 
 /**
@@ -284,6 +311,7 @@ void Task_WifiMgr::loop_ap_mode() {
   Task_WifiMgr::web_svr.on("/scan_ssid", Task_WifiMgr::handle_do_scan);
   Task_WifiMgr::web_svr.on("/confirm_reboot", Task_WifiMgr::handle_confirm_reboot);
   Task_WifiMgr::web_svr.on("/do_reboot", Task_WifiMgr::handle_do_reboot);
+
   //Task_WifiMgr::web_svr.onNotFound(Task_WifiMgr::handle_not_found);
   Task_WifiMgr::web_svr.onNotFound(Task_WifiMgr::handle_top);
 
@@ -294,7 +322,7 @@ void Task_WifiMgr::loop_ap_mode() {
   while ( true ) {
     this->dns_svr.processNextRequest();
     Task_WifiMgr::web_svr.handleClient();
-    delay(1000);
+    delay(10);
   }
   
   this->mode = WIFI_MGR_MODE_STA;
@@ -304,8 +332,9 @@ void Task_WifiMgr::loop_ap_mode() {
  *
  */
 void Task_WifiMgr::handle_not_found() {
-  log_i("[WifiMgr:AP]");
-  Task_WifiMgr::web_svr.send(404, "text/plain", "NotFound");
+  log_i("[WifiMgr:AP] method = %d", Task_WifiMgr::web_svr.method());
+  //Task_WifiMgr::web_svr.send(404, "text/plain", "NotFound");
+  Task_WifiMgr::web_svr.send(200, "text/html; charset=utf-8", "Not Found");
 } // Task_WifiMgr::handle_not_found()
   
 /** static
@@ -326,7 +355,7 @@ void Task_WifiMgr::handle_top() {
   html += "SSID: ";
   html += "</span>";
   html += "<span style='font-size: x-large; font-weight: bold'>";
-  if ( pw.size() == 0 ) {
+  if ( ssid.size() == 0 ) {
     html += "(none)";
   } else {
     html += ssid;
@@ -337,7 +366,7 @@ void Task_WifiMgr::handle_top() {
   html += "Passphrase: ";
   html += "</span>";
   html += "<span style='font-size: large; font-weight: bold'>";
-  if ( ssid.size() == 0 ) {
+  if ( pw.size() == 0 ) {
     html += "(none)";
   } else {
     html += pw[0];
@@ -352,7 +381,7 @@ void Task_WifiMgr::handle_top() {
   html += "<a href='/do_reboot'>OK (Reboot)</a>\n";
   html += Task_WifiMgr::html_footer();
 
-  Task_WifiMgr::web_svr.send(200, "text/html", String(html.c_str()));
+  Task_WifiMgr::web_svr.send(200, "text/html; charset=utf-8", String(html.c_str()));
 } // Task_WifiMgr::handle_top()
 
 /** static
@@ -448,7 +477,7 @@ void Task_WifiMgr::handle_confirm_reboot() {
   std::string html = Task_WifiMgr::html_header("Reboot confirmation");
 
   html += "<p>Are you sure to reboot ";
-  html += "WiFiMgr";
+  html += "Nixie Clock";
   html += " ?</p>\n";
   html += "<a href='/do_reboot'>Yes</a>";
   html += " or ";
