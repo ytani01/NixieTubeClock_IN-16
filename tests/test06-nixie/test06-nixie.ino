@@ -49,10 +49,10 @@ Task_WifiMgr *TaskWifiMgr = NULL;
 #define PIN_HV5812_DATA     6
 #define PIN_HV5812_BLANK    4
 
-#define PIN_COLON_R_TOP     2
-#define PIN_COLON_R_BOTTOM  2
-#define PIN_COLON_L_TOP     1
-#define PIN_COLON_L_BOTTOM  1
+#define PIN_COLON_L_TOP     2
+#define PIN_COLON_L_BOTTOM  2
+#define PIN_COLON_R_TOP     1
+#define PIN_COLON_R_BOTTOM  1
 
 uint8_t PINS_NIXIE_NUM[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N] = {
   { 9,  0,  6,  2,  3,  4,  5,  1,  7,  8},
@@ -147,14 +147,12 @@ void setup() {
   // NixieTube
   log_i("=== Nixie Tube Array");
   Nxa = new NixieTubeArray(PIN_HV5812_CLK,  PIN_HV5812_STOBE,
-                               PIN_HV5812_DATA, PIN_HV5812_BLANK,
-                               PINS_NIXIE_NUM, PINS_NIXIE_COLON);
+                           PIN_HV5812_DATA, PIN_HV5812_BLANK,
+                           PINS_NIXIE_NUM, PINS_NIXIE_COLON);
 
-  TaskNixieTubeArray = new Task_NixieTubeArray(Nxa, BRIGHTNESS_RESOLUTION/2);
+  TaskNixieTubeArray = new Task_NixieTubeArray(Nxa, BRIGHTNESS_RESOLUTION/4);
   TaskNixieTubeArray->start();
   delay(100);
-
-  Nxa->num[0].blink_start(millis(), 500);
 
   // WiFi
   log_i("=== Init WiFi");

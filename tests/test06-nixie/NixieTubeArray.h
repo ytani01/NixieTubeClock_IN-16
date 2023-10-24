@@ -39,13 +39,18 @@ class NixieTubeArray {
   brightness_t set_brightness(brightness_t bri);
                               
   void end_all_effect();
+
+  void set_num(uint8_t (&num)[NIXIE_NUM_N]);
+  void set_col(uint8_t (&col)[NIXIE_COLON_N]);
+  void set(std::string str);
   
-  void set_onoff(unsigned long cur_ms); // 表示状態更新
   void display(unsigned long cur_ms);
 
  private:
   uint8_t _pin_clk, _pin_stobe, _pin_data, _pin_blank;
   brightness_t _brightness = 3;
+
+  void set_onoff(unsigned long cur_ms); // 表示状態更新
 };
 
 #endif // _NIXIE_TUBE_ARRAY_H_

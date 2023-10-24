@@ -3,11 +3,13 @@
  */
 #include "ModeB.h"
 
-/**
+/** virtual
  *
  */
-bool ModeB::enter() {
-  log_d("enter mode: %s", this->name.c_str());
+void ModeB::enter() {
+  log_i("enter mode: %s", this->name.c_str());
+
+  Nxa->num[1].blink_start(millis(), 500);
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setTextColor(WHITE, BLACK);
@@ -20,11 +22,16 @@ bool ModeB::enter() {
   Disp->printf("%s", this->name.c_str());
 
   Disp->display();
-
-  return true;
 } // ModeB::enter()
 
-/**
+/** virtual
+ *
+ */
+void ModeB::exit() {
+  Nxa->end_all_effect();
+} // ModeB::exit()
+
+/** virtual
  *
  */
 void ModeB::loop() {

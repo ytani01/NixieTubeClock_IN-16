@@ -82,6 +82,59 @@ void NixieTubeArray::end_all_effect() {
 /**
  *
  */
+void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N]) {
+  for (int t=0; t < NIXIE_NUM_N; t++) {
+    for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
+      if ( num[t] == e ) {
+        this->num[t].element[e].set_brightness_to_max();
+      } else {
+        this->num[t].element[e].set_brightness(0);
+      }
+    } // for(e)
+  } // for(t)
+} // NixieTubeArray::set_num()
+
+/**
+ *
+ */
+void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N]) {
+  for (int t=0; t < NIXIE_COLON_N; t++) {
+    for (int e=0; e < NIXIE_COLON_DOT_N; e++) {
+      if ( col[t] == e ) {
+        this->colon[t].element[e].set_brightness_to_max();
+      } else {
+        this->colon[t].element[e].set_brightness(0);
+      }
+    } // for(e)
+  } // for(t)
+} // NixieTubeArray::set_col()
+
+/**
+ *
+ */
+void NixieTubeArray::set(std::string str) {
+  str += "AAAAAAAA";
+  log_d("str = %s", str.c_str());
+  
+  uint8_t num[NIXIE_NUM_N];
+  uint8_t col[NIXIE_COLON_N];
+
+  num[0] = str[0] - '0';
+  num[1] = str[1] - '0';
+  col[0] = str[2] == ' ' ? 10 : 0;
+  num[2] = str[3] - '0';
+  num[3] = str[4] - '0';
+  col[1] = str[2] == ' ' ? 10 : 0;
+  num[4] = str[6] - '0';
+  num[5] = str[7] - '0';
+
+  this->set_num(num);
+  this->set_col(col);
+} // NixieTubeArray::set()
+
+/** private
+ *
+ */
 void NixieTubeArray::set_onoff(unsigned long cur_ms) {
   uint8_t timing = cur_ms % BRIGHTNESS_RESOLUTION;
 

@@ -9,11 +9,11 @@
 ModeA::ModeA(): Mode() {
 } // ModeA::ModeA()
 
-/**
+/** virtual
  *
  */
-bool ModeA::enter() {
-  log_d("enter mode: %s", this->name.c_str());
+void ModeA::enter() {
+  log_i("enter mode: %s", this->name.c_str());
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setTextColor(WHITE, BLACK);
@@ -24,11 +24,16 @@ bool ModeA::enter() {
   Disp->setTextWrap(true);
   Disp->printf("%s", this->name.c_str());
   Disp->display();
+} // ModeA::enter()
 
-  return true;
-} // ModeA::en
+/** virtual
+ *
+ */
+void ModeA::exit() {
+  Nxa->end_all_effect();
+} // ModeA::exit()
 
-/**
+/** virtual
  *
  */
 void ModeA::loop() {
@@ -36,6 +41,9 @@ void ModeA::loop() {
   struct tm *tm = SysClock::now_tm();
   char *fmt_date, *fmt_time;
 
+  //
+  // WiFi status
+  //
   static wifi_mgr_mode_t prev_wifimgr_mode = WIFI_MGR_MODE_NONE;
   wifi_mgr_mode_t wifimgr_mode = TaskWifiMgr->mode;
 
@@ -60,13 +68,26 @@ void ModeA::loop() {
     prev_wl_stat = wl_stat;
   }
 
+  //
+  // date time format string
+  //
   fmt_date = (char *)"%Y/%m/%d(%a)";
-  if ( (millis() % 1000 / 500) == 0 ) {
+  struct timeval *tv = SysClock::now_timeval();
+  //if ( tv->tv_usec % 1000000 < 500000 ) {
+  if ( tv->tv_sec % 2 == 0 ) {
     fmt_time =(char *)"%H:%M:%S";
   } else {
     fmt_time =(char *)"%H %M %S";
   }
 
+  //
+  // for NixieTubeArray
+  //
+  Nxa->set(tm2string(tm, fmt_time));
+
+  //
+  // for Disp
+  //
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setCursor(0, 0);
   Disp->setTextSize(1);
@@ -104,7 +125,7 @@ void ModeA::loop() {
 
   Disp->display();
 
-  delayOrChangeMode(100);
+  delayOrChangeMode(50);
 } // ModeA::loop()
 
 /**

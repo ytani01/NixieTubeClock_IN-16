@@ -93,30 +93,31 @@ Mode::Mode() {
   log_v("");
 } // Mode::Mode()
 
-/**
- * 最初の初期化
+/** virtual
+ *
+ * @brief 最初の初期化
  */
 void Mode::setup() {
   log_d("%s", this->name.c_str());
 } // Mode::setup()
 
-/**
- * モード切替時に毎回実行
+/** virtual
+ *
+ * @brief モード切替時に毎回実行
  */
-bool Mode::enter() {
+void Mode::enter() {
   log_d("enter mode: %s", this->name.c_str());
-  return true;
-} // Mode::resume()
+} // Mode::enter()
 
-/**
- * モード切替時に毎回実行
+/** virtual
+ *
+ * @brief モード切替時に毎回実行
  */
-bool Mode::exit() {
+void Mode::exit() {
   log_d("exit mode %s", this->name.c_str());
-  return true;
-} // Mode::resume()
+} // Mode::exit()
 
-/**
+/** virtual
  * 
  */
 void Mode::loop() {
@@ -125,9 +126,9 @@ void Mode::loop() {
   delayOrChangeMode(2000);
 
   return;
-} // Mode::resume()
+} // Mode::loop()
 
-/**
+/** virtual
  *
  */
 void Mode::cbBtn(ButtonInfo_t *bi) {

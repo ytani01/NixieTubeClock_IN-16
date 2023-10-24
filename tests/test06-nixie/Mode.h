@@ -19,6 +19,7 @@
 extern Display_t *Disp;
 extern MyRtc *Rtc;
 extern Task_WifiMgr *TaskWifiMgr;
+extern NixieTubeArray *Nxa;
 
 extern bool Flag_LoopRunning;
 extern bool Flag_ReqModeChange;
@@ -44,9 +45,9 @@ public:
   static void set(String name);
 
   virtual void setup();
-  virtual bool enter();
+  virtual void enter();
+  virtual void exit();
   virtual void loop();
-  virtual bool exit();
 
   virtual void cbBtn(ButtonInfo_t *bi);
 

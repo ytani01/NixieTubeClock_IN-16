@@ -24,6 +24,15 @@ std::string SysClock::now_string(const char fmt[]) {
 /** static
  *
  */
+struct timeval* SysClock::now_timeval() {
+  static struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return &tv;
+} // SysClock::now_timeval()
+
+/** static
+ *
+ */
 void SysClock::set(struct tm *tm) {
   struct timeval tv = { mktime(tm), 0 };
   settimeofday(&tv, NULL);
