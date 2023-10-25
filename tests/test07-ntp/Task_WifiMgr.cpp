@@ -142,7 +142,7 @@ void Task_WifiMgr::on_wifi_event(WiFiEvent_t ev_id, WiFiEventInfo_t ev_info) {
  *
  */
 void Task_WifiMgr::setup() {
-  log_d("[WifiMgr] %s", this->conf.name);
+  log_d("[WifiMgr] %s", this->conf.name.c_str());
 } // Task_WifiMgr::setup()
 
 /** protected virtual

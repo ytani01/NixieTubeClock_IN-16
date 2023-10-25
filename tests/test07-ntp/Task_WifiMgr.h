@@ -47,7 +47,7 @@ static const char *WL_STATUS_T_STR[] = {
  */
 class Task_WifiMgr: public Task {
  public:
-  static const int STA_RETRY_MAX = 5;
+  static const int STA_RETRY_MAX = 6; // T.B.D.
   static constexpr char* WEB_NAME = (char *)"WiFi Manager";
 
   static const int DNS_PORT = 53;

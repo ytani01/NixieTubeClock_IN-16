@@ -14,8 +14,12 @@ std::string get_mac_addr_string();
 static const int DATETIME_STR_LEN = 128;
 
 DateTime tm2datetime(struct tm *tm);
-std::string tm2string(struct tm *tm, const char fmt[]="%Y/%m/%d(%a) %H:%M:%S");
-std::string datetime2string(DateTime *dt);
+
+std::string tm2string(struct tm *tm,
+                      const char fmt[]="%Y/%m/%d(%a) %H:%M:%S");
+
+std::string datetime2string(DateTime *dt,
+                            const char fmt[]="%Y/%m/%d(%a) %H:%M:%S");
 
 inline std::string className(const std::string& prettyFunction)
 {

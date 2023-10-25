@@ -14,11 +14,18 @@
 class Task_NixieTubeArray
   : public Task {
 public:
+  static const uint32_t STACK_SIZE = 4 * 1024;
+  static const UBaseType_t PRIORITY = 4;
+  static const UBaseType_t CORE = APP_CPU_NUM;
+
   static int INIT_VAL[];
 
   Task_NixieTubeArray(NixieTubeArray *nta,
                       brightness_t brightness = BRIGHTNESS_RESOLUTION,
-                      int *init_val=NULL);
+                      int *init_val=NULL,
+                      uint32_t stack_size=STACK_SIZE,
+                      UBaseType_t priority=PRIORITY,
+                      UBaseType_t core=CORE);
 
 protected:
   virtual void setup();

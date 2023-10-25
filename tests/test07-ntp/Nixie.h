@@ -48,7 +48,4 @@ constexpr brightness_t BRIGHTNESS_MIN        = 2;   // 明るさ最小値
 #define NtaCol(i)     Nta->colon[i]
 #define NtaColEl(i,j) NtaCol(i).element[j]
 
-//typedef unsigned long mode_t;
-typedef unsigned long stat_t;
-
 #endif // NIXIE_H

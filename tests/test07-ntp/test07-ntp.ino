@@ -11,6 +11,7 @@
 #include "Task_NixieTubeArray.h"
 #include "Task_ButtonWatcher.h"
 #include "Task_WifiMgr.h"
+#include "Task_Ntp.h"
 
 #include "Mode.h"
 #include "ModeClock.h"
@@ -42,6 +43,10 @@ Task_ButtonWatcher *TaskBtnWatcher = NULL;
 // WiFi
 static const std::string AP_HDR = "NxClk_";
 Task_WifiMgr *TaskWifiMgr = NULL;
+
+// Ntp
+const String NTP_SVR[] = {"ntp.nict.jp", "pool.ntp.org", "time.google.com"};
+Task_Ntp *TaskNtp = NULL;
 
 // Nixie Tube
 #define PIN_HV5812_CLK      7
@@ -100,6 +105,29 @@ void cbBtn(ButtonInfo_t *bi) {
 /**
  *
  */
+void cbNtp(Task_NtpInfo_t *ni) {
+  log_i("%s", SNTP_SYNC_STATUS_STR[ni->sntp_stat]);
+
+  if ( ni->sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
+    DateTime now_dt = Rtc->now();
+    log_i("now_dt: %s",
+          datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+
+    struct tm *tm_sys = SysClock::now_tm();
+    log_i("tm_sys: %s",
+          tm2string(tm_sys, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+
+    Rtc->adjust(tm_sys);
+    
+    now_dt = Rtc->now();
+    log_i("now_dt: %s",
+          datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+  }
+} // cbNtp()
+
+/**
+ *
+ */
 void setup() {
   delay(2000);
   log_i("-=-=-=-=-= start %s SysClock: %s =-=-=-=-=-",
@@ -107,6 +135,10 @@ void setup() {
         SysClock::now_string().c_str());
 
   //log_i("ARDUINO_LOOP_STACK_SIZE=%d", ARDUINO_LOOP_STACK_SIZE);
+
+  // set timezone
+  setenv("TZ", "JST-9", 1);
+  tzset();
 
   // I2C
   log_i("=== Init I2C: SDA=%d, SCL=%d", PIN_I2C_SDA, PIN_I2C_SCL);
@@ -119,6 +151,11 @@ void setup() {
   DateTime dt_rtc = Rtc->now();
   log_i("RTC      : %s", datetime2string(&dt_rtc).c_str());
 
+  // SysClock
+  log_i("=== Init System Clock");
+  SysClock::set(&dt_rtc);
+  log_i("SysClock : %s", SysClock::now_string().c_str());
+
   // Display
   log_i("=== Init Display");
   Disp = new Display_t(DISPLAY_W, DISPLAY_H);
@@ -126,11 +163,6 @@ void setup() {
   Disp->setRotation(0);
   //Disp->clearDisplay();
   Disp->display();
-
-  // SysClock
-  log_i("=== Init System Clock");
-  SysClock::set(&dt_rtc);
-  log_i("SysClock : %s", SysClock::now_string().c_str());
 
   // Button
   log_i("=== Init Buttons");
@@ -158,7 +190,14 @@ void setup() {
   log_i("=== Init WiFi");
   TaskWifiMgr = new Task_WifiMgr(AP_HDR);
   TaskWifiMgr->start();
+  delay(100);
 
+  // NTP
+  log_i("=== NTP");
+  TaskNtp = new Task_Ntp((String *)NTP_SVR, cbNtp);
+  TaskNtp->start();
+  delay(100);
+  
   // Mode
   log_i("=== Init Modes");
   Mode::add("ModeClock", new ModeClock());

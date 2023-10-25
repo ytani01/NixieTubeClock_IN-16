@@ -76,10 +76,18 @@ void ModeClock::loop() {
 
   switch ( this->clock_mode ) {
   case CLOCK_MODE_HMS:
-    if ( tv->tv_sec % 2 == 0 ) {
-      nx_fmt = ModeClock::NX_FMT_HMS1;
+    if ( wl_stat == WL_CONNECTED ) {
+      if ( tv->tv_sec % 2 == 0 ) {
+        nx_fmt = ModeClock::NX_FMT_HMS1;
+      } else {
+        nx_fmt = ModeClock::NX_FMT_HMS2;
+      }
     } else {
-      nx_fmt = ModeClock::NX_FMT_HMS2;
+      if ( tv->tv_sec % 4 <= 1 ) {
+        nx_fmt = ModeClock::NX_FMT_HMS1;
+      } else {
+        nx_fmt = ModeClock::NX_FMT_HMS2;
+      }
     }
     break;
 
@@ -180,23 +188,31 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
   } // if (Btn0)
 
   if ( String(bi->name) == "Btn1" ) {
-    if ( bi->value == Button::OFF ) {
-      if ( bi->click_count == 1 ) {
-        if ( this->clock_mode != CLOCK_MODE_ymd ) {
-          this->clock_mode = CLOCK_MODE_ymd;
-          this->date_start_ms = millis();
-        } else {
-          this->clock_mode = this->clock_mode_main;
-        }
-      } else if ( bi->click_count > 1 ) {
-        if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
-          this->clock_mode_main = CLOCK_MODE_dHM;
-        } else {
-          this->clock_mode_main = CLOCK_MODE_HMS;
-        }
-        this->clock_mode = this->clock_mode_main;
-      }
-    }
+    if ( bi->value == Button::ON ) {
+      if ( bi->push_count == 1 ) {
+        if ( ! bi->long_pressed ) {
+          // simply push
+          if ( this->clock_mode != CLOCK_MODE_ymd ) {
+            this->clock_mode = CLOCK_MODE_ymd;
+            this->date_start_ms = millis();
+          } else {
+            this->clock_mode = this->clock_mode_main;
+          }
+        } else { // long_pressed
+          // long pressed
+          if ( bi->repeat_count == 1 ) {
+            if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
+              this->clock_mode_main = CLOCK_MODE_dHM;
+            } else {
+              this->clock_mode_main = CLOCK_MODE_HMS;
+            }
+            this->clock_mode = this->clock_mode_main;
+            this->date_start_ms = 0;
+          }
+        } // if (!long_pressed)
+      } // if (push_count==1)
+    } // if (ON)
+    
     log_v("clock_mode_main = %d, clock_mode = %d",
           this->clock_mode_main, this->clock_mode);
     return;

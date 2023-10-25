@@ -41,7 +41,8 @@ void Task_ButtonWorker::addBtn(String name, uint8_t pin) {
  *
  */
 void Task_ButtonWorker::setup() {
-  log_d("%s: this->btn_ent: %d", this->conf.name, this->btn_ent.size());
+  log_d("%s: this->btn_ent: %d",
+        this->conf.name.c_str(), this->btn_ent.size());
 } // Task_ButtonWorker::setup()
 
 /**
