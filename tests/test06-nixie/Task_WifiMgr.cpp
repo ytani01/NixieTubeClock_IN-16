@@ -249,7 +249,7 @@ void Task_WifiMgr::loop_sta_mode() {
         Task_WifiMgr::LastEvId, Task_WifiMgr::LastEvStr);
 
   while ( (this->wl_stat = WiFi.status()) == WL_CONNECTED ) {
-    log_d("[WifiMgr:%s] wl_stat = %d:%s, last event = %d:%s",
+    log_v("[WifiMgr:%s] wl_stat = %d:%s, last event = %d:%s",
           WIFI_MGR_MODE_T_STR[this->mode],
           this->wl_stat, WL_STATUS_T_STR2(this->wl_stat),
           Task_WifiMgr::LastEvId, Task_WifiMgr::LastEvStr);

@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ModeA.h"
+#include "ModeClock.h"
 
 /**
  *
  */
-ModeA::ModeA(): Mode() {
-} // ModeA::ModeA()
+ModeClock::ModeClock(): Mode() {
+} // ModeClock::ModeClock()
 
 /** virtual
  *
  */
-void ModeA::enter() {
+void ModeClock::enter() {
   log_i("enter mode: %s", this->name.c_str());
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
@@ -24,22 +24,23 @@ void ModeA::enter() {
   Disp->setTextWrap(true);
   Disp->printf("%s", this->name.c_str());
   Disp->display();
-} // ModeA::enter()
+} // ModeClock::enter()
 
 /** virtual
  *
  */
-void ModeA::exit() {
+void ModeClock::exit() {
   Nxa->end_all_effect();
-} // ModeA::exit()
+} // ModeClock::exit()
 
 /** virtual
  *
  */
-void ModeA::loop() {
+void ModeClock::loop() {
   unsigned long cur_ms = millis();
   struct tm *tm = SysClock::now_tm();
-  char *fmt_date, *fmt_time;
+
+  struct timeval *tv = SysClock::now_timeval();
 
   //
   // WiFi status
@@ -69,10 +70,51 @@ void ModeA::loop() {
   }
 
   //
-  // date time format string
+  // for NixieTubeArray
   //
+  char *nx_fmt;
+
+  switch ( this->clock_mode ) {
+  case CLOCK_MODE_HMS:
+    if ( tv->tv_sec % 2 == 0 ) {
+      nx_fmt = ModeClock::NX_FMT_HMS1;
+    } else {
+      nx_fmt = ModeClock::NX_FMT_HMS2;
+    }
+    break;
+
+  case CLOCK_MODE_dHM:
+    if ( tv->tv_sec % 2 == 0 ) {
+      nx_fmt = ModeClock::NX_FMT_dHM1;
+    } else {
+      nx_fmt = ModeClock::NX_FMT_dHM2;
+    }
+    break;
+
+  case CLOCK_MODE_ymd:
+    if ( cur_ms - date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
+      this->clock_mode = this->clock_mode_main;
+      return;
+    }
+
+    nx_fmt = ModeClock::NX_FMT_ymd;
+    break;
+
+  default:
+    break;
+  } // switch (clock_mode)
+  
+  std::string nx_str = tm2string(tm, nx_fmt);
+  log_v("nx_fmt = %s, nx_str = %s", nx_fmt, nx_str.c_str());
+
+  Nxa->set_string(nx_str.c_str());
+
+  //
+  // for Disp
+  //
+  char *fmt_date, *fmt_time;
+
   fmt_date = (char *)"%Y/%m/%d(%a)";
-  struct timeval *tv = SysClock::now_timeval();
   //if ( tv->tv_usec % 1000000 < 500000 ) {
   if ( tv->tv_sec % 2 == 0 ) {
     fmt_time =(char *)"%H:%M:%S";
@@ -80,14 +122,6 @@ void ModeA::loop() {
     fmt_time =(char *)"%H %M %S";
   }
 
-  //
-  // for NixieTubeArray
-  //
-  Nxa->set(tm2string(tm, fmt_time));
-
-  //
-  // for Disp
-  //
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setCursor(0, 0);
   Disp->setTextSize(1);
@@ -126,62 +160,57 @@ void ModeA::loop() {
   Disp->display();
 
   delayOrChangeMode(50);
-} // ModeA::loop()
+} // ModeClock::loop()
 
 /**
  *
  */
-void ModeA::cbBtn(ButtonInfo_t *bi) {
+void ModeClock::cbBtn(ButtonInfo_t *bi) {
   log_d("%s", Button::info2String(bi).c_str());
 
   if ( String(bi->name) == "Btn0" ) {
     if ( bi->value == Button::ON ) {
-      if ( ! bi->long_pressed ) {
-        Mode::set("ModeB");
+      if ( bi->long_pressed ) {
+        if ( bi->repeat_count == 0 ) {
+          Mode::set("ModeB");
+        }
       }
     }
     return;
   } // if (Btn0)
 
-  bool flag_set_clock = false;
-  struct tm *tm_sys = SysClock::now_tm();  
-
   if ( String(bi->name) == "Btn1" ) {
-    if ( bi->value == Button::ON || bi->long_pressed ) {
-      if ( bi->repeat_count < 9 ) {
-        tm_sys->tm_mday++;
-        tm_sys->tm_wday++;
-      } else if ( bi->repeat_count < 19 ) {
-        tm_sys->tm_mon++;
-      } else {
-        tm_sys->tm_year++;
+    if ( bi->value == Button::OFF ) {
+      if ( bi->click_count == 1 ) {
+        if ( this->clock_mode != CLOCK_MODE_ymd ) {
+          this->clock_mode = CLOCK_MODE_ymd;
+          this->date_start_ms = millis();
+        } else {
+          this->clock_mode = this->clock_mode_main;
+        }
+      } else if ( bi->click_count > 1 ) {
+        if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
+          this->clock_mode_main = CLOCK_MODE_dHM;
+        } else {
+          this->clock_mode_main = CLOCK_MODE_HMS;
+        }
+        this->clock_mode = this->clock_mode_main;
       }
-      flag_set_clock = true;
     }
+    log_v("clock_mode_main = %d, clock_mode = %d",
+          this->clock_mode_main, this->clock_mode);
+    return;
   } // if (Btn1)
 
   if ( String(bi->name) == "Btn2" ) {
-    if ( bi->value == Button::ON || bi->long_pressed ) {
-      if ( bi->repeat_count < 9 ) {
-        tm_sys->tm_mday--;
-        tm_sys->tm_wday--;
-      } else if ( bi->repeat_count < 19 ) {
-        tm_sys->tm_mon--;
-      } else {
-        tm_sys->tm_year--;
+    if ( bi->value == Button::ON ) {
+      brightness_t bri = Nxa->brightness() / 2;
+      if ( bri < BRIGHTNESS_MIN ) {
+        bri = BRIGHTNESS_RESOLUTION;
       }
-      flag_set_clock = true;
+      Nxa->set_brightness(bri);
     }
+    return;
   } // if (Btn2)
 
-  if ( flag_set_clock ) {
-    // adjust SysClock
-    SysClock::set(tm_sys);
-    log_d("Sys : %s", tm2string(SysClock::now_tm()).c_str());
-    
-    // adjust RTC
-    Rtc->adjust(tm_sys);
-    DateTime dt = Rtc->now();
-    log_d("RTC : %s", datetime2string(&dt).c_str());
-  }
-} // ModeA::cbBtn()
+} // ModeClock::cbBtn()

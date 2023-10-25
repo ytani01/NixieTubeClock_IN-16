@@ -42,7 +42,7 @@ class NixieTubeArray {
 
   void set_num(uint8_t (&num)[NIXIE_NUM_N]);
   void set_col(uint8_t (&col)[NIXIE_COLON_N]);
-  void set(std::string str);
+  void set_string(std::string str);
   
   void display(unsigned long cur_ms);
 

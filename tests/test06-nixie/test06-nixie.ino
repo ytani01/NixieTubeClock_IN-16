@@ -13,7 +13,7 @@
 #include "Task_WifiMgr.h"
 
 #include "Mode.h"
-#include "ModeA.h"
+#include "ModeClock.h"
 #include "ModeB.h"
 
 
@@ -161,14 +161,14 @@ void setup() {
 
   // Mode
   log_i("=== Init Modes");
-  Mode::add("ModeA", new ModeA());
+  Mode::add("ModeClock", new ModeClock());
   Mode::add("ModeB", new ModeB());
 
   for (auto m: Mode::Ent) {
     m.second->setup();
   }
 
-  Mode::set("ModeA");
+  Mode::set("ModeClock");
 
 } // setup()
 

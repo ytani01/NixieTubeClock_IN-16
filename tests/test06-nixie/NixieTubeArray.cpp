@@ -112,9 +112,9 @@ void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N]) {
 /**
  *
  */
-void NixieTubeArray::set(std::string str) {
+void NixieTubeArray::set_string(std::string str) {
   str += "AAAAAAAA";
-  log_d("str = %s", str.c_str());
+  log_v("str = %s", str.c_str());
   
   uint8_t num[NIXIE_NUM_N];
   uint8_t col[NIXIE_COLON_N];
@@ -124,13 +124,15 @@ void NixieTubeArray::set(std::string str) {
   col[0] = str[2] == ' ' ? 10 : 0;
   num[2] = str[3] - '0';
   num[3] = str[4] - '0';
-  col[1] = str[2] == ' ' ? 10 : 0;
+  col[1] = str[5] == ' ' ? 10 : 0;
   num[4] = str[6] - '0';
   num[5] = str[7] - '0';
 
+  //log_d("col[] = {%d, %d}", col[0], col[1]);
+  
   this->set_num(num);
   this->set_col(col);
-} // NixieTubeArray::set()
+} // NixieTubeArray::set_string()
 
 /** private
  *
