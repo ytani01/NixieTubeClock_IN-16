@@ -6,7 +6,8 @@
 /**
  *
  */
-ModeBoot::ModeBoot(): Mode() {
+ModeBoot::ModeBoot(unsigned long interval): Mode() {
+  this->interval = interval;
 } // ModeBoot::ModeBoot()
 
 /** virtual
@@ -51,7 +52,10 @@ void ModeBoot::loop() {
   struct tm *tm = SysClock::now_tm();
   struct timeval *tv = SysClock::now_timeval();
 
-  if ( cur_ms - this->start_ms > ModeBoot::BOOT_INTERVAL_MS ) {
+  //
+  // check interval
+  //
+  if ( cur_ms - this->start_ms > this->interval ) {
     log_i("done");
     Flag_LoopRunning = false;
     Mode::set("ModeClock");
@@ -59,11 +63,7 @@ void ModeBoot::loop() {
   }
 
   //
-  // for NixieTubeArray
-  //
-
-  //
-  // for Disp
+  // Disp
   //
   char *fmt_date, *fmt_time;
 

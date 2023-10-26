@@ -12,9 +12,10 @@ class ModeBoot: public Mode {
  public:
   static const unsigned long BOOT_INTERVAL_MS = 2000;  // ms
 
+  unsigned long interval = BOOT_INTERVAL_MS;
   unsigned long start_ms = 0;
 
-  ModeBoot();  
+  ModeBoot(unsigned long interval=BOOT_INTERVAL_MS);
 
   virtual void enter();
   virtual void exit();

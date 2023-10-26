@@ -92,10 +92,18 @@ void ModeClock::loop() {
     break;
 
   case CLOCK_MODE_dHM:
-    if ( tv->tv_sec % 2 == 0 ) {
-      nx_fmt = ModeClock::NX_FMT_dHM1;
+    if ( wl_stat == WL_CONNECTED ) {
+      if ( tv->tv_sec % 2 == 0 ) {
+        nx_fmt = ModeClock::NX_FMT_dHM1;
+      } else {
+        nx_fmt = ModeClock::NX_FMT_dHM2;
+      }
     } else {
-      nx_fmt = ModeClock::NX_FMT_dHM2;
+      if ( tv->tv_sec % 4 <= 1 ) {
+        nx_fmt = ModeClock::NX_FMT_dHM1;
+      } else {
+        nx_fmt = ModeClock::NX_FMT_dHM2;
+      }
     }
     break;
 
@@ -123,7 +131,6 @@ void ModeClock::loop() {
   char *fmt_date, *fmt_time;
 
   fmt_date = (char *)"%Y/%m/%d(%a)";
-  //if ( tv->tv_usec % 1000000 < 500000 ) {
   if ( tv->tv_sec % 2 == 0 ) {
     fmt_time =(char *)"%H:%M:%S";
   } else {
@@ -191,7 +198,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
     if ( bi->value == Button::ON ) {
       if ( bi->push_count == 1 ) {
         if ( ! bi->long_pressed ) {
-          // simply push
+          // single push
           if ( this->clock_mode != CLOCK_MODE_ymd ) {
             this->clock_mode = CLOCK_MODE_ymd;
             this->date_start_ms = millis();

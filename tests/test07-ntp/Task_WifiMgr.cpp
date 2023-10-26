@@ -444,7 +444,7 @@ void Task_WifiMgr::handle_select_ssid() {
 
   html += "</select><br />\n";
 
-  html += "Password ";
+  html += "Passphrase ";
   html += "<span style='font-size: xx-large'>";
   html += "<input type='text'";
   html += " name='passwd'";

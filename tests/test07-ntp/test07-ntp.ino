@@ -18,7 +18,7 @@
 #include "ModeClock.h"
 #include "ModeB.h"
 
-std::string VersionString = "02.00.00";
+std::string VersionString = " 2. 0. 0";
 
 // Mode
 bool Flag_ReqModeChange = false; // モード変更要求フラグ
@@ -222,7 +222,7 @@ void setup() {
   
   // Mode
   log_i("=== Init Modes");
-  Mode::add("ModeBoot", new ModeBoot());
+  Mode::add("ModeBoot", new ModeBoot(2000));
   Mode::add("ModeClock", new ModeClock());
   //Mode::add("ModeB", new ModeB());
 
