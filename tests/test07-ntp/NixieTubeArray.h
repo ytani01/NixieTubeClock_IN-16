@@ -21,7 +21,9 @@
  */
 #ifndef _NIXIE_TUBE_ARRAY_H_
 #define _NIXIE_TUBE_ARRAY_H_
+
 #include "NixieTube.h"
+#include "ConfFile_Brightness.h"
 
 class NixieTubeArray {
  public:
@@ -49,6 +51,7 @@ class NixieTubeArray {
  private:
   uint8_t _pin_clk, _pin_stobe, _pin_data, _pin_blank;
   brightness_t _brightness = 3;
+  ConfFile_Brightness *_cf_bri;
 
   void set_onoff(unsigned long cur_ms); // 表示状態更新
 };

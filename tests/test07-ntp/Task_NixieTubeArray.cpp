@@ -27,6 +27,7 @@ Task_NixieTubeArray::Task_NixieTubeArray(NixieTubeArray *nta,
   } else {
     this->init_val = init_val;
   }
+
 } // Task_NixieTubeArray::Task_NixieTubeArray()
 
 /**

@@ -33,6 +33,7 @@ NixieTubeArray::NixieTubeArray(uint8_t clk, uint8_t stobe, uint8_t data,
     }
   } // for(c)
 
+  this->_cf_bri = new ConfFile_Brightness();
 } // NixieTubeArray::setup()
 
 void NixieTubeArray::loop(unsigned long cur_ms) {
@@ -48,23 +49,41 @@ void NixieTubeArray::loop(unsigned long cur_ms) {
  *
  */
 brightness_t NixieTubeArray::brightness() {
-  return this->_brightness;
+  return this->_cf_bri->brightness;
 } // NixieTubeArray::brightness()
 
 /**
  *
  */
 brightness_t NixieTubeArray::set_brightness(brightness_t bri) {
-  this->_brightness = bri;
+  if ( bri <= 0 ) {
+    //
+    // load config file
+    //
+    if ( this->_cf_bri->load() <= 0 ) {
+      this->_cf_bri->brightness = BRIGHTNESS_RESOLUTION;
+      this->_cf_bri->save();
+    }
+    if ( this->_cf_bri->brightness <= 0 ) {
+      this->_cf_bri->brightness = BRIGHTNESS_RESOLUTION;
+      this->_cf_bri->save();
+    }
+  } else {
+    //
+    // save config file
+    //
+    this->_cf_bri->brightness = bri;
+    this->_cf_bri->save();
+  }
 
   for (int i=0; i < NIXIE_NUM_N; i++) {
-    this->num[i].set_brightness(bri);
+    this->num[i].set_brightness(this->_cf_bri->brightness);
   }
   for (int i=0; i < NIXIE_COLON_N; i++) {
-    this->colon[i].set_brightness(bri);
+    this->colon[i].set_brightness(this->_cf_bri->brightness);
   }
   
-  return this->_brightness;
+  return this->_cf_bri->brightness;
 } // NixieTubeArray::set_brightness()
 
 /**

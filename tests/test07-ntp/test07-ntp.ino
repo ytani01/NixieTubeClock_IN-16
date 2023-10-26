@@ -203,7 +203,7 @@ void setup() {
                            PIN_HV5812_DATA, PIN_HV5812_BLANK,
                            PINS_NIXIE_NUM, PINS_NIXIE_COLON);
 
-  TaskNixieTubeArray = new Task_NixieTubeArray(Nxa, BRIGHTNESS_RESOLUTION/4);
+  TaskNixieTubeArray = new Task_NixieTubeArray(Nxa, 0);
   TaskNixieTubeArray->start();
   delay(100);
   Nxa->set_string(VersionString);

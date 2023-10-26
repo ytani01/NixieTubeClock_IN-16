@@ -21,7 +21,7 @@ public:
   static int INIT_VAL[];
 
   Task_NixieTubeArray(NixieTubeArray *nta,
-                      brightness_t brightness = BRIGHTNESS_RESOLUTION,
+                      brightness_t brightness = 0, // default: load conf file
                       int *init_val=NULL,
                       uint32_t stack_size=STACK_SIZE,
                       UBaseType_t priority=PRIORITY,
