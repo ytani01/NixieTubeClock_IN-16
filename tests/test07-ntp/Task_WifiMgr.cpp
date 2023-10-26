@@ -18,8 +18,11 @@ WebServer Task_WifiMgr::web_svr;
 /**
  *
  */
-Task_WifiMgr::Task_WifiMgr(std::string ap_ssid_hdr)
-  : Task(__CLASS_NAME__)
+Task_WifiMgr::Task_WifiMgr(std::string ap_ssid_hdr,
+                           uint32_t stack_size,
+                           UBaseType_t priority,
+                           UBaseType_t core)
+  : Task(__CLASS_NAME__, stack_size, priority, core)
 {
   this->ap_ssid = ap_ssid_hdr + get_mac_addr_string();
   log_i("[WifiMgr] %s: ap_ssid = \"%s\"",
@@ -34,7 +37,7 @@ Task_WifiMgr::Task_WifiMgr(std::string ap_ssid_hdr)
  *
  */
 void Task_WifiMgr::on_wifi_event(WiFiEvent_t ev_id, WiFiEventInfo_t ev_info) {
-  log_d("[WifiMgr] ev_id = %d", ev_id);
+  //log_d("[WifiMgr] ev_id = %d", ev_id);
 
   Task_WifiMgr::LastEvId = ev_id;
   Task_WifiMgr::LastEvInfo = ev_info;

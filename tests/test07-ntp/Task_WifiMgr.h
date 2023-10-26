@@ -47,6 +47,10 @@ static const char *WL_STATUS_T_STR[] = {
  */
 class Task_WifiMgr: public Task {
  public:
+  static const uint32_t STACK_SIZE = 4 * 1024;
+  static const UBaseType_t PRIORITY = 0;
+  static const UBaseType_t CORE = APP_CPU_NUM;
+
   static const int STA_RETRY_MAX = 6; // T.B.D.
   static constexpr char* WEB_NAME = (char *)"WiFi Manager";
 
@@ -57,7 +61,7 @@ class Task_WifiMgr: public Task {
   static WiFiMulti *Obj_WiFiMulti;
 
   static WiFiEvent_t LastEvId;
-  static char LastEvStr[];
+  static char LastEvStr[128];
   static WiFiEventInfo_t LastEvInfo;
 
   wifi_mgr_mode_t mode = WIFI_MGR_MODE_STA;
@@ -68,7 +72,10 @@ class Task_WifiMgr: public Task {
   std::string ap_ssid;
   unsigned long wifi_try_count;
 
-  Task_WifiMgr(std::string ap_ssid_hdr);
+  Task_WifiMgr(std::string ap_ssid_hdr,
+               uint32_t stack_size=STACK_SIZE,
+               UBaseType_t priority=PRIORITY,
+               UBaseType_t core=CORE);
 
  protected:
   IPAddress ap_ip, ap_netmask;
