@@ -14,9 +14,11 @@
 #include "Task_Ntp.h"
 
 #include "Mode.h"
+#include "ModeBoot.h"
 #include "ModeClock.h"
 #include "ModeB.h"
 
+std::string VersionString = "02.00.00";
 
 // Mode
 bool Flag_ReqModeChange = false; // モード変更要求フラグ
@@ -109,19 +111,38 @@ void cbNtp(Task_NtpInfo_t *ni) {
   log_i("%s", SNTP_SYNC_STATUS_STR[ni->sntp_stat]);
 
   if ( ni->sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
+    //
+    // adjust RTC
+    //
+    log_i("== adjust RTC from NTP");
+
     DateTime now_dt = Rtc->now();
-    log_i("now_dt: %s",
+    log_i("  now RTC     : %s",
           datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
 
     struct tm *tm_sys = SysClock::now_tm();
-    log_i("tm_sys: %s",
+    log_i("  src Sys(NTP): %s",
           tm2string(tm_sys, "%Y-%m-%d(%a),%H:%M:%S").c_str());
 
     Rtc->adjust(tm_sys);
     
     now_dt = Rtc->now();
-    log_i("now_dt: %s",
+    log_i("  dst RTC     : %s",
           datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+  } else {
+    //
+    // NTP is not available
+    // adjust system clock from RTC
+    //
+    log_i("== adjust system clock from RTC");
+
+    DateTime now_dt = Rtc->now();
+    log_i("  src RTC: %s",
+          datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+
+    SysClock::set(&now_dt);
+
+    log_i("  dst Sys: %s", SysClock::now_string().c_str());
   }
 } // cbNtp()
 
@@ -185,6 +206,7 @@ void setup() {
   TaskNixieTubeArray = new Task_NixieTubeArray(Nxa, BRIGHTNESS_RESOLUTION/4);
   TaskNixieTubeArray->start();
   delay(100);
+  Nxa->set_string(VersionString);
 
   // WiFi
   log_i("=== Init WiFi");
@@ -200,14 +222,15 @@ void setup() {
   
   // Mode
   log_i("=== Init Modes");
+  Mode::add("ModeBoot", new ModeBoot());
   Mode::add("ModeClock", new ModeClock());
-  Mode::add("ModeB", new ModeB());
+  //Mode::add("ModeB", new ModeB());
 
   for (auto m: Mode::Ent) {
     m.second->setup();
   }
 
-  Mode::set("ModeClock");
+  Mode::set("ModeBoot");
 
 } // setup()
 
@@ -234,7 +257,7 @@ void loop() {
     Flag_LoopRunning = true;
     Mode::Cur->loop();
     if ( Flag_ReqModeChange ) {
-      log_d("%s::loop(): done", Mode::Prev->name.c_str());
+      log_i("%s::loop(): done", Mode::Prev->name.c_str());
     }
     Flag_LoopRunning = false;
 
@@ -252,7 +275,7 @@ void loop() {
       vTaskDelayUntil(&xLastTime, 1);
     }
     if ( wait_count > 0 ) {
-      log_v("wait_count=%u", wait_count);
+      log_i("wait_count=%u", wait_count);
     }
   } else {
     log_e("Mode::Cur == NULL !?");

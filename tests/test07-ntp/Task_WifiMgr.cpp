@@ -231,8 +231,14 @@ void Task_WifiMgr::loop_sta_mode() {
     delay(1000);
 #endif
 
+    if ( Task_WifiMgr::LastEvId == ARDUINO_EVENT_WIFI_STA_DISCONNECTED ) {
+      if ( Task_WifiMgr::LastEvInfo.wifi_sta_disconnected.reason != 15 ) {
+        log_i("delay(6000)");
+        delay(6000);
+      }
+    }
     delay(5000);
-  }
+  } // for (count)
 
   delete Task_WifiMgr::Obj_WiFiMulti;
 
@@ -275,6 +281,8 @@ void Task_WifiMgr::loop_sta_mode() {
  *
  */
 void Task_WifiMgr::loop_ap_mode() {
+  WiFi.disconnect();
+
   if ( Task_WifiMgr::LastEvId != ARDUINO_EVENT_WIFI_AP_START ) {
     log_i("[WifiMgr:AP] ap_ssid=%s", this->ap_ssid.c_str());
 
@@ -285,6 +293,7 @@ void Task_WifiMgr::loop_ap_mode() {
       delay(2000);
       return;
     }
+    delay(200);
 
     this->ap_ip = WiFi.softAPIP();
     this->ap_netmask = WiFi.softAPSubnetMask();
@@ -393,15 +402,17 @@ void Task_WifiMgr::handle_top() {
 void Task_WifiMgr::handle_select_ssid() {
   std::string ssid = "", pw = "";
   
+  WiFi.disconnect();
+
   if ( Task_WifiMgr::Obj_ConfFile_Ssid->load() > 0 ) {
     ssid = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->first.c_str();
-    pw = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->second.c_str();
+    //pw = Task_WifiMgr::Obj_ConfFile_Ssid->ent.begin()->second.c_str();
   }
   log_i("[WifiMgr:AP] ssid=%s, pw=%s", ssid.c_str(), pw.c_str());
   
-  log_d("[WifiMgr:AP] scan SSIDs ...");
+  log_i("[WifiMgr:AP] scan SSIDs ...");
   int16_t ssid_n = WiFi.scanNetworks();
-  log_d("[WifiMgr:AP] ssid_n=%s", ssid_n);
+  log_i("[WifiMgr:AP] ssid_n=%d", ssid_n);
 
   if ( ssid_n < 0 ) {
     ssid_n = 0;
@@ -415,11 +426,15 @@ void Task_WifiMgr::handle_select_ssid() {
   html += "SSID ";
   html += "<select name='ssid' id='ssid' style='font-size:large;'>";
 
+  html += "<option value="">(clear)</option>\n";
+
   for(int i=0; i < ssid_n; i++){
     html += "<option value=" + std::string(WiFi.SSID(i).c_str());
     for ( auto ent: Task_WifiMgr::Obj_ConfFile_Ssid->ent ) {
       if ( std::string(WiFi.SSID(i).c_str()) == ent.first ) {
         html += " selected";
+        //pw = Task_WifiMgr::Obj_ConfFile_Ssid->ent[ent.first];
+        pw = ent.second;
       }
     }
     html += ">";
@@ -427,7 +442,6 @@ void Task_WifiMgr::handle_select_ssid() {
     html += "</option>\n";
   } // for(i)
 
-  html += "<option value="">(clear)</option>\n";
   html += "</select><br />\n";
 
   html += "Password ";

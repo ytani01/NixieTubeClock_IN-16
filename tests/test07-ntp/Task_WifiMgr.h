@@ -51,7 +51,7 @@ class Task_WifiMgr: public Task {
   static const UBaseType_t PRIORITY = 0;
   static const UBaseType_t CORE = APP_CPU_NUM;
 
-  static const int STA_RETRY_MAX = 6; // T.B.D.
+  static const int STA_RETRY_MAX = 3; // T.B.D.
   static constexpr char* WEB_NAME = (char *)"WiFi Manager";
 
   static const int DNS_PORT = 53;

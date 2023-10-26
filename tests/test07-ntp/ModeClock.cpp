@@ -154,7 +154,7 @@ void ModeClock::loop() {
       }
     }
   } else {
-    if ( cur_ms % 2000 > 200 ) {
+    if ( cur_ms % 5000 > 200 ) {
       Disp->printf("AP:%s\n", TaskWifiMgr->ap_ssid.c_str());
     } else {
       Disp->printf("\n");

@@ -27,14 +27,14 @@
 typedef unsigned int  brightness_t;
 
 constexpr brightness_t BRIGHTNESS_RESOLUTION = 16;  // 明るさの段階数 2^n
-constexpr brightness_t BRIGHTNESS_MIN        = 2;   // 明るさ最小値
+constexpr brightness_t BRIGHTNESS_MIN        = 4;   // 明るさ最小値
 
 #define NIXIE_NUM_N          6  // 数字の桁数
 #define NIXIE_NUM_DIGIT_N   10  // 一桁の数字のパターン数
 
 #define NIXIE_COLON_N        2
-#define NIXIE_COLON_R        0
-#define NIXIE_COLON_L        1
+#define NIXIE_COLON_L        0
+#define NIXIE_COLON_R        1
 #define NIXIE_COLON_DOT_N    1  // 現在は、上下同じピンなので、ドットは一つ
 #define NIXIE_COLON_DOT_UP   0  // UPとDOWNは、同じ
 #define NIXIE_COLON_DOT_DOWN 0  // UPとDOWNは、同じ

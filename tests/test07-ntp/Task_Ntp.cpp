@@ -49,8 +49,12 @@ void Task_Ntp::setup() {
 void Task_Ntp::loop() {
   static sntp_sync_status_t prev_stat = SNTP_SYNC_STATUS_RESET;
 
-  bool wifi_available = false;
   unsigned long interval = INTERVAL_NO_WIFI;
+
+  //
+  // get WiFi status
+  //
+  bool wifi_available = false;
 
   wifi_mgr_mode_t wifimgr_mode = TaskWifiMgr->mode;
   wl_status_t wl_stat = TaskWifiMgr->wl_stat;
@@ -62,6 +66,9 @@ void Task_Ntp::loop() {
   }
 
   if ( ! wifi_available ) {
+    //
+    // WiFi is not available
+    //
     log_w("WIFI is not available");
     this->info.sntp_stat = SNTP_SYNC_STATUS_RESET;
 

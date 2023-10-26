@@ -22,7 +22,8 @@ void Mode::add(String name, Mode *mode) {
 } // Mode::add()
 
 /** static
-    @brief  set Mode
+ *
+ * @brief  set Mode
  */
 void Mode::set(String name) {
   if ( Mode::Ent.size() == 0 ) {
@@ -38,7 +39,7 @@ void Mode::set(String name) {
   if ( Mode::Prev ) {
     prev_mode_name = Mode::Prev->name.c_str(); // String --> std::string
   }
-  log_d("%s --> %s ...", prev_mode_name.c_str(), name.c_str());
+  log_i("%s --> %s ...", prev_mode_name.c_str(), name.c_str());
 
   /*
     set Mode::Cur
