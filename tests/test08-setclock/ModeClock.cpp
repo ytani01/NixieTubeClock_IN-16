@@ -82,7 +82,8 @@ void ModeClock::loop() {
         nx_fmt = ModeClock::NX_FMT_HMS2;
       }
     } else {
-      if ( tv->tv_sec % 4 <= 2 ) {
+      //if ( tv->tv_sec % 4 <= 2 ) {
+      if ( tv->tv_sec % 2 <= 0 ) {
         nx_fmt = ModeClock::NX_FMT_HMS1;
       } else {
         nx_fmt = ModeClock::NX_FMT_HMS2;
