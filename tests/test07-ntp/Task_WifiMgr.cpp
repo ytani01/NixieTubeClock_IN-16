@@ -44,40 +44,52 @@ void Task_WifiMgr::on_wifi_event(WiFiEvent_t ev_id, WiFiEventInfo_t ev_info) {
   
   switch (ev_id) {
   case ARDUINO_EVENT_WIFI_READY: 
-    sprintf(Task_WifiMgr::LastEvStr, "WiFi interface ready");
+    //sprintf(Task_WifiMgr::LastEvStr, "WiFi interface ready");
+    sprintf(Task_WifiMgr::LastEvStr, "READY");
     break;
   case ARDUINO_EVENT_WIFI_SCAN_DONE:
-    sprintf(Task_WifiMgr::LastEvStr, "Completed scan for access points");
+    //sprintf(Task_WifiMgr::LastEvStr, "Completed scan for access points");
+    sprintf(Task_WifiMgr::LastEvStr, "SCAN DONE");
     break;
   case ARDUINO_EVENT_WIFI_STA_START:
-    sprintf(Task_WifiMgr::LastEvStr, "WiFi client started");
+    //sprintf(Task_WifiMgr::LastEvStr, "WiFi client started");
+    sprintf(Task_WifiMgr::LastEvStr, "STA START");
     break;
   case ARDUINO_EVENT_WIFI_STA_STOP:
-    sprintf(Task_WifiMgr::LastEvStr, "WiFi clients stopped");
+    //sprintf(Task_WifiMgr::LastEvStr, "WiFi clients stopped");
+    sprintf(Task_WifiMgr::LastEvStr, "STA STOP");
     break;
   case ARDUINO_EVENT_WIFI_STA_CONNECTED:
-    sprintf(Task_WifiMgr::LastEvStr, "Connected to access point");
+    //sprintf(Task_WifiMgr::LastEvStr, "Connected to access point");
+    sprintf(Task_WifiMgr::LastEvStr, "CONNECTED");
     break;
   case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-    sprintf(Task_WifiMgr::LastEvStr,
-            "Disconnected from WiFi access point: %u",
+    //sprintf(Task_WifiMgr::LastEvStr,
+    //        "Disconnected from WiFi access point: %u",
+    //        ev_info.wifi_sta_disconnected.reason);
+    sprintf(Task_WifiMgr::LastEvStr, "DISCONNECTED:%u",
             ev_info.wifi_sta_disconnected.reason);
     break;
   case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
-    sprintf(Task_WifiMgr::LastEvStr,
-            "Authentication mode of access point has changed");
+    //sprintf(Task_WifiMgr::LastEvStr,
+    //        "Authentication mode of access point has changed");
+    sprintf(Task_WifiMgr::LastEvStr, "AUTHMODE_CHANGE");
     break;
   case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-    sprintf(Task_WifiMgr::LastEvStr,
-            "Obtained IP address: %s", WiFi.localIP().toString().c_str());
+    //sprintf(Task_WifiMgr::LastEvStr,
+    //        "Obtained IP address: %s", WiFi.localIP().toString().c_str());
+    sprintf(Task_WifiMgr::LastEvStr, "GOT_IP:%s",
+            WiFi.localIP().toString().c_str());
     break;
   case ARDUINO_EVENT_WIFI_STA_LOST_IP:
-    sprintf(Task_WifiMgr::LastEvStr,
-            "Lost IP address and IP address is reset to 0");
+    //sprintf(Task_WifiMgr::LastEvStr,
+    //        "Lost IP address and IP address is reset to 0");
+    sprintf(Task_WifiMgr::LastEvStr, "LOST_IP");
     break;
   case ARDUINO_EVENT_WPS_ER_SUCCESS:
-    sprintf(Task_WifiMgr::LastEvStr,
-            "WiFi Protected Setup (WPS): succeeded in enrollee mode");
+    //sprintf(Task_WifiMgr::LastEvStr,
+    //        "WiFi Protected Setup (WPS): succeeded in enrollee mode");
+    sprintf(Task_WifiMgr::LastEvStr, "WPS_ER_SUCCESS");
     break;
   case ARDUINO_EVENT_WPS_ER_FAILED:
     sprintf(Task_WifiMgr::LastEvStr,
@@ -92,10 +104,12 @@ void Task_WifiMgr::on_wifi_event(WiFiEvent_t ev_id, WiFiEventInfo_t ev_info) {
             "WiFi Protected Setup (WPS): pin code in enrollee mode");
     break;
   case ARDUINO_EVENT_WIFI_AP_START:
-    sprintf(Task_WifiMgr::LastEvStr, "WiFi access point started");
+    //sprintf(Task_WifiMgr::LastEvStr, "WiFi access point started");
+    sprintf(Task_WifiMgr::LastEvStr, "AP_START");
     break;
   case ARDUINO_EVENT_WIFI_AP_STOP:
-    sprintf(Task_WifiMgr::LastEvStr, "WiFi access point  stopped");
+    //sprintf(Task_WifiMgr::LastEvStr, "WiFi access point  stopped");
+    sprintf(Task_WifiMgr::LastEvStr, "AP_STOP");
     break;
   case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
     sprintf(Task_WifiMgr::LastEvStr, "Client connected");
@@ -201,6 +215,10 @@ void Task_WifiMgr::loop_sta_mode() {
   // try to connect
   //
   for (int count=1; count <= Task_WifiMgr::STA_RETRY_MAX; count++) {
+    if ( this->mode != WIFI_MGR_MODE_STA ) {
+      break;
+    }
+
     this->wl_stat = WiFi.status();
     
     log_i("[WifiMgr:%s] %d/%d Task_WifiMgr::Obj_WiFiMulti->run() <-- %d:%s",
@@ -208,6 +226,7 @@ void Task_WifiMgr::loop_sta_mode() {
           count, Task_WifiMgr::STA_RETRY_MAX,
           this->wl_stat, WL_STATUS_T_STR2(this->wl_stat));
 
+    // try to connect WiFi
     this->wl_stat = (wl_status_t)Task_WifiMgr::Obj_WiFiMulti->run();
 
     log_i("[WifiMgr:%s] %d/%d Task_WifiMgr::Obj_WiFiMulti->run() --> %d:%s",
@@ -223,6 +242,9 @@ void Task_WifiMgr::loop_sta_mode() {
       break;
     }
 
+    if ( this->mode != WIFI_MGR_MODE_STA ) {
+      break;
+    }
 #if 0
     if ( this->wl_stat == WL_NO_SSID_AVAIL ||
          this->wl_stat == WL_DISCONNECTED     ) {
@@ -233,10 +255,11 @@ void Task_WifiMgr::loop_sta_mode() {
 
     if ( Task_WifiMgr::LastEvId == ARDUINO_EVENT_WIFI_STA_DISCONNECTED ) {
       if ( Task_WifiMgr::LastEvInfo.wifi_sta_disconnected.reason != 15 ) {
-        log_i("delay(6000)");
-        delay(6000);
+        log_i("delay(7000)");
+        delay(7000);
       }
     }
+    log_i("delay(5000)");
     delay(5000);
   } // for (count)
 
@@ -282,6 +305,7 @@ void Task_WifiMgr::loop_sta_mode() {
  */
 void Task_WifiMgr::loop_ap_mode() {
   WiFi.disconnect();
+  delay(100);
 
   if ( Task_WifiMgr::LastEvId != ARDUINO_EVENT_WIFI_AP_START ) {
     log_i("[WifiMgr:AP] ap_ssid=%s", this->ap_ssid.c_str());

@@ -39,7 +39,6 @@ void ModeClock::exit() {
 void ModeClock::loop() {
   unsigned long cur_ms = millis();
   struct tm *tm = SysClock::now_tm();
-
   struct timeval *tv = SysClock::now_timeval();
 
   //
@@ -99,7 +98,8 @@ void ModeClock::loop() {
         nx_fmt = ModeClock::NX_FMT_dHM2;
       }
     } else {
-      if ( tv->tv_sec % 4 <= 2 ) {
+      //if ( tv->tv_sec % 4 <= 2 ) {
+      if ( tv->tv_sec % 2 <= 0 ) {
         nx_fmt = ModeClock::NX_FMT_dHM1;
       } else {
         nx_fmt = ModeClock::NX_FMT_dHM2;
@@ -140,42 +140,70 @@ void ModeClock::loop() {
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setCursor(0, 0);
   Disp->setTextSize(1);
-
-  //Disp->printf("%s\n",  __CLASS_NAME__.c_str());
-
-  Disp->setTextColor(BLACK, WHITE);
-  Disp->printf("%s\n", tm2string(tm, fmt_date).c_str());
   Disp->setTextColor(WHITE, BLACK);
 
-  Disp->setTextSize(1);
-  Disp->printf("%s\n", tm2string(tm, fmt_time).c_str());
+  Disp->printf("%s", tm2string(tm, fmt_date).c_str());
+
+  if ( wifimgr_mode == WIFI_MGR_MODE_AP ) {
+    Disp->printf("  RTC");
+  } else {
+    if ( TaskNtp->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
+      Disp->printf("  NTP");
+    } else {
+      if ( wl_stat == WL_CONNECTED ) {
+        if ( millis() % 500 >= 250 ) {
+          Disp->printf("  NTP");
+        }
+      } else {
+        if ( millis() % 1500 >= 750 ) {
+          Disp->printf("  NTP");
+        }
+      }
+    }
+  }
+  Disp->printf("\n");
+  
+  Disp->printf("  %s\n", tm2string(tm, fmt_time).c_str());
 
   if ( wifimgr_mode == WIFI_MGR_MODE_STA ) {
     if ( wl_stat == WL_CONNECTED ) {
-      Disp->printf("%s", TaskWifiMgr->cur_ssid.c_str());
+      Disp->printf("%s\n", TaskWifiMgr->cur_ssid.c_str());
+      Disp->printf("%s\n", WiFi.localIP().toString().c_str());
     } else {
+      Mode::disp_spin(100);
       if ( cur_ms % 1000 > 500 ) {
-        Disp->printf(">%s\n", WL_STATUS_T_STR2(wl_stat));
+        static wl_status_t prev_wl_stat = WL_IDLE_STATUS;
+        static WiFiEvent_t prev_evid = (WiFiEvent_t)NULL;
+        static char *str = (char *)"";
+        if ( wl_stat != prev_wl_stat ) {
+          str = (char *)WL_STATUS_T_STR2(wl_stat);
+          prev_wl_stat = wl_stat;
+        }
+        if ( Task_WifiMgr::LastEvId != prev_evid ) {
+          str = Task_WifiMgr::LastEvStr;
+          prev_evid = Task_WifiMgr::LastEvId;
+        }
+        Disp->printf("%s\n", str);
       } else {
         Disp->printf("\n");
       }
     }
-  } else {
-    if ( cur_ms % 5000 > 200 ) {
-      Disp->printf("AP:%s\n", TaskWifiMgr->ap_ssid.c_str());
+  } else { // WIFI_MGR_MODE_AP
+    if ( cur_ms % 5000 >= 0 ) {
+      Disp->printf("<<WiFi Setup SSID>>\n%s\n", TaskWifiMgr->ap_ssid.c_str());
     } else {
-      Disp->printf("\n");
+      Disp->printf("\n\n");
     }
   }
   
-  Disp->setCursor(0, DISPLAY_H - DISPLAY_CH_H);
-  Disp->setTextSize(1);
   Disp->printf("%s", get_mac_addr_string().c_str());
 
   Disp->display();
 
   delayOrChangeMode(50);
 } // ModeClock::loop()
+
+bool CbBtnEnable = false;
 
 /**
  *
@@ -188,6 +216,11 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
       if ( bi->long_pressed ) {
         if ( bi->repeat_count == 0 ) {
           Mode::set("ModeB");
+          return;
+        }
+        if ( bi->repeat_count > 15 ) {
+          Mode::set("ModeReboot");
+          return;
         }
       }
     }
@@ -207,7 +240,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
           }
         } else { // long_pressed
           // long pressed
-          if ( bi->repeat_count == 1 ) {
+          if ( bi->repeat_count == 0 ) {
             if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
               this->clock_mode_main = CLOCK_MODE_dHM;
             } else {
@@ -215,7 +248,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
             }
             this->clock_mode = this->clock_mode_main;
             this->date_start_ms = 0;
-          }
+          } // if (repeat_count==0)
         } // if (!long_pressed)
       } // if (push_count==1)
     } // if (ON)

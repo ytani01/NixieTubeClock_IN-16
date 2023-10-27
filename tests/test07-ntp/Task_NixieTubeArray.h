@@ -20,6 +20,8 @@ public:
 
   static int INIT_VAL[];
 
+  bool enable_update = true;
+
   Task_NixieTubeArray(NixieTubeArray *nta,
                       brightness_t brightness = 0, // default: load conf file
                       int *init_val=NULL,

@@ -132,8 +132,14 @@ void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N]) {
  *
  */
 void NixieTubeArray::set_string(std::string str) {
+  static std::string prev_str = "";
+  
+  if ( str != prev_str ) {
+    log_v("str = \"%s\"", str.c_str());
+    prev_str = str;
+  }
+  
   str += "AAAAAAAA";
-  log_v("str = %s", str.c_str());
   
   uint8_t num[NIXIE_NUM_N];
   uint8_t col[NIXIE_COLON_N];
@@ -151,6 +157,8 @@ void NixieTubeArray::set_string(std::string str) {
   
   this->set_num(num);
   this->set_col(col);
+
+  //this->display(millis());
 } // NixieTubeArray::set_string()
 
 /** private

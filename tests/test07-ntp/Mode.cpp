@@ -7,6 +7,55 @@ std::map<std::string, Mode *> Mode::Ent;
 Mode *Mode::Cur = (Mode *)NULL;
 Mode *Mode::Prev = (Mode *)NULL;
 
+/** constructor
+ *
+ */
+Mode::Mode() {
+  log_v("");
+} // Mode::Mode()
+
+/** virtual
+ *
+ * @brief 最初の初期化
+ */
+void Mode::setup() {
+  log_d("%s", this->name.c_str());
+} // Mode::setup()
+
+/** virtual
+ *
+ * @brief モード切替時に毎回実行
+ */
+void Mode::enter() {
+  log_d("enter mode: %s", this->name.c_str());
+} // Mode::enter()
+
+/** virtual
+ *
+ * @brief モード切替時に毎回実行
+ */
+void Mode::exit() {
+  log_d("exit mode %s", this->name.c_str());
+} // Mode::exit()
+
+/** virtual
+ * 
+ */
+void Mode::loop() {
+  log_d("cur_ms=%u", millis());
+
+  delayOrChangeMode(2000);
+
+  return;
+} // Mode::loop()
+
+/** virtual
+ *
+ */
+void Mode::cbBtn(ButtonInfo_t *bi) {
+  log_d("%s", Button::info2String(bi).c_str());
+} // Mode::cbBtn()
+
 /** static
  *
  */
@@ -87,51 +136,19 @@ void Mode::set(String name) {
   
 } // Mode::set()
 
-/** constructor
+/** static
  *
  */
-Mode::Mode() {
-  log_v("");
-} // Mode::Mode()
-
-/** virtual
- *
- * @brief 最初の初期化
- */
-void Mode::setup() {
-  log_d("%s", this->name.c_str());
-} // Mode::setup()
-
-/** virtual
- *
- * @brief モード切替時に毎回実行
- */
-void Mode::enter() {
-  log_d("enter mode: %s", this->name.c_str());
-} // Mode::enter()
-
-/** virtual
- *
- * @brief モード切替時に毎回実行
- */
-void Mode::exit() {
-  log_d("exit mode %s", this->name.c_str());
-} // Mode::exit()
-
-/** virtual
- * 
- */
-void Mode::loop() {
-  log_d("cur_ms=%u", millis());
-
-  delayOrChangeMode(2000);
-
-  return;
-} // Mode::loop()
-
-/** virtual
- *
- */
-void Mode::cbBtn(ButtonInfo_t *bi) {
-  log_d("%s", Button::info2String(bi).c_str());
-} // Mode::cbBtn()
+void Mode::disp_spin(unsigned long interval_ms) {
+  switch ( millis() / interval_ms % 8 ) {
+  case 0: Disp->printf("|"); break;
+  case 1: Disp->printf("/"); break;
+  case 2: Disp->printf("-"); break;
+  case 3: Disp->printf("\\"); break;
+  case 4: Disp->printf("|"); break;
+  case 5: Disp->printf("/"); break;
+  case 6: Disp->printf("-"); break;
+  case 7: Disp->printf("\\"); break;
+  default: Disp->printf(" "); break;
+  } // switch
+} // Mode::disp_spin()  

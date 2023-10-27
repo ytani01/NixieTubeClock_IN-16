@@ -270,8 +270,8 @@ void NixieEffectBlink::start(unsigned long start_ms,
 
   this->_onoff = true;
 
-  for (int i=0; i < this->_el_n; i++) {
-    this->_brightness[i] = this->_el[i].brightness();
+  for (int e=0; e < this->_el_n; e++) {
+    this->_brightness[e] = this->_el[e].brightness();
   } // for(i)
 
 } // NixieEffectBlink::start()
@@ -286,16 +286,16 @@ void NixieEffectBlink::loop(unsigned long cur_ms) {
 
   if ( this->_onoff ) {
     this->_onoff = false;
-    for (int i=0; i < this->_el_n; i++) {
-      this->_el[i].set_brightness(0);
+    for (int e=0; e < this->_el_n; e++) {
+      this->_el[e].set_brightness(0);
     } // for(i)
     return;
   }
 
   // this->_onoff == false
   this->_onoff = true;
-  for (int i=0; i < this->_el_n; i++) {
-    this->_el[i].set_brightness(this->_brightness[i]);
+  for (int e=0; e < this->_el_n; e++) {
+    this->_el[e].set_brightness(this->_brightness[e]);
   } // for(i)
 } // NixieEffectBlink::loop()
 

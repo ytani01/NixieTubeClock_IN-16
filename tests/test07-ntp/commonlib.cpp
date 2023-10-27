@@ -56,14 +56,6 @@ std::string tm2string(struct tm *tm, const char fmt[]) {
  * @brief  DateTime --> string
  */
 std::string datetime2string(DateTime *dt, const char *fmt) {
-#if 0
-  time_t t = (time_t)dt->unixtime();
-  log_d("t = %d", t);
-  log_d("t2= %d", time(NULL));
-  localtime_r(&t, &tm);
-  //gmtime_r(&t, &tm);
-#endif
-
   static struct tm tm;
   tm.tm_year = dt->year() - 1900;
   tm.tm_mon = dt->month() - 1;

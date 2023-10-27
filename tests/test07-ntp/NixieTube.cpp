@@ -123,8 +123,8 @@ void NixieTube::shuffle_start(unsigned long start_ms,
   this->_ef->start(start_ms, tick_ms, n, el);
 } // NixieTube::shuffle_start()
 
-void NixieTube::blink_start(unsigned long start_ms,
-                            unsigned long tick_ms) {
+void NixieTube::blink_start(unsigned long start_ms, unsigned long tick_ms) {
+  log_d("");
   this->_ef = this->init_effect(NIXIE_EFFECT_BLINK);
   this->_ef->start(start_ms, tick_ms);
 } // NixieTube::blink_start()

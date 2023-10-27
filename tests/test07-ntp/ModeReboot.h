@@ -1,21 +1,21 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#ifndef _MODE_BOOT_H_
-#define _MODE_BOOT_H_
+#ifndef _MODE_REBOOT_H_
+#define _MODE_REBOOT_H_
 
 #include "Mode.h"
 
 extern std::string VersionString;
 
-class ModeBoot: public Mode {
+class ModeReboot: public Mode {
  public:
   static const unsigned long BOOT_INTERVAL_MS = 2000;  // ms
 
   unsigned long interval = BOOT_INTERVAL_MS;
   unsigned long start_ms = 0;
 
-  ModeBoot(unsigned long interval=BOOT_INTERVAL_MS);
+  ModeReboot(unsigned long interval=BOOT_INTERVAL_MS);
 
   virtual void enter();
   virtual void exit();
@@ -24,4 +24,4 @@ class ModeBoot: public Mode {
   virtual void cbBtn(ButtonInfo_t *bi);
 };
 
-#endif // _MODE_BOOT_H_
+#endif // _MODE_REBOOT_H_

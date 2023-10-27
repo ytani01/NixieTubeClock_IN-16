@@ -31,7 +31,7 @@ Button::Button(String name, uint8_t pin, void (*intr_hdr)(void *btn)) {
   if ( intr_hdr != NULL ) {
     this->info.intr_pin = digitalPinToInterrupt(this->info.pin);
     log_d("%s: intr_pin=%d", this->info.name, this->info.intr_pin);
-    this->enable();
+    //this->enable();
   }
 } // Button::Button()
 

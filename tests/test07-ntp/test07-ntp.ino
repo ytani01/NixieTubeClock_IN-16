@@ -15,8 +15,8 @@
 
 #include "Mode.h"
 #include "ModeBoot.h"
+#include "ModeReboot.h"
 #include "ModeClock.h"
-#include "ModeB.h"
 
 std::string VersionString = " 2. 0. 0";
 
@@ -79,6 +79,8 @@ NixieTubeArray *Nxa = NULL;
 
 Task_NixieTubeArray *TaskNixieTubeArray = NULL;
 
+bool Flag_enableIntr = false;
+
 /** global
  *
  */
@@ -86,6 +88,7 @@ void enableIntr() {
   if ( TaskBtnWatcher ) {
     TaskBtnWatcher->enable();
   }
+  Flag_enableIntr = true;
 }
 
 /** global
@@ -95,6 +98,7 @@ void disableIntr() {
   if ( TaskBtnWatcher ) {
     TaskBtnWatcher->disable();
   }
+  Flag_enableIntr = false;
 }
 
 /**
@@ -182,7 +186,10 @@ void setup() {
   Disp = new Display_t(DISPLAY_W, DISPLAY_H);
   Disp->DispBegin(DISP_ADDR);
   Disp->setRotation(0);
-  //Disp->clearDisplay();
+  Disp->clearDisplay();
+  Disp->setCursor(0, 0);
+  Disp->setTextSize(2);
+  Disp->printf("%s", VersionString.c_str());
   Disp->display();
 
   // Button
@@ -215,7 +222,7 @@ void setup() {
   delay(100);
 
   // NTP
-  log_i("=== NTP");
+  log_i("=== Init NTP");
   TaskNtp = new Task_Ntp((String *)NTP_SVR, cbNtp);
   TaskNtp->start();
   delay(100);
@@ -223,15 +230,17 @@ void setup() {
   // Mode
   log_i("=== Init Modes");
   Mode::add("ModeBoot", new ModeBoot(2000));
+  Mode::add("ModeReboot", new ModeReboot(2000));
   Mode::add("ModeClock", new ModeClock());
-  //Mode::add("ModeB", new ModeB());
 
   for (auto m: Mode::Ent) {
     m.second->setup();
   }
 
   Mode::set("ModeBoot");
+  delay(100);
 
+  enableIntr();
 } // setup()
 
 /**

@@ -56,7 +56,10 @@ void Task_NixieTubeArray::setup() {
  *
  */
 void Task_NixieTubeArray::loop() {
-  //log_d("%s", this->conf.name);
+  if ( ! enable_update ) {
+    return;
+  }
+
   unsigned long cur_ms = millis();
   
   Nta->display(cur_ms);

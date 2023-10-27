@@ -14,12 +14,17 @@
 #include "MyRtc.h"
 #include "Task_NixieTubeArray.h"
 #include "Task_WifiMgr.h"
+#include "Task_Ntp.h"
 
 // from main ino
+extern std::string VersionString;
+
 extern Display_t *Disp;
 extern MyRtc *Rtc;
 extern Task_WifiMgr *TaskWifiMgr;
 extern NixieTubeArray *Nxa;
+extern Task_NixieTubeArray *TaskNixieTubeArray;
+extern Task_Ntp *TaskNtp;
 
 extern bool Flag_LoopRunning;
 extern bool Flag_ReqModeChange;
@@ -41,15 +46,16 @@ public:
 
   Mode();
 
-  static void add(String name, Mode *mode);
-  static void set(String name);
-
   virtual void setup();
   virtual void enter();
   virtual void exit();
   virtual void loop();
 
   virtual void cbBtn(ButtonInfo_t *bi);
+
+  static void add(String name, Mode *mode);
+  static void set(String name);
+  static void disp_spin(unsigned long interval_ms=100);
 
 protected:
 }; // class Mode

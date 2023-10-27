@@ -7,6 +7,7 @@
 #include <RTClib.h>
 #include "commonlib.h"
 
+extern bool Flag_enableIntr;
 extern void enableIntr();
 extern void disableIntr();
 
