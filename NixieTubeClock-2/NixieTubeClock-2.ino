@@ -18,6 +18,7 @@
 #include "ModeReboot.h"
 #include "ModeClock.h"
 #include "ModeSetclock.h"
+#include "ModeScoreboard.h"
 
 std::string VersionString = " 2. 0. 1";
 
@@ -255,6 +256,7 @@ void setup() {
   Mode::add("ModeReboot", new ModeReboot(2000));
   Mode::add("ModeClock", new ModeClock());
   Mode::add("ModeSetclock", new ModeSetclock());
+  Mode::add("ModeScoreboard", new ModeScoreboard());
 
   for (auto m: Mode::Ent) {
     m.second->setup();

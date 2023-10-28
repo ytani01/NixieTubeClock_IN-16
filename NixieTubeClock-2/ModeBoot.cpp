@@ -19,19 +19,16 @@ void ModeBoot::enter() {
   this->start_ms = millis();
 
   Nxa->set_string(VersionString.c_str());
+  delay(50);
 
-  Nxa->num[0].blink_start(millis(), 300);
-  Nxa->num[1].blink_start(millis(), 300);
-  delay(30);
-  Nxa->colon[NIXIE_COLON_L].blink_start(millis(), 300);
-  delay(30);
-  Nxa->num[2].blink_start(millis(), 300);
-  Nxa->num[3].blink_start(millis(), 300);
-  delay(30);
-  Nxa->colon[NIXIE_COLON_R].blink_start(millis(), 300);
-  delay(30);
-  Nxa->num[4].blink_start(millis(), 300);
-  Nxa->num[5].blink_start(millis(), 300);
+  Nxa->num[0].blink_start(this->start_ms, 300);
+  Nxa->num[1].blink_start(this->start_ms, 300);
+  Nxa->colon[NIXIE_COLON_L].blink_start(this->start_ms+20, 300);
+  Nxa->num[2].blink_start(this->start_ms+40, 300);
+  Nxa->num[3].blink_start(this->start_ms+40, 300);
+  Nxa->colon[NIXIE_COLON_R].blink_start(this->start_ms+60, 300);
+  Nxa->num[4].blink_start(this->start_ms+80, 300);
+  Nxa->num[5].blink_start(this->start_ms+80, 300);
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setTextColor(WHITE, BLACK);

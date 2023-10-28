@@ -66,7 +66,7 @@ boolean Button::get() {
 
     // Released button then refresh some flags and do nothing any more
     this->info.press_start = 0;
-    this->info.long_pressed = false;
+    //this->info.long_pressed = false;
     this->info.repeat_count = 0;
 
     if ( this->info.prev_value == Button::ON) {
@@ -81,6 +81,7 @@ boolean Button::get() {
   // this->info.value == Button::ON
   if ( this->info.prev_value == Button::OFF ) {
     // Pushed now !
+    this->info.long_pressed = false;
     this->info.press_start = cur_msec;
     this->info.push_count++;
     if ( this->info.push_count == 1 ) {

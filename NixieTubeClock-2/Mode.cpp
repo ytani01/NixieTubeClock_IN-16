@@ -36,6 +36,7 @@ void Mode::enter() {
  */
 void Mode::exit() {
   log_d("exit mode %s", this->name.c_str());
+  Nxa->end_all_effect();
 } // Mode::exit()
 
 /** virtual

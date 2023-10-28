@@ -15,8 +15,11 @@ static void _ntp_cb(Task_NtpInfo_t *ntp_info) {
  *
  */
 Task_Ntp::Task_Ntp(String ntp_svr[],
-                   void (*cb)(Task_NtpInfo_t *ntp_info))
-  : Task("NTP_task") {
+                   void (*cb)(Task_NtpInfo_t *ntp_info),
+                   uint32_t stack_size,
+                   UBaseType_t priority,
+                   UBaseType_t core)
+  : Task(__CLASS_NAME__, stack_size, priority, core) {
 
   this->ntp_svr = ntp_svr;
   this->_cb = cb;

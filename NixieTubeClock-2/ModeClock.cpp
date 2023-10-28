@@ -28,7 +28,7 @@ ModeClock::ModeClock(): Mode() {
 void ModeClock::enter() {
   log_i("enter mode: %s", this->name.c_str());
 
-  Nxa->set_string("00:00:00");
+  Nxa->set_string("        ");
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setTextColor(WHITE, BLACK);
@@ -258,6 +258,10 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
     // Btn1:OFF
     if ( bi->click_count == 2 ) {
       this->sw_xfade = this->sw_xfade ? false : true;
+    }
+
+    if ( bi->click_count == 3 ) {
+      Mode::set("ModeScoreboard");
     }
     return;
   } // if (Btn0)

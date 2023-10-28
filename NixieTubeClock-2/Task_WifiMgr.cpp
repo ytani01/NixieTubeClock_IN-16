@@ -248,13 +248,6 @@ void Task_WifiMgr::loop_sta_mode() {
     if ( this->mode != WIFI_MGR_MODE_STA ) {
       break;
     }
-#if 0
-    if ( this->wl_stat == WL_NO_SSID_AVAIL ||
-         this->wl_stat == WL_DISCONNECTED     ) {
-      delay(10000);
-    }
-    delay(1000);
-#endif
 
     if ( Task_WifiMgr::LastEvId == ARDUINO_EVENT_WIFI_STA_DISCONNECTED ) {
       if ( Task_WifiMgr::LastEvInfo.wifi_sta_disconnected.reason != 15 ) {

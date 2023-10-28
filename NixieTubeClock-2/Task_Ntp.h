@@ -24,6 +24,10 @@ typedef struct {
  */
 class Task_Ntp: public Task {
 public:
+  static const uint32_t STACK_SIZE = 4 * 1024;
+  static const UBaseType_t PRIORITY = 0;
+  static const UBaseType_t CORE = APP_CPU_NUM;
+
   static const unsigned long INTERVAL_NORMAL = 1 * 60 * 1000; // ms
   static const unsigned long INTERVAL_PROGRESS = 10 * 1000; // ms
   static const unsigned long INTERVAL_NO_WIFI = 5 * 1000; // ms
@@ -35,7 +39,10 @@ public:
   
   // constructor
   Task_Ntp(String ntp_svr[],
-           void (*cb)(Task_NtpInfo_t *ntp_info)=NULL);
+           void (*cb)(Task_NtpInfo_t *ntp_info)=NULL,
+           uint32_t stack_size=STACK_SIZE,
+           UBaseType_t priority=PRIORITY,
+           UBaseType_t core=CORE);
 
   void start_sync();
 
