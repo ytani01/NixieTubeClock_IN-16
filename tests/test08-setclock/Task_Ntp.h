@@ -31,12 +31,15 @@ public:
   String *ntp_svr;
 
   Task_NtpInfo_t info;
+  sntp_sync_status_t prev_stat = SNTP_SYNC_STATUS_RESET;
   
   // constructor
   Task_Ntp(String ntp_svr[],
            void (*cb)(Task_NtpInfo_t *ntp_info)=NULL);
 
-  void *get_info();
+  void start_sync();
+
+  Task_NtpInfo_t *get_info();
 
 protected:
   virtual void setup();

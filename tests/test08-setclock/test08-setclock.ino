@@ -155,6 +155,7 @@ void cbNtp(Task_NtpInfo_t *ni) {
   } else {
     //
     // NTP is not available
+    //
     // adjust system clock from RTC
     //
     log_i("== adjust system clock from RTC");

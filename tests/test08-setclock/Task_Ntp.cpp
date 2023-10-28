@@ -30,16 +30,32 @@ Task_Ntp::Task_Ntp(String ntp_svr[],
 /**
  *
  */
-void *Task_Ntp::get_info() {
-  return (void *)&(this->info);
+void Task_Ntp::start_sync() {
+  log_i("start sync: %s ..", SNTP_SYNC_STATUS_STR[this->prev_stat]);
+
+  configTime(9 * 3600L, 0,
+             this->ntp_svr[0].c_str(),
+             this->ntp_svr[1].c_str(),
+             this->ntp_svr[2].c_str());
+
+#if 0
+  configTzTime("JST-9",
+               ntp_svr[0].c_str(), ntp_svr[1].c_str(), ntp_svr[2].c_str());
+#endif
+  return;
+} // Task_Ntp::start_sync()
+
+/**
+ *
+ */
+Task_NtpInfo_t *Task_Ntp::get_info() {
+  return &(this->info);
 } // Task_Ntp::get_info()
 
 /**
  *
  */
 void Task_Ntp::setup() {
-  log_d("%s", this->conf.name.c_str());
-
   sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
 } // Task_Ntp::setup()
 
@@ -47,8 +63,6 @@ void Task_Ntp::setup() {
  *
  */
 void Task_Ntp::loop() {
-  static sntp_sync_status_t prev_stat = SNTP_SYNC_STATUS_RESET;
-
   unsigned long interval = INTERVAL_NO_WIFI;
 
   //
@@ -80,15 +94,7 @@ void Task_Ntp::loop() {
   //
   // start NTP sync
   //
-  log_d("start sync: %s ..", SNTP_SYNC_STATUS_STR[prev_stat]);
-
-  configTime(9 * 3600L, 0,
-             ntp_svr[0].c_str(), ntp_svr[1].c_str(), ntp_svr[2].c_str());
-
-  /*
-  configTzTime("JST-9",
-               ntp_svr[0].c_str(), ntp_svr[1].c_str(), ntp_svr[2].c_str());
-  */
+  this->start_sync();
 
   /*
    * sntp_get_sync_status()
@@ -101,7 +107,7 @@ void Task_Ntp::loop() {
 
   if ( this->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
     interval = INTERVAL_NORMAL;    
-    if ( prev_stat != SNTP_SYNC_STATUS_COMPLETED ) {
+    if ( this->prev_stat != SNTP_SYNC_STATUS_COMPLETED ) {
       log_d("%s: NTP sync done: sntp_stat=%s(%d), interval=%'d",
             SysClock::now_string().c_str(),
             SNTP_SYNC_STATUS_STR[this->info.sntp_stat], this->info.sntp_stat,
@@ -125,6 +131,6 @@ void Task_Ntp::loop() {
 
   this->_cb(&(this->info));
 
-  prev_stat = this->info.sntp_stat;
+  this->prev_stat = this->info.sntp_stat;
   delay(interval);
 } // Task_Ntp::loop()

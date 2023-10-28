@@ -69,64 +69,6 @@ void ModeClock::loop() {
   }
 
   //
-  // for NixieTubeArray
-  //
-  char *nx_fmt;
-
-  switch ( this->clock_mode ) {
-  case CLOCK_MODE_HMS:
-    if ( wl_stat == WL_CONNECTED ) {
-      if ( tv->tv_sec % 2 == 0 ) {
-        nx_fmt = ModeClock::NX_FMT_HMS1;
-      } else {
-        nx_fmt = ModeClock::NX_FMT_HMS2;
-      }
-    } else {
-      //if ( tv->tv_sec % 4 <= 2 ) {
-      if ( tv->tv_sec % 2 <= 0 ) {
-        nx_fmt = ModeClock::NX_FMT_HMS1;
-      } else {
-        nx_fmt = ModeClock::NX_FMT_HMS2;
-      }
-    }
-    break;
-
-  case CLOCK_MODE_dHM:
-    if ( wl_stat == WL_CONNECTED ) {
-      if ( tv->tv_sec % 2 == 0 ) {
-        nx_fmt = ModeClock::NX_FMT_dHM1;
-      } else {
-        nx_fmt = ModeClock::NX_FMT_dHM2;
-      }
-    } else {
-      //if ( tv->tv_sec % 4 <= 2 ) {
-      if ( tv->tv_sec % 2 <= 0 ) {
-        nx_fmt = ModeClock::NX_FMT_dHM1;
-      } else {
-        nx_fmt = ModeClock::NX_FMT_dHM2;
-      }
-    }
-    break;
-
-  case CLOCK_MODE_ymd:
-    if ( cur_ms - date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
-      this->clock_mode = this->clock_mode_main;
-      return;
-    }
-
-    nx_fmt = ModeClock::NX_FMT_ymd;
-    break;
-
-  default:
-    break;
-  } // switch (clock_mode)
-  
-  std::string nx_str = tm2string(tm, nx_fmt);
-  log_v("nx_fmt = %s, nx_str = %s", nx_fmt, nx_str.c_str());
-
-  Nxa->set_string(nx_str.c_str());
-
-  //
   // for Disp
   //
   char *fmt_date, *fmt_time;
@@ -201,6 +143,65 @@ void ModeClock::loop() {
 
   Disp->display();
 
+  //
+  // for NixieTubeArray
+  //
+  char *nx_fmt;
+
+  switch ( this->clock_mode ) {
+  case CLOCK_MODE_HMS:
+    if ( wl_stat == WL_CONNECTED ) {
+      if ( tv->tv_sec % 2 == 0 ) {
+        nx_fmt = ModeClock::NX_FMT_HMS1;
+      } else {
+        nx_fmt = ModeClock::NX_FMT_HMS2;
+      }
+    } else {
+      //if ( tv->tv_sec % 4 <= 2 ) {
+      if ( tv->tv_sec % 2 <= 0 ) {
+        nx_fmt = ModeClock::NX_FMT_HMS1;
+      } else {
+        nx_fmt = ModeClock::NX_FMT_HMS2;
+      }
+    }
+    break;
+
+  case CLOCK_MODE_dHM:
+    if ( wl_stat == WL_CONNECTED ) {
+      if ( tv->tv_sec % 2 == 0 ) {
+        nx_fmt = ModeClock::NX_FMT_dHM1;
+      } else {
+        nx_fmt = ModeClock::NX_FMT_dHM2;
+      }
+    } else {
+      //if ( tv->tv_sec % 4 <= 2 ) {
+      if ( tv->tv_sec % 2 <= 0 ) {
+        nx_fmt = ModeClock::NX_FMT_dHM1;
+      } else {
+        nx_fmt = ModeClock::NX_FMT_dHM2;
+      }
+    }
+    break;
+
+  case CLOCK_MODE_ymd:
+    if ( cur_ms - date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
+      this->clock_mode = this->clock_mode_main;
+      return;
+    }
+
+    nx_fmt = ModeClock::NX_FMT_ymd;
+    break;
+
+  default:
+    break;
+  } // switch (clock_mode)
+  
+  std::string nx_str = tm2string(tm, nx_fmt);
+  log_v("nx_fmt = %s, nx_str = %s", nx_fmt, nx_str.c_str());
+
+  Nxa->set_string(nx_str.c_str());
+
+  //
   delayOrChangeMode(this->LOOP_DELAY_MS);
 } // ModeClock::loop()
 

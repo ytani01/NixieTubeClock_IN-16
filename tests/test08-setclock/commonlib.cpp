@@ -67,3 +67,23 @@ std::string datetime2string(DateTime *dt, const char *fmt) {
   
   return tm2string(&tm, fmt);
 } // datetime2str()
+
+/**
+ *
+ */
+bool is_leap_year(int year) {
+  return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+} // isLeapYear()
+
+/**
+ *
+ */
+int last_day(int year, int month) {
+  if (month == 4 || month == 6 || month == 9 || month == 11) {
+    return 30;
+  }
+  if (month == 2) {
+    return is_leap_year(year) ? 29 : 28;
+  }
+  return 31;
+} // getLastDayOfMonth()
