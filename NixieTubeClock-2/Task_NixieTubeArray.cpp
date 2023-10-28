@@ -50,6 +50,7 @@ void Task_NixieTubeArray::setup() {
     Nta->colon[i].element[0].set_brightness_to_max();
   } // for(i)
   
+  log_i("uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
 } // Task_NixieTubeArray::setup()
 
 /**

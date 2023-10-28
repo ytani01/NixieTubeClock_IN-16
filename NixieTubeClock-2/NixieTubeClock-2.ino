@@ -72,14 +72,12 @@ uint8_t PINS_NIXIE_NUM[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N] = {
   {55, 54, 58, 52, 51, 50, 59, 53, 57, 56},
   {49, 40, 46, 42, 43, 44, 45, 41, 47, 48}
 };
-
 uint8_t PINS_NIXIE_COLON[NIXIE_COLON_N][NIXIE_COLON_DOT_N] = {
   {PIN_COLON_R_TOP},
   {PIN_COLON_L_TOP}
 };
 
 NixieTubeArray *Nxa = NULL;
-
 Task_NixieTubeArray *TaskNixieTubeArray = NULL;
 
 bool Flag_enableIntr = false;
@@ -177,33 +175,18 @@ void cbNtp(Task_NtpInfo_t *ni) {
  *
  */
 void setup() {
-  delay(2000);
-  log_i("-=-=-=-=-= start %s SysClock: %s =-=-=-=-=-",
-        get_mac_addr_string().c_str(),
-        SysClock::now_string().c_str());
+  log_i("===\n");
+  delay(2500);
 
-  //log_i("ARDUINO_LOOP_STACK_SIZE=%d", ARDUINO_LOOP_STACK_SIZE);
+  log_i("=== start %s ===",
+        get_mac_addr_string().c_str());
 
-  // set timezone
-  setenv("TZ", "JST-9", 1);
-  tzset();
+  log_i("uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
 
   // I2C
   log_i("=== Init I2C: SDA=%d, SCL=%d", PIN_I2C_SDA, PIN_I2C_SCL);
   Wire.setPins(PIN_I2C_SDA, PIN_I2C_SCL);
   
-  // RTC
-  log_i("=== Init RTC");
-  Rtc = new MyRtc();
-  Rtc->begin(&Wire);
-  DateTime dt_rtc = Rtc->now();
-  log_i("RTC      : %s", datetime2string(&dt_rtc).c_str());
-
-  // SysClock
-  log_i("=== Init System Clock");
-  SysClock::set(&dt_rtc);
-  log_i("SysClock : %s", SysClock::now_string().c_str());
-
   // Display
   log_i("=== Init Display");
   Disp = new Display_t(DISPLAY_W, DISPLAY_H);
@@ -214,6 +197,22 @@ void setup() {
   Disp->setTextSize(2);
   Disp->printf("%s", VersionString.c_str());
   Disp->display();
+  delay(100);
+
+  // set timezone
+  setenv("TZ", "JST-9", 1);
+  tzset();
+
+  // RTC
+  Rtc = new MyRtc();
+  Rtc->begin(&Wire);
+  DateTime dt_rtc = Rtc->now();
+  log_i("=== RTC      : %s", datetime2string(&dt_rtc).c_str());
+
+  // SysClock
+  SysClock::set(&dt_rtc);
+  log_i("=== SysClock : %s", SysClock::now_string().c_str());
+  delay(100);
 
   // Button
   log_i("=== Init Buttons");
@@ -265,6 +264,8 @@ void setup() {
   delay(100);
 
   enableIntr();
+
+  log_i("uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
 } // setup()
 
 /**

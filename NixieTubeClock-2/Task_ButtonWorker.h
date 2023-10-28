@@ -16,7 +16,7 @@ public:
   static const TickType_t DEF_RECV_QUE_TIMEOUT = 1000;
   static const UBaseType_t Q_SIZE = 16;
 
-  static const uint32_t STACK_SIZE = 8 * 1024;
+  static const uint32_t STACK_SIZE = 4 * 1024;
   static const UBaseType_t PRIORITY = 0;
   static const UBaseType_t CORE = APP_CPU_NUM;
 
