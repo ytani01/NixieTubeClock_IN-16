@@ -7,14 +7,19 @@
  *
  */
 Task_NetMgr::Task_NetMgr(String name, String ap_ssid_hdr,
-                       NetMgrInfo_t *netmgr_info,
-                       unsigned long wifi_try_count):
-  Task(String(this->name)) {
+                         NetMgrInfo_t *netmgr_info)
+  : Task(String(this->name)) {
 
   this->ap_ssid_hdr = ap_ssid_hdr;
-  this->wifi_try_count = wifi_try_count;
   this->netmgr_info = netmgr_info;
 } // Task_NetMgr::Task_NetMgr
+
+/**
+ *
+ */
+void Task_NetMgr::set_mode(NetMgrMode_t mode) {
+  this->netMgr->cur_mode = mode;
+} // Task_NetMgr::set_mode()
 
 /**
  *
@@ -38,7 +43,7 @@ void Task_NetMgr::clear_ssid() {
 void Task_NetMgr::setup() {
   log_i("%s", this->conf.name);
 
-  this->netMgr = new NetMgr(this->ap_ssid_hdr, this->wifi_try_count);
+  this->netMgr = new NetMgr(this->ap_ssid_hdr);
 
   this->netmgr_info->ap_ssid = this->netMgr->ap_ssid;
   for (int i=0; i < 6; i++) {

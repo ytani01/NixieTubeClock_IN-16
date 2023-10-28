@@ -20,7 +20,7 @@ void Task_NixieTubeArray::setup() {
 
   Nta->brightness = BRIGHTNESS_RESOLUTION / 4;
 
-  int init_val[NIXIE_NUM_N] = {0, 1, 2, 3, 4, 5};
+  int init_val[NIXIE_NUM_N] = {0, 0, 0, 0, 0, 0};
   for (int i = 0; i < NIXIE_NUM_N; i++) {
     for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
       if ( init_val[i] == e ) {

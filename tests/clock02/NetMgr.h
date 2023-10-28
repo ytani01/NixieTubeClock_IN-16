@@ -11,33 +11,49 @@
 
 #include "commonlib.h"
 #include "SSIDent.h"
-#include "ConfSsid.h"
+#include "ConfFile_Ssid.h"
 
-typedef enum { NETMGR_MODE_NULL,
-               NETMGR_MODE_START,
-               NETMGR_MODE_TRY_WIFI,
-               NETMGR_MODE_AP_INIT,
-               NETMGR_MODE_AP_LOOP,
-               NETMGR_MODE_SCANNING_SSID,
-               NETMGR_MODE_WIFI_ON,
-               NETMGR_MODE_WIFI_OFF,
-               NETMGR_MODE_N
+typedef enum {
+  NETMGR_MODE_NULL,
+  NETMGR_MODE_START,
+  NETMGR_MODE_WAIT_CONNECT,
+  NETMGR_MODE_AP_INIT,
+  NETMGR_MODE_AP_LOOP,
+  NETMGR_MODE_SCANNING_SSID,
+  NETMGR_MODE_WIFI_ON,
+  NETMGR_MODE_WIFI_OFF,
+  NETMGR_MODE_N
 } NetMgrMode_t;
-static const char *NETMGR_MODE_STR[]
-= {"NULL", "START", "TRY_WIFI", "AP_INIT", "AP_LOOP",
-   "SCANNING_SSID", "WIFI_ON", "WIFI_OFF"};
 
-static const char *WL_STATUS_T_STR[]
-= {"IDLE_STATUS", "NO_SSID_AVAIL", "SCAN_COMPLETED", "CONNECTED",
-   "CONNECT_FAILED", "CONNECTION_LOST", "DISCONNECTED"};
+static const char *NETMGR_MODE_STR[] = {
+  "NULL",
+  "START",
+  "WAIT_CONNECT",
+  "AP_INIT",
+  "AP_LOOP",
+  "SCANNING_SSID",
+  "WIFI_ON",
+  "WIFI_OFF"
+};
+
+static const char *WL_STATUS_T_STR[] = {
+  "IDLE_STATUS",
+  "NO_SSID_AVAIL",
+  "SCAN_COMPLETED",
+  "CONNECTED",
+  "CONNECT_FAILED",
+  "CONNECTION_LOST",
+  "DISCONNECTED"
+};
 
 /**
  *
  */
 class NetMgr {
 public:
-  static const unsigned int TRY_INTERVAL  = 1000; // ms
-  static const unsigned int DEF_TRY_COUNT_MAX = 8;
+  static const unsigned int WAIT_CONNECT_INTERVAL  = 1000; // ms
+  static const unsigned int WAIT_CONNECT_COUNT_MAX = 5;
+  static const unsigned int TRY_CONNECT_COUNT_MAX = 3;
   
   static const unsigned int SSID_N_MAX = 40;
   
@@ -50,13 +66,9 @@ public:
   static int16_t ssidN;
   static SSIDent ssidEnt[SSID_N_MAX];
 
-  unsigned int try_count_max = DEF_TRY_COUNT_MAX;
-
   uint8_t mac_addr[6];
   String cur_ssid = "";
   IPAddress ip_addr;
-
-  boolean net_is_available = false;;
 
   String ap_ssid_hdr = "AP_";
   String ap_ssid = ap_ssid_hdr;
@@ -69,7 +81,7 @@ public:
   IPAddress ap_netmask;  // initialize in constructor
   DNSServer dns_svr;
 
-  NetMgr(String ap_ssid_hdr, unsigned int try_count_max=DEF_TRY_COUNT_MAX);
+  NetMgr(String ap_ssid_hdr);
   NetMgrMode_t loop();
 
   void save_ssid(String ssid, String pw);

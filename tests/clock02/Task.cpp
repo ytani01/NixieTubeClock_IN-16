@@ -36,6 +36,7 @@ void Task::start() {
                                         this->conf.priority,
                                         &(this->conf.handle),
                                         this->conf.core);
+  delay(100);
   log_i("Start:%s(Stack:%dB,Priority:%d,CPU:%d,handle:%X): ret=%d",
         this->conf.name, this->conf.stack_size, this->conf.priority,
         this->conf.core, this->conf.handle,

@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2021 Yoichi Tanibayashi
+ * Copyright (c) 2023 Yoichi Tanibayashi
  */
 #include "NetMgr.h"
 
 #undef CONFIG_LOG_MAXIMUM_LEVEL
 #define CONFIG_LOG_MAXIMUM_LEVEL 5
 
-static ConfSsid *confSsid;
+static ConfFile_Ssid *confSsid;
 /**
  * Initialize static variables
  */
@@ -15,15 +15,14 @@ int16_t NetMgr::ssidN = 0;
 SSIDent NetMgr::ssidEnt[NetMgr::SSID_N_MAX];
 WebServer NetMgr::web_svr(WEBSVR_PORT);
 
+static int try_connect_count = NetMgr::TRY_CONNECT_COUNT_MAX;
+
 /** constructor
  *
  */
-NetMgr::NetMgr(String ap_ssid_hdr, unsigned int try_count_max) {
+NetMgr::NetMgr(String ap_ssid_hdr) {
   if ( ap_ssid_hdr.length() > 0 ) {
     this->ap_ssid_hdr = ap_ssid_hdr;
-  }
-  if ( try_count_max > 0 ) {
-    this->try_count_max = try_count_max;
   }
 
   esp_read_mac(this->mac_addr, ESP_MAC_WIFI_STA);
@@ -43,7 +42,7 @@ NetMgr::NetMgr(String ap_ssid_hdr, unsigned int try_count_max) {
                                this->ap_netmask_int[2],
                                this->ap_netmask_int[3]);
 
-  confSsid = new ConfSsid;
+  confSsid = new ConfFile_Ssid;
 } // NetMgr::NetMgr()
 
 /**
@@ -53,12 +52,12 @@ NetMgrMode_t NetMgr::loop() {
   static NetMgrMode_t prev_mode = NETMGR_MODE_NULL;
   static String ssid = "";
   static String pw = "";
-  static int retry_count = 2; // XXX WiFiが頻繁に切れるのでリトライ
+  static unsigned int wait_connect_count = NetMgr::WAIT_CONNECT_COUNT_MAX;
 
   if ( this->cur_mode != prev_mode ) {
-    log_i("cur_mode: %s(%d) ==> %s(%d)",
-          NETMGR_MODE_STR[prev_mode], prev_mode,
-          NETMGR_MODE_STR[this->cur_mode], this->cur_mode);
+    log_i("%d:%s ==> %d:%s",
+          prev_mode, NETMGR_MODE_STR[prev_mode],
+          this->cur_mode, NETMGR_MODE_STR[this->cur_mode]);
     prev_mode = this->cur_mode;
   }
   this->_loop_count++;
@@ -72,8 +71,10 @@ NetMgrMode_t NetMgr::loop() {
     break;
     
   case NETMGR_MODE_START:
-    log_i("NETMGR_MODE_START: retry_count=%d", retry_count);
+    log_i("NETMGR_MODE_START: try_connect_count=%d/%d",
+          try_connect_count, NetMgr::TRY_CONNECT_COUNT_MAX);
 
+    // 登録されているSSID,passwordを読み込む
     confSsid->load();
     ent_size = confSsid->ent.size();
     if ( ent_size == 0 ) {
@@ -87,40 +88,33 @@ NetMgrMode_t NetMgr::loop() {
      * XXX TBD
      */
     WiFi.mode(WIFI_OFF);
-    log_i("WIFI_OFF");
     delay(100);
-
-    //eps_wifi_restore();
-    //log_i("esp_wifi_restore()");
-    //delay(5000);
 
     WiFi.mode(WIFI_STA);
     WiFi.disconnect(true, true);
     delay(100);
     
     // scan SSIDs
-    log_i("scan SSID ..");
-    NetMgr::ssidN = WiFi.scanNetworks(false, true);
-    log_i("ssidN=%d", NetMgr::ssidN);
-
-    if ( ssidN <= 0 ) {
-      WiFi.mode(WIFI_STA);
-      WiFi.disconnect();
-      delay(200);
-
-      log_i("retry: scan SSID ..");
-      NetMgr::ssidN = WiFi.scanNetworks(false, true);
-      log_i("ssidN=%d", NetMgr::ssidN);
+    NetMgr::ssidN = 0;
+    for (int i=0; i < 2 && NetMgr::ssidN == 0; i++) {
+      log_i("[%d] scan SSID ..", i);
+      NetMgr::ssidN = WiFi.scanNetworks();
+      log_i("[%d] ssidN=%d", i, NetMgr::ssidN);
     }
+
+    // SSIDが無い場合は、APモード
     if ( ssidN <= 0 ) {
       this->cur_mode = NETMGR_MODE_AP_INIT;
       break;
     }
 
+    // SSIDエントリの数を制限
     if ( NetMgr::ssidN > SSID_N_MAX ) {
       NetMgr::ssidN = SSID_N_MAX;
       log_i("ssidN=%d", NetMgr::ssidN);
     }
+
+    // ssidEnt[]に格納
     for (int i=0; i < NetMgr::ssidN; i++) {
       log_i("  %s", WiFi.SSID(i).c_str());
       NetMgr::ssidEnt[i].set(WiFi.SSID(i), WiFi.RSSI(i), WiFi.encryptionType(i));
@@ -147,53 +141,73 @@ NetMgrMode_t NetMgr::loop() {
       
     WiFi.begin(ssid.c_str(), pw.c_str());
 
-    this->_loop_count = 0;
-    this->cur_mode = NETMGR_MODE_TRY_WIFI;
+    wait_connect_count = WAIT_CONNECT_COUNT_MAX;
+    this->cur_mode = NETMGR_MODE_WAIT_CONNECT;
     break;
 
-  case NETMGR_MODE_TRY_WIFI:
+  case NETMGR_MODE_WAIT_CONNECT:
+    log_i("%s %d/%d %d/%d wl_stat=%d:%s",
+          NETMGR_MODE_STR[this->cur_mode],
+          try_connect_count, NetMgr::TRY_CONNECT_COUNT_MAX,
+          wait_connect_count, NetMgr::WAIT_CONNECT_COUNT_MAX,
+          wl_stat, WL_STATUS_T_STR[wl_stat]);
+
+    if (wl_stat == WL_CONNECTED) {
+      // 接続
+      this->ip_addr = WiFi.localIP();
+      log_i("IPaddr=%s", this->ip_addr.toString().c_str());
+
+      try_connect_count = NetMgr::TRY_CONNECT_COUNT_MAX; // XXX 不要？
+      this->cur_mode = NETMGR_MODE_WIFI_ON;
+      break;
+    }
+    
+    // 未接続
+    if ( wait_connect_count == 0 ) {
+      if ( try_connect_count > 0 ) {
+        // retry connect
+        log_w("Retry ..");
+
+        try_connect_count--;
+        this->cur_mode = NETMGR_MODE_START;
+        break;
+      }
+
+      // WiFi failed -> AP mode
+      log_w(" WiFi faild");
+
+      try_connect_count = NetMgr::TRY_CONNECT_COUNT_MAX;
+      this->cur_mode = NETMGR_MODE_AP_INIT;
+      break;
+    }
+
     if ( this->restart_flag ) {
       log_i("restart_flag=%s", (this->restart_flag ? "true" : "false"));
       this->_restart();
       break;
     }
 
-    if (wl_stat == WL_CONNECTED) {
-      log_i("wl_stat=%s(%d): IPaddr=%s",
-            WL_STATUS_T_STR[wl_stat], wl_stat,
-            WiFi.localIP().toString().c_str());
+    // wait
+    wait_connect_count--;
+    delay(NetMgr::WAIT_CONNECT_INTERVAL);
+    break;
 
-      //WiFi.persistent(false);
-      this->ip_addr = WiFi.localIP();
-      this->net_is_available = true;
-      this->cur_mode = NETMGR_MODE_WIFI_ON;
+  case NETMGR_MODE_WIFI_ON:
+    if ( wl_stat != WL_CONNECTED ) {
+      log_w("wl_stat=%s(%d)", WL_STATUS_T_STR[wl_stat], wl_stat);
+
+      try_connect_count = TRY_CONNECT_COUNT_MAX;
+      this->cur_mode = NETMGR_MODE_START;
       break;
     }
 
-    if (this->_loop_count > this->try_count_max) {
-      if ( retry_count ) {
-        log_w("Retry .. (%d)", retry_count);
-        this->cur_mode = NETMGR_MODE_START;
-        retry_count--;
-        break;
-      }
-      
-      log_w(" WiFi faild");
-      this->cur_mode = NETMGR_MODE_AP_INIT;
-      break;
+    if ( this->restart_flag ) {
+      log_i("restart_flag=%s", (this->restart_flag ? "true" : "false"));
+      this->_restart();
     }
-
-    log_w("%s %d/%d wl_stat=%s(%d)",
-          NETMGR_MODE_STR[this->cur_mode],
-          this->_loop_count, this->try_count_max,
-          WL_STATUS_T_STR[wl_stat], wl_stat);
-
-    delay(TRY_INTERVAL);
     break;
 
   case NETMGR_MODE_AP_INIT:
-    retry_count = 2;
-
     // log_i("%s", this->ModeStr[this->cur_mode]);
     log_i("cur_mode=%s", NETMGR_MODE_STR[this->cur_mode]);
 
@@ -249,24 +263,7 @@ NetMgrMode_t NetMgr::loop() {
     }
     break;
 
-  case NETMGR_MODE_WIFI_ON:
-    retry_count = 2;
-
-    if ( wl_stat != WL_CONNECTED ) {
-      log_w("wl_stat=%s(%d)", WL_STATUS_T_STR[wl_stat], wl_stat);
-      this->cur_mode = NETMGR_MODE_START;
-      break;
-    }
-
-    if ( this->restart_flag ) {
-      log_i("restart_flag=%s", (this->restart_flag ? "true" : "false"));
-      this->_restart();
-    }
-    break;
-
   case NETMGR_MODE_WIFI_OFF:
-    retry_count = 2;
-
     if (wl_stat == WL_CONNECTED) {
       log_i("wl_stat=%s(%d)", WL_STATUS_T_STR[wl_stat], wl_stat);
       this->cur_mode = NETMGR_MODE_WIFI_ON;
@@ -280,7 +277,7 @@ NetMgrMode_t NetMgr::loop() {
   } // switch
 
   if ( this->cur_mode == NETMGR_MODE_WIFI_ON
-       || this->cur_mode == NETMGR_MODE_TRY_WIFI ) {
+       || this->cur_mode == NETMGR_MODE_WAIT_CONNECT ) {
     this->cur_ssid = ssid;
   } else {
     this->cur_ssid = "";
@@ -315,9 +312,7 @@ void NetMgr::_restart() {
   this->restart_flag = false;
   this->cur_mode = NETMGR_MODE_START;
 
-  // WiFi.disconnect(true);
-  // WiFi.mode(WIFI_OFF);
-  // delay(100);
+  try_connect_count = NetMgr::TRY_CONNECT_COUNT_MAX;
 } // NetMgr::restart()
 
 /**
@@ -438,11 +433,15 @@ unsigned int NetMgr::async_scan_ssid_wait() {
  *
  */
 void NetMgr::handle_top() {
-  String   ssid, pw;
+  String   ssid = "", pw = "";
+
+  log_i("");
 
   confSsid->load();
-  ssid = confSsid->ent.begin()->first.c_str();
-  pw = confSsid->ent.begin()->second.c_str();
+  if ( confSsid->ent.size() > 0 ) {
+    ssid = confSsid->ent.begin()->first.c_str();
+    pw = confSsid->ent.begin()->second.c_str();
+  }
   log_i("ssid=%s, pw=%s", ssid.c_str(), pw.c_str());
 
   String html = NetMgr::html_header("Current settings");
