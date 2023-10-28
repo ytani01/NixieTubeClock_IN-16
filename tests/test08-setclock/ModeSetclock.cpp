@@ -1,19 +1,32 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ModeClock.h"
+#include "ModeSetclock.h"
 
 /**
  *
  */
-ModeClock::ModeClock(): Mode() {
-} // ModeClock::ModeClock()
+ModeSetclock::ModeSetclock(): Mode() {
+} // ModeSetclock::ModeSetclock()
 
 /** virtual
  *
  */
-void ModeClock::enter() {
+void ModeSetclock::enter() {
   log_i("enter mode: %s", this->name.c_str());
+
+  struct tm *tm = SysClock::now_tm();
+
+  this->pos = SETCLOCK_POS_YEAR;
+  this->prev_pos = SETCLOCK_POS_N;
+  this->flag_nx_update = true;
+
+  this->val.year = (tm->tm_year + 1900) % 100;
+  this->val.month = tm->tm_mon + 1;
+  this->val.day = tm->tm_mday;
+  this->val.hour = tm->tm_hour;
+  this->val.minute = tm->tm_min;
+  this->val.sec = tm->tm_sec;
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setTextColor(WHITE, BLACK);
@@ -24,21 +37,20 @@ void ModeClock::enter() {
   Disp->setTextWrap(true);
   Disp->printf("%s", this->name.c_str());
   Disp->display();
-} // ModeClock::enter()
+} // ModeSetclock::enter()
 
 /** virtual
  *
  */
-void ModeClock::exit() {
+void ModeSetclock::exit() {
   Nxa->end_all_effect();
-} // ModeClock::exit()
+} // ModeSetclock::exit()
 
 /** virtual
  *
  */
-void ModeClock::loop() {
+void ModeSetclock::loop() {
   unsigned long cur_ms = millis();
-  struct tm *tm = SysClock::now_tm();
   struct timeval *tv = SysClock::now_timeval();
 
   //
@@ -69,65 +81,7 @@ void ModeClock::loop() {
   }
 
   //
-  // for NixieTubeArray
-  //
-  char *nx_fmt;
-
-  switch ( this->clock_mode ) {
-  case CLOCK_MODE_HMS:
-    if ( wl_stat == WL_CONNECTED ) {
-      if ( tv->tv_sec % 2 == 0 ) {
-        nx_fmt = ModeClock::NX_FMT_HMS1;
-      } else {
-        nx_fmt = ModeClock::NX_FMT_HMS2;
-      }
-    } else {
-      //if ( tv->tv_sec % 4 <= 2 ) {
-      if ( tv->tv_sec % 2 <= 0 ) {
-        nx_fmt = ModeClock::NX_FMT_HMS1;
-      } else {
-        nx_fmt = ModeClock::NX_FMT_HMS2;
-      }
-    }
-    break;
-
-  case CLOCK_MODE_dHM:
-    if ( wl_stat == WL_CONNECTED ) {
-      if ( tv->tv_sec % 2 == 0 ) {
-        nx_fmt = ModeClock::NX_FMT_dHM1;
-      } else {
-        nx_fmt = ModeClock::NX_FMT_dHM2;
-      }
-    } else {
-      //if ( tv->tv_sec % 4 <= 2 ) {
-      if ( tv->tv_sec % 2 <= 0 ) {
-        nx_fmt = ModeClock::NX_FMT_dHM1;
-      } else {
-        nx_fmt = ModeClock::NX_FMT_dHM2;
-      }
-    }
-    break;
-
-  case CLOCK_MODE_ymd:
-    if ( cur_ms - date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
-      this->clock_mode = this->clock_mode_main;
-      return;
-    }
-
-    nx_fmt = ModeClock::NX_FMT_ymd;
-    break;
-
-  default:
-    break;
-  } // switch (clock_mode)
-  
-  std::string nx_str = tm2string(tm, nx_fmt);
-  log_v("nx_fmt = %s, nx_str = %s", nx_fmt, nx_str.c_str());
-
-  Nxa->set_string(nx_str.c_str());
-
-  //
-  // for Disp
+  // Disp
   //
   char *fmt_date, *fmt_time;
 
@@ -143,6 +97,7 @@ void ModeClock::loop() {
   Disp->setTextSize(1);
   Disp->setTextColor(WHITE, BLACK);
 
+  struct tm *tm = SysClock::now_tm();
   Disp->printf("%s", tm2string(tm, fmt_date).c_str());
 
   if ( wifimgr_mode == WIFI_MGR_MODE_AP ) {
@@ -201,66 +156,128 @@ void ModeClock::loop() {
 
   Disp->display();
 
+  if ( ! this->flag_nx_update ) {
+    delayOrChangeMode(this->LOOP_DELAY_MS);
+    return;
+  }
+  this->flag_nx_update = false;
+    
+  //
+  // NixieTubeArray
+  //
+  char *nx_fmt = NX_FMT_HMS;
+  int num1, num2, num3;
+
+  switch ( this->pos ) {
+  case SETCLOCK_POS_YEAR:
+  case SETCLOCK_POS_MONTH:
+  case SETCLOCK_POS_DAY:
+    nx_fmt = ModeSetclock::NX_FMT_ymd;
+    num1 = this->val.year;
+    num2 = this->val.month;
+    num3 = this->val.day;
+    break;
+  case SETCLOCK_POS_HOUR:
+  case SETCLOCK_POS_MINUTE:
+  case SETCLOCK_POS_SEC:
+    nx_fmt = ModeSetclock::NX_FMT_ymd;
+    num1 = this->val.hour;
+    num2 = this->val.minute;
+    num3 = this->val.sec;
+    break;
+  default:
+    log_e("pos = %d", (int)this->pos);
+    break;
+  } // switch (clock_mode)
+  
+  char nx_str[16];
+  sprintf(nx_str, nx_fmt, num1, num2, num3);
+  log_i("nx_str = %s", nx_str);
+
+  Nxa->end_all_effect();
+  Nxa->set_string(nx_str);
+
+  //
+  // blink current position
+  //
+  switch ( this->pos ) {
+  case SETCLOCK_POS_YEAR:
+  case SETCLOCK_POS_HOUR:
+    Nxa->num[0].blink_start(millis(), 200);
+    Nxa->num[1].blink_start(millis(), 200);
+    break;
+  case SETCLOCK_POS_MONTH:
+  case SETCLOCK_POS_MINUTE:
+    Nxa->num[2].blink_start(millis(), 200);
+    Nxa->num[3].blink_start(millis(), 200);
+    break;
+  case SETCLOCK_POS_DAY:
+  case SETCLOCK_POS_SEC:
+    Nxa->num[4].blink_start(millis(), 200);
+    Nxa->num[5].blink_start(millis(), 200);
+    break;
+  } // switch(pos)
+
+  //
+  this->prev_pos = this->pos;
   delayOrChangeMode(this->LOOP_DELAY_MS);
-} // ModeClock::loop()
+} // ModeSetclock::loop()
 
 /**
  *
  */
-void ModeClock::cbBtn(ButtonInfo_t *bi) {
+void ModeSetclock::cbBtn(ButtonInfo_t *bi) {
   log_d("%s", Button::info2String(bi).c_str());
 
   if ( String(bi->name) == "Btn0" ) {
     if ( bi->value == Button::ON ) {
       if ( bi->long_pressed ) {
         if ( bi->repeat_count == 0 ) {
-          Mode::set("ModeSetclock");
+          Mode::set("ModeClock");
         }
       }
     }
     return;
   } // if (Btn0)
 
-  if ( String(bi->name) == "Btn1" ) {
-    if ( bi->value == Button::ON ) {
-      if ( bi->push_count == 1 ) {
-        if ( ! bi->long_pressed ) {
-          // single push
-          if ( this->clock_mode != CLOCK_MODE_ymd ) {
-            this->clock_mode = CLOCK_MODE_ymd;
-            this->date_start_ms = millis();
-          } else {
-            this->clock_mode = this->clock_mode_main;
-          }
-        } else { // long_pressed
-          // long pressed
-          if ( bi->repeat_count == 0 ) {
-            if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
-              this->clock_mode_main = CLOCK_MODE_dHM;
-            } else {
-              this->clock_mode_main = CLOCK_MODE_HMS;
-            }
-            this->clock_mode = this->clock_mode_main;
-            this->date_start_ms = 0;
-          } // if (repeat_count==0)
-        } // if (!long_pressed)
-      } // if (push_count==1)
-    } // if (ON)
-    
-    log_v("clock_mode_main = %d, clock_mode = %d",
-          this->clock_mode_main, this->clock_mode);
+  if ( String(bi->name) == "Btn1" &&
+       bi->value == Button::ON ) {
+
+    // XXX enumの計算
+    int pos_int = static_cast<int>(this->pos);
+    int pos_n = static_cast<int>(SETCLOCK_POS_N);
+
+    pos_int = (pos_int + 1) % pos_n;
+    log_i("pos_int = %d", pos_int);
+
+    this->pos = static_cast<setclock_pos_t>(pos_int);
+
+    this->flag_nx_update = true;
     return;
   } // if (Btn1)
 
-  if ( String(bi->name) == "Btn2" ) {
-    if ( bi->value == Button::ON ) {
-      brightness_t bri = Nxa->brightness() / 2;
-      if ( bri < BRIGHTNESS_MIN ) {
-        bri = BRIGHTNESS_RESOLUTION;
+  if ( String(bi->name) == "Btn2" &&
+       bi->value == Button::ON ) {
+
+    switch ( this->pos ) {
+    case SETCLOCK_POS_YEAR:
+      this->val.year++;
+      if ( this->val.year > this->MAX_YEAR ) {
+        this->val.year = this->MIN_YEAR;
       }
-      Nxa->set_brightness(bri);
-    }
+      log_i("year = %d", this->val.year);
+      break;
+    case SETCLOCK_POS_MONTH:
+      this->val.month++;
+      if ( this->val.month > this->MAX_MONTH ) {
+        this->val.month = this->MIN_MONTH;
+      }
+      log_i("month = %d", this->val.month);
+      break;
+    } // switch (pos)
+
+    this->flag_nx_update = true;
     return;
   } // if (Btn2)
 
-} // ModeClock::cbBtn()
+} // ModeSetclock::cbBtn()

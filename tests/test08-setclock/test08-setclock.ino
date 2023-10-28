@@ -17,6 +17,7 @@
 #include "ModeBoot.h"
 #include "ModeReboot.h"
 #include "ModeClock.h"
+#include "ModeSetclock.h"
 
 std::string VersionString = " 2. 0. 0";
 
@@ -41,6 +42,8 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
   {"Btn2", 18},
 };
 Task_ButtonWatcher *TaskBtnWatcher = NULL;
+
+static const int BTN_REPEAT_COUNT_REBOOT = 15;
 
 // WiFi
 static const std::string AP_HDR = "NxClk_";
@@ -105,6 +108,20 @@ void disableIntr() {
  *
  */
 void cbBtn(ButtonInfo_t *bi) {
+  log_i("%s", Button::info2String(bi).c_str());
+
+  //
+  // reboot check
+  //
+  if ( String(bi->name) == "Btn0" &&
+       bi->value == Button::ON &&
+       bi->long_pressed &&
+       bi->repeat_count > BTN_REPEAT_COUNT_REBOOT ) {
+
+    Mode::set("ModeReboot");
+    return;
+  } // if (Btn0)
+
   Mode::Cur->cbBtn(bi);
 } // cbBtn()
 
@@ -112,7 +129,9 @@ void cbBtn(ButtonInfo_t *bi) {
  *
  */
 void cbNtp(Task_NtpInfo_t *ni) {
-  log_i("%s", SNTP_SYNC_STATUS_STR[ni->sntp_stat]);
+  sntp_sync_status_t prev_sntp_stat = SNTP_SYNC_STATUS_RESET;
+
+  log_d("%s", SNTP_SYNC_STATUS_STR[ni->sntp_stat]);
 
   if ( ni->sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
     //
@@ -148,6 +167,8 @@ void cbNtp(Task_NtpInfo_t *ni) {
 
     log_i("  dst Sys: %s", SysClock::now_string().c_str());
   }
+
+  prev_sntp_stat = ni->sntp_stat;
 } // cbNtp()
 
 /**
@@ -232,6 +253,7 @@ void setup() {
   Mode::add("ModeBoot", new ModeBoot(2000));
   Mode::add("ModeReboot", new ModeReboot(2000));
   Mode::add("ModeClock", new ModeClock());
+  Mode::add("ModeSetclock", new ModeSetclock());
 
   for (auto m: Mode::Ent) {
     m.second->setup();

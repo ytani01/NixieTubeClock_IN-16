@@ -69,7 +69,7 @@ void Task_Ntp::loop() {
     //
     // WiFi is not available
     //
-    log_w("WIFI is not available");
+    log_d("WIFI is not available");
     this->info.sntp_stat = SNTP_SYNC_STATUS_RESET;
 
     this->_cb(&(this->info));

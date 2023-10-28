@@ -15,6 +15,8 @@ typedef enum {
 
 class ModeClock: public Mode {
  public:
+  static const unsigned long LOOP_DELAY_MS = 50; // ms
+
   static constexpr char* NX_FMT_HMS1 = (char *)"%H:%M:%S";
   static constexpr char* NX_FMT_HMS2 = (char *)"%H %M %S";
 
