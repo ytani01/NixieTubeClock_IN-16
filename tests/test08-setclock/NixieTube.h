@@ -41,8 +41,9 @@ class NixieTube {
   NixieEffect *init_effect(effect_id_t eid);
   void end_effect();
 
-  boolean effect_is_active();
+  bool effect_is_active();
 
+  void one(int element);
   void fadein_start(unsigned long start_ms, unsigned long ms, int el_i);
   void fadeout_start(unsigned long start_ms, unsigned long ms, int el_i);
   void xfade_start(unsigned long start_ms, unsigned long ms,

@@ -65,7 +65,7 @@ void loop() {
  */
 class Task_ButtonWatcher: public Task {
 public:
-  static const uint32_t STACK_SIZE = 4 * 1024;
+  static const uint32_t STACK_SIZE = 8 * 1024;
   static const UBaseType_t PRIORITY = 0;
   static const UBaseType_t CORE = APP_CPU_NUM;
 

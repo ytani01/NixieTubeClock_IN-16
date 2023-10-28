@@ -89,7 +89,7 @@ void ModeBoot::loop() {
 
   Disp->setTextColor(WHITE, BLACK);
   Disp->printf("%s\n", tm2string(tm, fmt_date).c_str());
-  Disp->printf("%s\n", tm2string(tm, fmt_time).c_str());
+  Disp->printf("     %s\n", tm2string(tm, fmt_time).c_str());
   Disp->printf("booting .. ");
   Mode::disp_spin(100);
 

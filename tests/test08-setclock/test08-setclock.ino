@@ -108,7 +108,7 @@ void disableIntr() {
  *
  */
 void cbBtn(ButtonInfo_t *bi) {
-  log_i("%s", Button::info2String(bi).c_str());
+  log_d("%s", Button::info2String(bi).c_str());
 
   //
   // reboot check
@@ -117,6 +117,7 @@ void cbBtn(ButtonInfo_t *bi) {
        bi->value == Button::ON &&
        bi->long_pressed &&
        bi->repeat_count > BTN_REPEAT_COUNT_REBOOT ) {
+    log_w("%s", Button::info2String(bi).c_str());
 
     Mode::set("ModeReboot");
     return;

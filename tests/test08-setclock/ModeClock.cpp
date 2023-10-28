@@ -28,6 +28,8 @@ ModeClock::ModeClock(): Mode() {
 void ModeClock::enter() {
   log_i("enter mode: %s", this->name.c_str());
 
+  Nxa->set_string("00:00:00");
+
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setTextColor(WHITE, BLACK);
 
@@ -37,6 +39,8 @@ void ModeClock::enter() {
   Disp->setTextWrap(true);
   Disp->printf("%s", this->name.c_str());
   Disp->display();
+
+  delay(10);
 } // ModeClock::enter()
 
 /** virtual
@@ -119,7 +123,7 @@ void ModeClock::loop() {
   }
   Disp->printf("\n");
   
-  Disp->printf("  %s\n", tm2string(tm, fmt_time).c_str());
+  Disp->printf("     %s\n", tm2string(tm, fmt_time).c_str());
 
   if ( wifimgr_mode == WIFI_MGR_MODE_STA ) {
     if ( wl_stat == WL_CONNECTED ) {
@@ -209,12 +213,24 @@ void ModeClock::loop() {
     break;
   } // switch (clock_mode)
   
-  std::string nx_str = tm2string(tm, nx_fmt);
+  static std::string prev_nx_str = "";
+
+  // xfadeするため、少し進める
+  long nx_usec = tv->tv_usec + 500000;
+  log_v("nx_usec = %d", nx_usec);
+  time_t nx_sec = tv->tv_sec + (nx_usec / 1000000);
+  struct tm nx_tm;
+  localtime_r(&nx_sec, &nx_tm);
+
+  std::string nx_str = tm2string(&nx_tm, nx_fmt);
   log_v("nx_fmt = %s, nx_str = %s", nx_fmt, nx_str.c_str());
 
-  Nxa->set_string(nx_str.c_str());
+  unsigned long xfade_ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
+  Nxa->set_string(nx_str.c_str(), xfade_ms);
 
-  //
+  prev_nx_str = nx_str;
+
+  //---------------
   delayOrChangeMode(this->LOOP_DELAY_MS);
 } // ModeClock::loop()
 
@@ -222,7 +238,7 @@ void ModeClock::loop() {
  *
  */
 void ModeClock::cbBtn(ButtonInfo_t *bi) {
-  log_d("%s", Button::info2String(bi).c_str());
+  log_i("%s", Button::info2String(bi).c_str());
 
   if ( String(bi->name) == "Btn0" ) {
     if ( bi->value == Button::ON ) {
@@ -239,16 +255,21 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
     if ( bi->value == Button::ON ) {
       if ( bi->push_count == 1 ) {
         if ( ! bi->long_pressed ) {
-          // single push
+          //
+          // Btn1: single short push
+          //
           if ( this->clock_mode != CLOCK_MODE_ymd ) {
             this->clock_mode = CLOCK_MODE_ymd;
             this->date_start_ms = millis();
           } else {
             this->clock_mode = this->clock_mode_main;
+            this->date_start_ms = 0;
           }
         } else { // long_pressed
-          // long pressed
-          if ( bi->repeat_count == 0 ) {
+          if ( bi->repeat_count == 1 ) {
+            //
+            // Btn1: long pressed(1)
+            //
             if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
               this->clock_mode_main = CLOCK_MODE_dHM;
             } else {
@@ -264,9 +285,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
         } // if (!long_pressed)
       } // if (push_count==1)
     } // if (ON)
-    
-    log_v("clock_mode_main = %d, clock_mode = %d",
-          this->clock_mode_main, this->clock_mode);
+
     return;
   } // if (Btn1)
 
@@ -277,6 +296,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
         bri = BRIGHTNESS_RESOLUTION;
       }
       Nxa->set_brightness(bri);
+      Nxa->display(millis());
     }
     return;
   } // if (Btn2)

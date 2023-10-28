@@ -32,6 +32,9 @@ class NixieTubeArray {
   NixieTube  num[NIXIE_NUM_N];
   NixieTube  colon[NIXIE_COLON_N];
 
+  uint8_t prev_num_int[NIXIE_NUM_N];
+  uint8_t prev_col_int[NIXIE_COLON_N];
+
   NixieTubeArray(uint8_t clk, uint8_t stobe, uint8_t data, uint8_t blank,
                  uint8_t num[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N],
                  uint8_t colon[NIXIE_COLON_N][NIXIE_COLON_DOT_N]);
@@ -42,9 +45,9 @@ class NixieTubeArray {
                               
   void end_all_effect();
 
-  void set_num(uint8_t (&num)[NIXIE_NUM_N]);
-  void set_col(uint8_t (&col)[NIXIE_COLON_N]);
-  void set_string(std::string str);
+  void set_num(uint8_t (&num)[NIXIE_NUM_N], unsigned long xfade_ms=0);
+  void set_col(uint8_t (&col)[NIXIE_COLON_N], unsigned long xfade_ms=0);
+  void set_string(std::string str, unsigned long xfade_ms=0);
   
   void display(unsigned long cur_ms);
 

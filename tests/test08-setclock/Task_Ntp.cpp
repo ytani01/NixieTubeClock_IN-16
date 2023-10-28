@@ -103,7 +103,7 @@ void Task_Ntp::loop() {
    *   SNTP_SYNC_MODE_SMOOTHの同期中の場合は、SNTP_SYNC_STAUS_IN_PROGRESS)
    */
   this->info.sntp_stat = sntp_get_sync_status();
-  log_d("sntp_stat = %s ..", SNTP_SYNC_STATUS_STR[this->info.sntp_stat]);
+  log_i("sntp_stat = %s ..", SNTP_SYNC_STATUS_STR[this->info.sntp_stat]);
 
   if ( this->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
     interval = INTERVAL_NORMAL;    

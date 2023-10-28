@@ -119,7 +119,7 @@ void ModeSetclock::loop() {
   }
   Disp->printf("\n");
   
-  Disp->printf("  %s\n", tm2string(tm, fmt_time).c_str());
+  Disp->printf("     %s\n", tm2string(tm, fmt_time).c_str());
 
   if ( wifimgr_mode == WIFI_MGR_MODE_STA ) {
     if ( wl_stat == WL_CONNECTED ) {

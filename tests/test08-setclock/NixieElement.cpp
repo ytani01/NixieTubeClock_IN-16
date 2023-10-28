@@ -45,13 +45,13 @@ brightness_t NixieElement::set_brightness(brightness_t brightness) {
  *
  */
 brightness_t NixieElement::inc_brightness() {
-  if (this->_brightness < BRIGHTNESS_RESOLUTION) {
+  if ( this->_brightness < this->_max_brightness ) {
     this->_brightness++;
   }
   return this->_brightness;
 }
 brightness_t NixieElement::dec_brightness() {
-  if (this->_brightness > 0) {
+  if ( this->_brightness > 0 ) {
     this->_brightness--;
   }
   return this->_brightness;

@@ -6,6 +6,9 @@
 //============================================================================
 // class NixieTubeArray
 //----------------------------------------------------------------------------
+/**
+ *
+ */
 NixieTubeArray::NixieTubeArray(uint8_t clk, uint8_t stobe, uint8_t data,
                                uint8_t blank,
                                uint8_t num_pin[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N],
@@ -23,10 +26,12 @@ NixieTubeArray::NixieTubeArray(uint8_t clk, uint8_t stobe, uint8_t data,
 
   for (int n=0; n < NIXIE_NUM_N; n++) {
     this->num[n].setup(NIXIE_NUM_DIGIT_N, num_pin[n]);
+    this->prev_num_int[n] = 255;
   } // for(n)
 
   for (int c=0; c < NIXIE_COLON_N; c++) {
     this->colon[c].setup(NIXIE_COLON_DOT_N, colon_pin[c]);
+    this->prev_col_int[c] = 255;
     for (int d=0; d < NIXIE_COLON_DOT_N; d++) {
       pinMode(colon_pin[c][d], OUTPUT);
       digitalWrite(colon_pin[c][d], LOW);
@@ -34,8 +39,11 @@ NixieTubeArray::NixieTubeArray(uint8_t clk, uint8_t stobe, uint8_t data,
   } // for(c)
 
   this->_cf_bri = new ConfFile_Brightness();
-} // NixieTubeArray::setup()
+} // NixieTubeArray::NixieArray()
 
+/**
+ *
+ */
 void NixieTubeArray::loop(unsigned long cur_ms) {
   for (int ti=0; ti < NIXIE_NUM_N; ti++) {
     this->num[ti].loop(cur_ms);
@@ -101,37 +109,51 @@ void NixieTubeArray::end_all_effect() {
 /**
  *
  */
-void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N]) {
+void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
+                             unsigned long xfade_ms) {
+  unsigned long cur_ms = millis();
+
   for (int t=0; t < NIXIE_NUM_N; t++) {
-    for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
-      if ( num[t] == e ) {
-        this->num[t].element[e].set_brightness_to_max();
-      } else {
-        this->num[t].element[e].set_brightness(0);
-      }
-    } // for(e)
+    if ( num[t] == this->prev_num_int[t] ) {
+      continue;
+    }
+    if ( xfade_ms > 0 ) {
+      this->num[t].xfade_start(cur_ms, xfade_ms, num[t], this->prev_num_int[t]);
+    } else {
+      this->num[t].one(num[t]);
+    }
+    this->prev_num_int[t] = num[t];
   } // for(t)
 } // NixieTubeArray::set_num()
 
 /**
  *
  */
-void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N]) {
+void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
+                             unsigned long xfade_ms) {
+  unsigned long cur_ms = millis();
+
   for (int t=0; t < NIXIE_COLON_N; t++) {
-    for (int e=0; e < NIXIE_COLON_DOT_N; e++) {
-      if ( col[t] == e ) {
-        this->colon[t].element[e].set_brightness_to_max();
-      } else {
-        this->colon[t].element[e].set_brightness(0);
-      }
-    } // for(e)
+    if ( col[t] == this->prev_col_int[t] ) {
+      continue;
+    }
+    if ( xfade_ms > 0 ) {
+      //
+      // XXX ここで xfadeすると、なぜかパニックで落ちる
+      //
+      this->colon[t].xfade_start(cur_ms, xfade_ms, col[t], this->prev_col_int[t]);
+      //this->colon[t].one(col[t]);
+    } else {
+      this->colon[t].one(col[t]);
+    }
+    this->prev_col_int[t] = col[t];
   } // for(t)
 } // NixieTubeArray::set_col()
 
 /**
  *
  */
-void NixieTubeArray::set_string(std::string str) {
+void NixieTubeArray::set_string(std::string str, unsigned long xfade_ms) {
   static std::string prev_str = "";
   
   if ( str != prev_str ) {
@@ -155,8 +177,8 @@ void NixieTubeArray::set_string(std::string str) {
 
   //log_d("col[] = {%d, %d}", col[0], col[1]);
   
-  this->set_num(num);
-  this->set_col(col);
+  this->set_num(num, xfade_ms);
+  this->set_col(col, xfade_ms);
 
   //this->display(millis());
 } // NixieTubeArray::set_string()
