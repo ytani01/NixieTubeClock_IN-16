@@ -5,6 +5,7 @@
 #define _MODE_CLOCK_H_
 
 #include "Mode.h"
+#include "ConfFile_ModeClock.h"
 
 typedef enum {
   CLOCK_MODE_HMS,
@@ -30,6 +31,8 @@ class ModeClock: public Mode {
 
   unsigned long date_start_ms = 0;
   static const unsigned long CLOCK_MODE_DATE_INTERVAL = 5000;
+
+  ConfFile_ModeClock *conf;
   
   ModeClock();
 

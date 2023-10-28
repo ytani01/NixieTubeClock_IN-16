@@ -7,6 +7,19 @@
  *
  */
 ModeClock::ModeClock(): Mode() {
+  //
+  // init clock mode
+  //
+  this->conf = new ConfFile_ModeClock();
+  this->conf->load();
+
+  if ( this->conf->clock_mode >= CLOCK_MODE_SIZE ) {
+    this->conf->clock_mode = CLOCK_MODE_HMS;
+    this->conf->save();
+  }
+  
+  this->clock_mode_main = (clock_mode_t)this->conf->clock_mode;
+  this->clock_mode = this->clock_mode_main;
 } // ModeClock::ModeClock()
 
 /** virtual
@@ -241,6 +254,10 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
             } else {
               this->clock_mode_main = CLOCK_MODE_HMS;
             }
+            // save main mode
+            this->conf->clock_mode = static_cast<int>(this->clock_mode_main);
+            this->conf->save();
+            
             this->clock_mode = this->clock_mode_main;
             this->date_start_ms = 0;
           } // if (repeat_count==0)
