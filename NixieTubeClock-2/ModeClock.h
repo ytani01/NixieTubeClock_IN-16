@@ -33,6 +33,8 @@ class ModeClock: public Mode {
   static const unsigned long CLOCK_MODE_DATE_INTERVAL = 5000;
 
   ConfFile_ModeClock *conf;
+
+  bool sw_xfade = true;
   
   ModeClock();
 

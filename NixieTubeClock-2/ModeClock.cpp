@@ -215,8 +215,11 @@ void ModeClock::loop() {
   
   static std::string prev_nx_str = "";
 
-  // xfadeするため、少し進める
-  long nx_usec = tv->tv_usec + 500000;
+  long nx_usec = tv->tv_usec;
+  if ( this->sw_xfade ) {
+    // T.B.D. xfadeする場合、少し進める
+    nx_usec + 500000;
+  }
   log_v("nx_usec = %d", nx_usec);
   time_t nx_sec = tv->tv_sec + (nx_usec / 1000000);
   struct tm nx_tm;
@@ -226,6 +229,9 @@ void ModeClock::loop() {
   log_v("nx_fmt = %s, nx_str = %s", nx_fmt, nx_str.c_str());
 
   unsigned long xfade_ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
+  if ( ! this->sw_xfade ) {
+    xfade_ms = 0;
+  }
   Nxa->set_string(nx_str.c_str(), xfade_ms);
 
   prev_nx_str = nx_str;
@@ -247,6 +253,11 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
           Mode::set("ModeSetclock");
         }
       }
+    }
+
+    // Btn1:OFF
+    if ( bi->click_count == 2 ) {
+      this->sw_xfade = this->sw_xfade ? false : true;
     }
     return;
   } // if (Btn0)

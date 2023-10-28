@@ -138,11 +138,7 @@ void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
       continue;
     }
     if ( xfade_ms > 0 ) {
-      //
-      // XXX ここで xfadeすると、なぜかパニックで落ちる
-      //
       this->colon[t].xfade_start(cur_ms, xfade_ms, col[t], this->prev_col_int[t]);
-      //this->colon[t].one(col[t]);
     } else {
       this->colon[t].one(col[t]);
     }

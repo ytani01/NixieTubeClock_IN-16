@@ -19,7 +19,7 @@
 #include "ModeClock.h"
 #include "ModeSetclock.h"
 
-std::string VersionString = " 2. 0. 0";
+std::string VersionString = " 2. 0. 1";
 
 // Mode
 bool Flag_ReqModeChange = false; // モード変更要求フラグ
