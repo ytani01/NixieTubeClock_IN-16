@@ -53,7 +53,7 @@ class NixieTube {
   void randomOnOff_start(int el_i, unsigned long ms, unsigned long start_ms=0);
 
  private:
-  NixieEffect *_ef = NULL;
+  NixieEffect *_ef1 = NULL;
   NixieEffect *_ef2 = NULL;
   brightness_t _brightness;
 }; // class NixieTube

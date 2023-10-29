@@ -268,37 +268,36 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
 
   if ( String(bi->name) == "Btn1" ) {
     if ( bi->value == Button::ON ) {
-      if ( bi->push_count == 1 ) {
-        if ( ! bi->long_pressed ) {
+      if ( ! bi->long_pressed ) {
+        //
+        // Btn1: single short push
+        //
+        if ( this->clock_mode != CLOCK_MODE_ymd ) {
+          this->clock_mode = CLOCK_MODE_ymd;
+          this->date_start_ms = millis();
+        } else {
+          this->clock_mode = this->clock_mode_main;
+          this->date_start_ms = 0;
+        }
+        log_i("clock_mode = %d", this->clock_mode);
+      } else { // long_pressed
+        if ( bi->repeat_count == 1 ) {
           //
-          // Btn1: single short push
+          // Btn1: long pressed(1)
           //
-          if ( this->clock_mode != CLOCK_MODE_ymd ) {
-            this->clock_mode = CLOCK_MODE_ymd;
-            this->date_start_ms = millis();
+          if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
+            this->clock_mode_main = CLOCK_MODE_dHM;
           } else {
-            this->clock_mode = this->clock_mode_main;
-            this->date_start_ms = 0;
+            this->clock_mode_main = CLOCK_MODE_HMS;
           }
-        } else { // long_pressed
-          if ( bi->repeat_count == 1 ) {
-            //
-            // Btn1: long pressed(1)
-            //
-            if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
-              this->clock_mode_main = CLOCK_MODE_dHM;
-            } else {
-              this->clock_mode_main = CLOCK_MODE_HMS;
-            }
-            // save main mode
-            this->conf->clock_mode = static_cast<int>(this->clock_mode_main);
-            this->conf->save();
+          // save main mode
+          this->conf->clock_mode = static_cast<int>(this->clock_mode_main);
+          this->conf->save();
             
-            this->clock_mode = this->clock_mode_main;
-            this->date_start_ms = 0;
-          } // if (repeat_count==0)
-        } // if (!long_pressed)
-      } // if (push_count==1)
+          this->clock_mode = this->clock_mode_main;
+          this->date_start_ms = 0;
+        } // if (repeat_count==0)
+      } // if (!long_pressed)
     } // if (ON)
 
     return;

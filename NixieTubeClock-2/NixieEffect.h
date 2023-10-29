@@ -30,7 +30,6 @@ typedef enum {
   NIXIE_EFFECT_ONLY,
   NIXIE_EFFECT_FADEIN,
   NIXIE_EFFECT_FADEOUT,
-  NIXIE_EFFECT_XFADE,
   NIXIE_EFFECT_FOGIN,
   NIXIE_EFFECT_FOGOUT,
   NIXIE_EFFECT_SHUFFLE,
@@ -100,7 +99,7 @@ class NixieEffectFadeIn : public NixieEffect {
   int _el_i;
 }; // class NixieEffectFadeIn
 
-/**
+/** ==========================================================================
  *
  */
 class NixieEffectFadeOut : public NixieEffect {
@@ -113,20 +112,6 @@ class NixieEffectFadeOut : public NixieEffect {
  private:
   int _el_i;
 }; // class NixieEffectFadeOut
-
-/** ==========================================================================
- *
- */
-class NixieEffectXFade : public NixieEffect {
- public:
-  NixieEffectXFade(NixieElement *el, unsigned long el_n);
-  void start(int el_src, int el_dst,
-             unsigned long tick_ms, unsigned long start_ms=0);
-  void loop(unsigned long cur_ms=0);
-
- private:
-  int _el_i_src, _el_i_dst;
-}; // class NixieEffectXFade
 
 //============================================================================
 class NixieEffectShuffle : public NixieEffect {
