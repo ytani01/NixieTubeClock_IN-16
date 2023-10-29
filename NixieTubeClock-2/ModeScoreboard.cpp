@@ -85,7 +85,13 @@ void ModeScoreboard::cbBtn(ButtonInfo_t *bi) {
   if ( bi->value == Button::ON ) {
     if ( bi->long_pressed ) {
       if ( bi->push_count == 1 ) {
-        this->dec_score(b_i);
+        if ( bi->repeat_count < 6 ) {
+          if ( bi->repeat_count % 2 == 0 ) {
+            this->dec_score(b_i);
+          }
+        } else {
+          this->dec_score(b_i);
+        }
       } else {
         if ( bi->repeat_count > 3 ) {
           Mode::set("ModeClock");

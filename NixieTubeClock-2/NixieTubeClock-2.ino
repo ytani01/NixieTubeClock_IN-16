@@ -176,20 +176,18 @@ void cbNtp(Task_NtpInfo_t *ni) {
  *
  */
 void setup() {
-  log_i("===\n");
-  delay(2500);
+  for (int i=0; i < 3; i++) {
+    log_i("%d ===", i);
+    delay(500);
+  }
 
-  log_i("=== start %s ===",
-        get_mac_addr_string().c_str());
-
-  log_i("uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
+  log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
 
   // I2C
   log_i("=== Init I2C: SDA=%d, SCL=%d", PIN_I2C_SDA, PIN_I2C_SCL);
   Wire.setPins(PIN_I2C_SDA, PIN_I2C_SCL);
   
   // Display
-  log_i("=== Init Display");
   Disp = new Display_t(DISPLAY_W, DISPLAY_H);
   Disp->DispBegin(DISP_ADDR);
   Disp->setRotation(0);
@@ -267,7 +265,9 @@ void setup() {
 
   enableIntr();
 
-  log_i("uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
+  log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
+  log_i("=== start %s ===",
+        get_mac_addr_string().c_str());
 } // setup()
 
 /**
