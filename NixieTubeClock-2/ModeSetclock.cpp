@@ -203,18 +203,18 @@ void ModeSetclock::loop() {
   switch ( this->pos ) {
   case SETCLOCK_POS_YEAR:
   case SETCLOCK_POS_HOUR:
-    Nxa->num[0].blink_start(millis(), BLINK_INTERVAL_MS);
-    Nxa->num[1].blink_start(millis(), BLINK_INTERVAL_MS);
+    Nxa->num[0].blink_start(BLINK_INTERVAL_MS);
+    Nxa->num[1].blink_start(BLINK_INTERVAL_MS);
     break;
   case SETCLOCK_POS_MONTH:
   case SETCLOCK_POS_MINUTE:
-    Nxa->num[2].blink_start(millis(), BLINK_INTERVAL_MS);
-    Nxa->num[3].blink_start(millis(), BLINK_INTERVAL_MS);
+    Nxa->num[2].blink_start(BLINK_INTERVAL_MS);
+    Nxa->num[3].blink_start(BLINK_INTERVAL_MS);
     break;
   case SETCLOCK_POS_DAY:
   case SETCLOCK_POS_SEC:
-    Nxa->num[4].blink_start(millis(), BLINK_INTERVAL_MS);
-    Nxa->num[5].blink_start(millis(), BLINK_INTERVAL_MS);
+    Nxa->num[4].blink_start(BLINK_INTERVAL_MS);
+    Nxa->num[5].blink_start(BLINK_INTERVAL_MS);
     break;
   } // switch(pos)
 

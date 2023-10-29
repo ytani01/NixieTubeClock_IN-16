@@ -20,14 +20,14 @@ void ModeReboot::enter() {
 
   Nxa->set_string(VersionString.c_str());
   
-  Nxa->num[5].blink_start(this->start_ms, 300);
-  Nxa->num[4].blink_start(this->start_ms, 300);
-  Nxa->colon[NIXIE_COLON_R].blink_start(this->start_ms+20, 300);
-  Nxa->num[3].blink_start(this->start_ms+40, 300);
-  Nxa->num[2].blink_start(this->start_ms+40, 300);
-  Nxa->colon[NIXIE_COLON_L].blink_start(this->start_ms+60, 300);
-  Nxa->num[1].blink_start(this->start_ms+80, 300);
-  Nxa->num[0].blink_start(this->start_ms+80, 300);
+  Nxa->num[5].blink_start(300, start_ms);
+  Nxa->num[4].blink_start(300, start_ms);
+  Nxa->colon[NIXIE_COLON_R].blink_start(300, this->start_ms+20);
+  Nxa->num[3].blink_start(300, this->start_ms+40);
+  Nxa->num[2].blink_start(300, this->start_ms+40);
+  Nxa->colon[NIXIE_COLON_L].blink_start(300, this->start_ms+60);
+  Nxa->num[1].blink_start(300, this->start_ms+80);
+  Nxa->num[0].blink_start(300, this->start_ms+80);
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->display();

@@ -257,7 +257,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
 
     // Btn1:OFF
     if ( bi->click_count == 2 ) {
-      this->sw_xfade = this->sw_xfade ? false : true;
+      this->sw_xfade = ! this->sw_xfade;
     }
 
     if ( bi->click_count == 3 ) {

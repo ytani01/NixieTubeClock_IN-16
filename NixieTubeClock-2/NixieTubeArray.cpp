@@ -111,19 +111,17 @@ void NixieTubeArray::end_all_effect() {
  */
 void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
                              unsigned long xfade_ms) {
-  unsigned long cur_ms = millis();
-
-  for (int t=0; t < NIXIE_NUM_N; t++) {
-    if ( num[t] == this->prev_num_int[t] ) {
+  for (int i=0; i < NIXIE_NUM_N; i++) {
+    if ( num[i] == this->prev_num_int[i] ) {
       continue;
     }
     if ( xfade_ms > 0 ) {
-      this->num[t].xfade_start(cur_ms, xfade_ms, num[t], this->prev_num_int[t]);
+      this->num[i].xfade_start(this->prev_num_int[i], num[i], xfade_ms);
     } else {
-      this->num[t].one(num[t]);
+      this->num[i].one(num[i]);
     }
-    this->prev_num_int[t] = num[t];
-  } // for(t)
+    this->prev_num_int[i] = num[i];
+  } // for(i)
 } // NixieTubeArray::set_num()
 
 /**
@@ -131,18 +129,16 @@ void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
  */
 void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
                              unsigned long xfade_ms) {
-  unsigned long cur_ms = millis();
-
-  for (int t=0; t < NIXIE_COLON_N; t++) {
-    if ( col[t] == this->prev_col_int[t] ) {
+  for (int i=0; i < NIXIE_COLON_N; i++) {
+    if ( col[i] == this->prev_col_int[i] ) {
       continue;
     }
     if ( xfade_ms > 0 ) {
-      this->colon[t].xfade_start(cur_ms, xfade_ms, col[t], this->prev_col_int[t]);
+      this->colon[i].xfade_start(this->prev_col_int[i], col[i], xfade_ms);
     } else {
-      this->colon[t].one(col[t]);
+      this->colon[i].one(col[i]);
     }
-    this->prev_col_int[t] = col[t];
+    this->prev_col_int[i] = col[i];
   } // for(t)
 } // NixieTubeArray::set_col()
 
@@ -194,7 +190,7 @@ void NixieTubeArray::set_onoff(unsigned long cur_ms) {
         this->num[t].element[e].off();
       }
     } // for(e)
-  } // for(t)
+  } // for(i)
 
   // colon部
   for (int t=0; t < NIXIE_COLON_N; t++) {

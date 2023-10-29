@@ -2,7 +2,7 @@
  * Copyright (c) 2023 Yoichi Tanibayashi
  *
  *----------------------------------------------------------------------------
- * [ Data structure ( not a class tree ) ]
+ * [ has-a tree ]
  *
  *  NixieTubeArray
  *   |
@@ -22,9 +22,6 @@
 #ifndef NIXIE_EFFECT_H
 #define NIXIE_EFFECT_H
 
-#include <Arduino.h>
-#include <RTClib.h>
-#include <WiFi.h>
 #include "Nixie.h"
 #include "NixieElement.h"
 
@@ -42,7 +39,7 @@ typedef enum {
   NIXIE_EFFECT_SIZE
 } effect_id_t;
 
-/**
+/** ==========================================================================
  *
  */
 class NixieEffect {
@@ -50,17 +47,17 @@ class NixieEffect {
   NixieEffect(effect_id_t eid, NixieElement *element, unsigned long el_n);
   virtual ~NixieEffect();
 
-  virtual void  start(unsigned long start_ms, unsigned long tick_ms);
-  virtual void  start(unsigned long start_ms, unsigned long tick_ms,
-                      int element);
-  virtual void  start(unsigned long start_ms, unsigned long tick_ms,
-                      int el1, int el2);
-  virtual void  loop(unsigned long cur_ms);
+  virtual void  start(unsigned long tick_ms, unsigned long start_ms=0);
+  virtual void  start(int el_i,
+                      unsigned long tick_ms, unsigned long start_ms=0);
+  virtual void  start(int el_i1, int el_i2,
+                      unsigned long tick_ms, unsigned long start_ms=0);
+  virtual void  loop(unsigned long cur_ms=0);
   virtual void  end();
 
   effect_id_t get_id();
   boolean     is_active();
-  boolean     tick(unsigned long cur_ms);
+  boolean     tick(unsigned long cur_ms=0);
     
  protected:
   NixieElement *_el;   // array
@@ -74,63 +71,70 @@ class NixieEffect {
   int           _el_random = 0; // for shuffle
 }; // class NixieEffect
 
-//============================================================================
+/** ==========================================================================
+ *
+ */
 class NixieEffectOnly : public NixieEffect {
  public:
   NixieEffectOnly(NixieElement *el, unsigned long el_n);
-  void start(unsigned long start_ms, unsigned long tick_ms, int el_i, int bl);
-  void loop(unsigned long cur_ms);
+  void start(int el_i, int bl,
+             unsigned long tick_ms, unsigned long start_ms=0);
+  void loop(unsigned long cur_ms=0);
 
  private:
   int _el_i;
   int _bl;
 }; // class NixieEffectOnly
 
-//============================================================================
+/** ==========================================================================
+ *
+ */
 class NixieEffectFadeIn : public NixieEffect {
  public:
   NixieEffectFadeIn(NixieElement *el, unsigned long el_n);
-  void start(unsigned long start_ms, unsigned long tick_ms, int element);
-  void loop(unsigned long cur_ms);
+  void start(int el_i, unsigned long tick_ms, unsigned long start_ms=0);
+  void loop(unsigned long cur_ms=0);
+  void end();
 
  private:
   int _el_i;
-
 }; // class NixieEffectFadeIn
 
-//============================================================================
+/**
+ *
+ */
 class NixieEffectFadeOut : public NixieEffect {
  public:
   NixieEffectFadeOut(NixieElement *el, unsigned long el_n);
-  void start(unsigned long start_ms, unsigned long tick_ms, int element);
-  void loop(unsigned long cur_ms);
+  void start(int el_i, unsigned long tick_ms, unsigned long start_ms=0);
+  void loop(unsigned long cur_ms=0);
+  void end();
 
  private:
   int _el_i;
-
 }; // class NixieEffectFadeOut
 
-//============================================================================
+/** ==========================================================================
+ *
+ */
 class NixieEffectXFade : public NixieEffect {
  public:
   NixieEffectXFade(NixieElement *el, unsigned long el_n);
-  void start(unsigned long start_ms, unsigned long tick_ms,
-             int el_in, int el_out);
-  void loop(unsigned long cur_ms);
+  void start(int el_src, int el_dst,
+             unsigned long tick_ms, unsigned long start_ms=0);
+  void loop(unsigned long cur_ms=0);
 
  private:
-  int _el_i_in;
-  int _el_i_out;
-
+  int _el_i_src, _el_i_dst;
 }; // class NixieEffectXFade
 
 //============================================================================
 class NixieEffectShuffle : public NixieEffect {
  public:
   NixieEffectShuffle(NixieElement *el, unsigned long el_n);
-  void start(unsigned long start_ms, unsigned long tick_ms,
-             int n, int el_i);
-  void loop(unsigned long cur_ms);
+  void start(int n, int el_i,
+             unsigned long tick_ms, unsigned long start_ms=0);
+  void loop(unsigned long cur_ms=0);
   void end();
 
  private:
@@ -142,22 +146,22 @@ class NixieEffectShuffle : public NixieEffect {
 class NixieEffectBlink : public NixieEffect {
  public:
   NixieEffectBlink(NixieElement *el, unsigned long el_n);
-  void start(unsigned long start_ms, unsigned long tick_ms);
-  void loop(unsigned long cur_ms);
+  void start(unsigned long tick_ms, unsigned long start_ms=0);
+  void loop(unsigned long cur_ms=0);
   void end();
 
  private:
   int      _el_i;
   uint8_t  _brightness[NIXIE_ELEMENT_N_MAX];
-  boolean  _onoff;
+  boolean  _is_on;
 }; // class NixieEffectBlink
 
 //============================================================================
 class NixieEffectRandomOnOff : public NixieEffect {
  public:
   NixieEffectRandomOnOff(NixieElement *el, unsigned long el_n);
-  void start(unsigned long start_ms, unsigned long tick_ms, int el_i);
-  void loop(unsigned long cur_ms);
+  void start(int el_i, unsigned long tick_ms, unsigned long start_ms=0);
+  void loop(unsigned long cur_ms=0);
   void end();
 
  private:

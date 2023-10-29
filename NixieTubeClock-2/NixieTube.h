@@ -43,18 +43,18 @@ class NixieTube {
 
   bool effect_is_active();
 
-  void one(int element);
-  void fadein_start(unsigned long start_ms, unsigned long ms, int el_i);
-  void fadeout_start(unsigned long start_ms, unsigned long ms, int el_i);
-  void xfade_start(unsigned long start_ms, unsigned long ms,
-                   int el_in, int el_out);
-  void shuffle_start(unsigned long start_ms, unsigned long tick, int n,
-                     int el_i);
-  void blink_start(unsigned long start_ms, unsigned long ms);
-  void randomOnOff_start(unsigned long start_ms, unsigned long ms, int el_i);
+  void one(int el_i);
+  void fadein_start(int el_i, unsigned long ms, unsigned long start_ms=0);
+  void fadeout_start(int el_i, unsigned long ms, unsigned long start_ms=0);
+  void xfade_start(int el_src, int el_dst,
+                   unsigned long ms, unsigned long start_ms=0);
+  void shuffle_start(int el_i, int n, unsigned long ms, unsigned long start_ms=0);
+  void blink_start(unsigned long ms, unsigned long start_ms=0);
+  void randomOnOff_start(int el_i, unsigned long ms, unsigned long start_ms=0);
 
  private:
-  NixieEffect *_ef;
+  NixieEffect *_ef = NULL;
+  NixieEffect *_ef2 = NULL;
   brightness_t _brightness;
 }; // class NixieTube
 #endif // NIXIE_TUBE_H
