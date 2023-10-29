@@ -116,9 +116,10 @@ void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
       continue;
     }
     if ( xfade_ms > 0 ) {
-      this->num[i].xfade_start(this->prev_num_int[i], num[i], xfade_ms);
+      this->num[i].effect_xfade(this->prev_num_int[i], num[i], xfade_ms);
+      //this->num[i].effect_shuffle(num[i], 10, 20);
     } else {
-      this->num[i].one(num[i]);
+      this->num[i].effect_one(num[i]);
     }
     this->prev_num_int[i] = num[i];
   } // for(i)
@@ -134,9 +135,9 @@ void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
       continue;
     }
     if ( xfade_ms > 0 ) {
-      this->colon[i].xfade_start(this->prev_col_int[i], col[i], xfade_ms);
+      this->colon[i].effect_xfade(this->prev_col_int[i], col[i], xfade_ms);
     } else {
-      this->colon[i].one(col[i]);
+      this->colon[i].effect_one(col[i]);
     }
     this->prev_col_int[i] = col[i];
   } // for(t)

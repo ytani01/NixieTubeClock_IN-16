@@ -9,10 +9,7 @@
 /**
  *
  */
-NixieEffect::NixieEffect(effect_id_t eid,
-                         NixieElement *element,
-                         unsigned long el_n) {
-  this->_id = eid;
+NixieEffect::NixieEffect(NixieElement *element, unsigned long el_n) {
   this->_el = element;
   this->_el_n = el_n;
 }
@@ -22,11 +19,12 @@ NixieEffect::NixieEffect(effect_id_t eid,
  */
 NixieEffect::~NixieEffect() {}
 
-/**
+/** virtual
  *
  */
-void NixieEffect::start(unsigned long tick_ms, unsigned long start_ms) {
-  this->_tick_ms = tick_ms;
+void NixieEffect::start(unsigned long ms, unsigned long start_ms) {
+  this->_ms = ms;
+
   if ( start_ms == 0 ) {
     this->_start_ms = millis();
   } else {
@@ -35,22 +33,7 @@ void NixieEffect::start(unsigned long tick_ms, unsigned long start_ms) {
 
   (void)this->tick(this->_start_ms);
   this->_active = true;
-}
-
-/**
- *
- */
-void NixieEffect::start(int el, unsigned long tick_ms, unsigned long start_ms) {
-  this->start(tick_ms, start_ms);
-}
-
-/**
- *
- */
-void NixieEffect::start(int el1, int el2,
-                        unsigned long tick_ms, unsigned long start_ms) {
-  this->start(tick_ms, start_ms);
-}
+} // NixieEffect::start()
 
 /**
  *
@@ -62,7 +45,16 @@ void NixieEffect::loop(unsigned long cur_ms) {
   if ( ! tick(cur_ms) ) {
     return;
   }
+
+  this->do_loop();
 } // NixieEffect::loop()
+
+/** virtual
+ *
+ */
+void NixieEffect::do_loop() {
+  
+} // NixieEffect::do_loop()
 
 /**
  *
@@ -70,13 +62,6 @@ void NixieEffect::loop(unsigned long cur_ms) {
 void NixieEffect::end() {
   this->_active = false;
 } // NixieEffect::end()
-
-/**
- *
- */
-effect_id_t NixieEffect::get_id() {
-  return this->_id;
-} // NixieEffect::get_id()
 
 /**
  *
@@ -92,11 +77,12 @@ boolean NixieEffect::tick(unsigned long cur_ms) {
   if ( cur_ms == 0 ) {
     cur_ms = millis();
   }
-  if ( this->_tick_ms == 0 ) {
+  if ( this->_ms == 0 ) {
     return false;
   }
+
   this->_prev_tick = this->_tick;
-  this->_tick = (cur_ms - this->_start_ms) / this->_tick_ms;
+  this->_tick = (cur_ms - this->_start_ms) / this->_ms;
   if ( this->_tick == this->_prev_tick ) {
     return false;
   }
@@ -109,48 +95,36 @@ boolean NixieEffect::tick(unsigned long cur_ms) {
 /**
  *
  */
-NixieEffectFadeIn::NixieEffectFadeIn(NixieElement *el, unsigned long el_n)
-  : NixieEffect::NixieEffect(NIXIE_EFFECT_FADEIN, el, el_n) {
-}
+NixieEffectFadeIn::NixieEffectFadeIn(int el_i,
+                                     NixieElement *el, unsigned long el_n)
+  : NixieEffect::NixieEffect(el, el_n)
+{
+  if ( el_i < el_n ) {
+    this->_el1 = &(el[el_i]);
+  } else {
+    this->_el1 = NULL;
+  }
+} // NixieEffectFadeIn::NixieEffectFadeIn()
 
-/**
+/** virtual
  *
  */
-void NixieEffectFadeIn::start(int el_i,
-                              unsigned long tick_ms, unsigned long start_ms) {
-  NixieEffect::start(tick_ms, start_ms);
-
-  this->_el_i = el_i;
-} // NixieEffectFadeIn::start()
-
-/**
- *
- */
-void NixieEffectFadeIn::loop(unsigned long cur_ms) {
-  if ( cur_ms == 0 ) {
-    cur_ms = millis();
-  }
-  if ( ! this->tick(cur_ms) ) {
-    return;
-  }
-
-  if ( this->_el_i < this->_el_n ) {
-    NixieElement *e = &(this->_el[this->_el_i]);
-    if ( e->brightness() < e->max_brightness() ) {
-      e->inc_brightness();
+void NixieEffectFadeIn::do_loop() {
+  if ( this->_el1 ) {
+    if ( this->_el1->brightness() < this->_el1->max_brightness() ) {
+      this->_el1->inc_brightness();
     } else {
       this->end();
     }
   }
-} // NixieEffectFadeIn::loop()
+} // NixieEffectFadeIn::do_loop()
 
 /**
  *
  */
 void NixieEffectFadeIn::end() {
-  if ( this->_el_i < this->_el_n ) {
-    NixieElement *e = &(this->_el[this->_el_i]);
-    e->set_brightness_to_max();
+  if ( this->_el1 ) {
+    this->_el1->set_brightness_to_max();
   }
   NixieEffect::end();
 } // NixieEffectFadeIn::end()
@@ -161,48 +135,36 @@ void NixieEffectFadeIn::end() {
 /**
  *
  */
-NixieEffectFadeOut::NixieEffectFadeOut(NixieElement *el, unsigned long el_n)
-  : NixieEffect::NixieEffect(NIXIE_EFFECT_FADEOUT, el, el_n) {
+NixieEffectFadeOut::NixieEffectFadeOut(int el_i,
+                                       NixieElement *el, unsigned long el_n)
+  : NixieEffect::NixieEffect(el, el_n)
+{
+  if ( el_i < el_n ) {
+    this->_el1 = &(el[el_i]);
+  } else {
+    this->_el1 = NULL;
+  }
 }
 
-/**
+/** virtual
  *
  */
-void NixieEffectFadeOut::start(int el_i,
-                               unsigned long tick_ms, unsigned long start_ms) {
-  NixieEffect::start(tick_ms, start_ms);
-
-  this->_el_i = el_i;
-}
-
-/**
- *
- */
-void NixieEffectFadeOut::loop(unsigned long cur_ms) {
-  if ( cur_ms == 0 ) {
-    cur_ms = millis();
-  }
-  if ( ! this->tick(cur_ms) ) {
-    return;
-  }
-
-  if ( this->_el_i < this->_el_n ) {
-    NixieElement *e = &(this->_el[this->_el_i]);
-    if ( e->brightness() > 0 ) {
-      e->dec_brightness();
+void NixieEffectFadeOut::do_loop() {
+  if ( this->_el1 ) {
+    if ( this->_el1->brightness() > 0 ) {
+      this->_el1->dec_brightness();
     } else {
       this->end();
     }
   }
-} // NixieEffectFadeOut::loop()
+} // NixieEffectFadeOut::do_loop()
 
-/**
+/** virtual
  *
  */
 void NixieEffectFadeOut::end() {
-  if ( this->_el_i < this->_el_n ) {
-    NixieElement *e = &(this->_el[this->_el_i]);
-    e->set_brightness(0);
+  if ( this->_el1 ) {
+    this->_el1->set_brightness(0);
   }
   NixieEffect::end();
 } // NixieEffectFadeOut::end()
@@ -213,36 +175,35 @@ void NixieEffectFadeOut::end() {
 /**
  *
  */
-NixieEffectShuffle::NixieEffectShuffle(NixieElement *el, unsigned long el_n)
-  : NixieEffect(NIXIE_EFFECT_SHUFFLE, el, el_n) {
+NixieEffectShuffle::NixieEffectShuffle(int el_i, int n,
+                                       NixieElement *el, unsigned long el_n)
+  : NixieEffect(el, el_n)
+{
+  if ( el_i < el_n ) {
+    this->_el1 = &(el[el_i]);
+  } else {
+    this->_el1 = NULL;
+  }
+  this->_n = n;
+
+  this->_el_random = 0;
 }
 
-/**
+/** virtual
  *
  */
-void NixieEffectShuffle::start(int n, int el_i,
-                               unsigned long tick_ms, unsigned long start_ms) {
-  NixieEffect::start(tick_ms, start_ms);
+void NixieEffectShuffle::start(unsigned long ms, unsigned long start_ms) {
+  NixieEffect::start(ms, start_ms);
 
-  this->_n = n;
-  this->_el_i = el_i;
-
-  for (int e=0; e < this->_el_n; e++) {
-    this->_el[e].set_brightness(0);
+  for (int i=0; i < this->_el_n; i++) {
+    this->_el[i].set_brightness(0);
   }
 } // NixieEffectShuffle::start()
 
-/**
+/** virtual
  *
  */
-void NixieEffectShuffle::loop(unsigned long cur_ms) {
-  if ( cur_ms == 0 ) {
-    cur_ms = millis();
-  }
-  if ( ! this->tick(cur_ms) ) {
-    return;
-  }
-
+void NixieEffectShuffle::do_loop() {
   this->_el[this->_el_random].set_brightness(0);
 
   if ( this->_tick >= this->_n ) {
@@ -252,15 +213,16 @@ void NixieEffectShuffle::loop(unsigned long cur_ms) {
   
   this->_el_random = random(this->_el_n);
   this->_el[this->_el_random].set_brightness_to_max();
+} // NixieEffectShuffle::do_loop()
 
-} // NixieEffectShuffle::loop()
-
-/**
+/** virtual
  *
  */
 void NixieEffectShuffle::end() {
-  this->_el[this->_el_i].set_brightness_to_max();
-
+  for (int i=0; i < this->_el_n; i++) {
+    this->_el[i].set_brightness(0);
+  }
+  this->_el1->set_brightness_to_max();
   NixieEffect::end();
 } // NixieEffectShuffle::end()
 
@@ -271,14 +233,15 @@ void NixieEffectShuffle::end() {
  *
  */
 NixieEffectBlink::NixieEffectBlink(NixieElement *el, unsigned long el_n)
-  : NixieEffect(NIXIE_EFFECT_BLINK, el, el_n) {
+  : NixieEffect(el, el_n)
+{
 } // NixieEffectBlink::NixieEffectBlink()
 
-/**
+/** virtual
  *
  */
-void NixieEffectBlink::start(unsigned long tick_ms, unsigned long start_ms) {
-  NixieEffect::start(tick_ms, start_ms);
+void NixieEffectBlink::start(unsigned long ms, unsigned long start_ms) {
+  NixieEffect::start(ms, start_ms);
 
   this->_is_on = true;
 
@@ -287,17 +250,10 @@ void NixieEffectBlink::start(unsigned long tick_ms, unsigned long start_ms) {
   } // for(i)
 } // NixieEffectBlink::start()
 
-/**
+/** virtual
  *
  */
-void NixieEffectBlink::loop(unsigned long cur_ms) {
-  if ( cur_ms == 0 ) {
-    cur_ms = millis();
-  }
-  if ( ! this->tick(cur_ms) ) {
-    return;
-  }
-
+void NixieEffectBlink::do_loop() {
   for (int i=0; i < this->_el_n; i++) {
     if ( this->_is_on ) {
       this->_el[i].set_brightness(0);
@@ -306,9 +262,9 @@ void NixieEffectBlink::loop(unsigned long cur_ms) {
     }
   } // for(i)
   this->_is_on = ! this->_is_on;
-} // NixieEffectBlink::loop()
+} // NixieEffectBlink::do_loop()
 
-/**
+/** virtual
  *
  */
 void NixieEffectBlink::end() {
@@ -324,46 +280,48 @@ void NixieEffectBlink::end() {
 /**
  *
  */
-NixieEffectRandomOnOff::NixieEffectRandomOnOff(NixieElement *el,
+NixieEffectRandomOnOff::NixieEffectRandomOnOff(int el_i,
+                                               NixieElement *el,
                                                unsigned long el_n)
-  : NixieEffect(NIXIE_EFFECT_RANDOM_ONOFF, el, el_n) {
+  : NixieEffect(el, el_n)
+{
+  if ( el_i < el_n ) {
+    this->_el1 = &(el[el_i]);
+  } else {
+    this->_el1 = NULL;
+  }
 } // NixieEffectRandomOnOff::NixieEffectRandomOnOff()
 
-/**
+/** virtual
  *
  */
-void NixieEffectRandomOnOff::start(int el_i,
-                                   unsigned long tick_ms,
-                                   unsigned long start_ms) {
-  NixieEffect::start(tick_ms, start_ms);
+void NixieEffectRandomOnOff::start(unsigned long ms, unsigned long start_ms) {
+  NixieEffect::start(ms, start_ms);
 
-  this->_el_i = el_i;
-  this->_el[this->_el_i].set_brightness_to_max();
+  if ( this->_el1 ) {
+    this->_el1->set_brightness_to_max();
+  }
 } // NixieEffectRandomOnOff::start()
 
-/**
+/** virtual
  *
  */
-void NixieEffectRandomOnOff::loop(unsigned long cur_ms) {
-  if ( cur_ms == 0 ) {
-    cur_ms = millis();
+void NixieEffectRandomOnOff::do_loop() {
+  if ( this->_el1 ) {
+    if (random(10) > 5) {
+      this->_el1->set_brightness_to_max();
+    } else {
+      this->_el1->set_brightness(0);    
+    }
   }
-  if ( ! this->tick(cur_ms) ) {
-    return;
-  }
-
-  NixieElement *e = &(this->_el[this->_el_i]); // 重要！ポインタ渡し
-  if (random(10) > 5) {
-    e->set_brightness_to_max();
-  } else {
-    e->set_brightness(0);    
-  }
-} // NixieEffectRandomOnOff::loop()
+} // NixieEffectRandomOnOff::do_loop()
 
 /**
  *
  */
 void NixieEffectRandomOnOff::end() {
-  this->_el[this->_el_i].set_brightness_to_max();
+  if ( this->_el1 ) {
+    this->_el1->set_brightness_to_max();
+  }
   NixieEffect::end();
 } // NixieEffectRandomOnOff::end()

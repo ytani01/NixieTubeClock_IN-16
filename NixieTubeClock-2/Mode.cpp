@@ -4,8 +4,8 @@
 #include "Mode.h"
 
 std::map<std::string, Mode *> Mode::Ent;
-Mode *Mode::Cur = (Mode *)NULL;
-Mode *Mode::Prev = (Mode *)NULL;
+Mode *Mode::Cur = NULL;
+Mode *Mode::Prev = NULL;
 
 /** constructor
  *
