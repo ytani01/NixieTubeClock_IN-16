@@ -15,6 +15,7 @@ class ConfFile_ModeClock: public ConfFile {
   static constexpr char *FILE_NAME = (char *)"/mode_clock";
 
   int clock_mode = 0;
+  int eff_i = 0;
 
   ConfFile_ModeClock();
   virtual int load();

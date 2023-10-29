@@ -143,6 +143,14 @@ void NixieTube::effect_xfade(int el_src, int el_dst,
 /**
  *
  */
+void NixieTube::effect_fog(int el_i, unsigned long ms, unsigned long start_ms) {
+  this->_ef1 = new NixieEffectFog(el_i, this->element, this->element_n);
+  this->_ef1->start(ms, start_ms);
+} // NixieTube::effect_fadeout()
+
+/**
+ *
+ */
 void NixieTube::effect_shuffle(int el_i, int n,
                               unsigned long ms, unsigned long start_ms) {
   this->_ef1 = new NixieEffectShuffle(el_i, n,

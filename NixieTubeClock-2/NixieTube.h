@@ -45,7 +45,8 @@ class NixieTube {
   void effect_fadein(int el_i, unsigned long ms, unsigned long start_ms=0);
   void effect_fadeout(int el_i, unsigned long ms, unsigned long start_ms=0);
   void effect_xfade(int el_src, int el_dst,
-                   unsigned long ms, unsigned long start_ms=0);
+                    unsigned long ms, unsigned long start_ms=0);
+  void effect_fog(int el_i, unsigned long ms, unsigned long start_ms=0);
   void effect_shuffle(int el_i, int n, unsigned long ms, unsigned long start_ms=0);
   void effect_blink(unsigned long ms, unsigned long start_ms=0);
   void effect_randomOnOff(int el_i, unsigned long ms, unsigned long start_ms=0);

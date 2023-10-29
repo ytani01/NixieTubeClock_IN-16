@@ -77,6 +77,20 @@ class NixieEffectFadeOut : public NixieEffect {
   NixieElement *_el1;
 }; // class NixieEffectFadeOut
 
+/** ==========================================================================
+ *
+ */
+class NixieEffectFog : public NixieEffect {
+ public:
+  NixieEffectFog(int el_i, NixieElement *el, unsigned long el_n);
+  virtual void do_loop();
+  virtual void end();
+
+ private:
+  int _el_i;
+  bool _fog_up;
+}; // class NixieEffectFog
+
 //============================================================================
 class NixieEffectShuffle : public NixieEffect {
  public:

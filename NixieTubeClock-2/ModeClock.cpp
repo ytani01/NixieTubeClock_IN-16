@@ -8,7 +8,7 @@
  */
 ModeClock::ModeClock(): Mode() {
   //
-  // init clock mode
+  // load config file
   //
   this->conf = new ConfFile_ModeClock();
   this->conf->load();
@@ -17,9 +17,14 @@ ModeClock::ModeClock(): Mode() {
     this->conf->clock_mode = CLOCK_MODE_HMS;
     this->conf->save();
   }
+  if ( this->conf->eff_i >= this->effect.size() ) {
+    this->conf->eff_i = 0;
+    this->conf->save();
+  }
   
   this->clock_mode_main = (clock_mode_t)this->conf->clock_mode;
   this->clock_mode = this->clock_mode_main;
+
 } // ModeClock::ModeClock()
 
 /** virtual
@@ -203,6 +208,7 @@ void ModeClock::loop() {
   case CLOCK_MODE_ymd:
     if ( cur_ms - date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
       this->clock_mode = this->clock_mode_main;
+      log_i("clock_mode = %d", this->clock_mode);
       return;
     }
 
@@ -216,8 +222,8 @@ void ModeClock::loop() {
   static std::string prev_nx_str = "";
 
   long nx_usec = tv->tv_usec;
-  if ( this->sw_xfade ) {
-    // T.B.D. xfadeする場合、少し進める
+  if ( this->effect[this->conf->eff_i] != NXA_EFFECT_NONE ) {
+    // T.B.D. effectする場合、少し進める
     nx_usec + 500000;
   }
   log_v("nx_usec = %d", nx_usec);
@@ -228,11 +234,8 @@ void ModeClock::loop() {
   std::string nx_str = tm2string(&nx_tm, nx_fmt);
   log_v("nx_fmt = %s, nx_str = %s", nx_fmt, nx_str.c_str());
 
-  unsigned long xfade_ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
-  if ( ! this->sw_xfade ) {
-    xfade_ms = 0;
-  }
-  Nxa->set_string(nx_str.c_str(), xfade_ms);
+  unsigned long ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
+  Nxa->set_string(nx_str.c_str(), this->effect[this->conf->eff_i], ms);
 
   prev_nx_str = nx_str;
 
@@ -257,7 +260,8 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
 
     // Btn1:OFF
     if ( bi->click_count == 2 ) {
-      this->sw_xfade = ! this->sw_xfade;
+      this->conf->eff_i = (this->conf->eff_i + 1) % this->effect.size();
+      this->conf->save();
     }
 
     if ( bi->click_count == 3 ) {
@@ -291,7 +295,8 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
             this->clock_mode_main = CLOCK_MODE_HMS;
           }
           // save main mode
-          this->conf->clock_mode = static_cast<int>(this->clock_mode_main);
+          //this->conf->clock_mode = static_cast<int>(this->clock_mode_main);
+          this->conf->clock_mode = this->clock_mode_main;
           this->conf->save();
             
           this->clock_mode = this->clock_mode_main;

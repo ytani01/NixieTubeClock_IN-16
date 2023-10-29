@@ -34,7 +34,12 @@ class ModeClock: public Mode {
 
   ConfFile_ModeClock *conf;
 
-  bool sw_xfade = true;
+  std::vector<nxa_effect_t> effect = {
+    NXA_EFFECT_XFADE,
+    NXA_EFFECT_NONE,
+    NXA_EFFECT_FOG,
+    NXA_EFFECT_SHUFFLE
+  };
   
   ModeClock();
 

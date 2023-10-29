@@ -170,6 +170,64 @@ void NixieEffectFadeOut::end() {
 } // NixieEffectFadeOut::end()
 
 //============================================================================
+// class NixieEffectFog
+//----------------------------------------------------------------------------
+/**
+ *
+ */
+NixieEffectFog::NixieEffectFog(int el_i,
+                               NixieElement *el, unsigned long el_n)
+  : NixieEffect::NixieEffect(el, el_n)
+{
+  this->_el_i = el_i;
+  
+  this->_fog_up = true;
+}
+
+/** virtual
+ *
+ */
+void NixieEffectFog::do_loop() {
+  int count = 0;
+
+  if ( _fog_up ) {
+    for (int i=0; i < this->_el_n; i++) {
+      if ( this->_el[i].brightness() < this->_el[i].max_brightness() ) {
+        this->_el[i].inc_brightness();
+      }
+      if ( this->_el[i].brightness() >= this->_el[i].max_brightness() ) {
+        count++;
+      }
+    } // for(i)
+    if ( count >= this->_el_n ) {
+      _fog_up = false;
+    }
+  } else {
+    for (int i=0; i < this->_el_n; i++) {
+      if ( i != this->_el_i ) {
+        if ( this->_el[i].brightness() > 0 ) {
+          this->_el[i].dec_brightness();
+        }
+        if ( this->_el[i].brightness() == 0 ) {
+          count++;
+        }
+      }
+      if ( count >= this->_el_n - 1) {
+        this->end();
+        return;
+      }
+    } // for(i)
+  } // if
+} // NixieEffectFog::do_loop()
+
+/** virtual
+ *
+ */
+void NixieEffectFog::end() {
+  NixieEffect::end();
+} // NixieEffectFog::end()
+
+//============================================================================
 // class NixieEffectShuffle
 //----------------------------------------------------------------------------
 /**

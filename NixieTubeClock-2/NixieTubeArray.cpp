@@ -110,17 +110,26 @@ void NixieTubeArray::end_all_effect() {
  *
  */
 void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
-                             unsigned long xfade_ms) {
+                             nxa_effect_t effect, unsigned long ms) {
   for (int i=0; i < NIXIE_NUM_N; i++) {
     if ( num[i] == this->prev_num_int[i] ) {
       continue;
     }
-    if ( xfade_ms > 0 ) {
-      this->num[i].effect_xfade(this->prev_num_int[i], num[i], xfade_ms);
-      //this->num[i].effect_shuffle(num[i], 10, 20);
-    } else {
+    switch ( effect ) {
+    case NXA_EFFECT_NONE:
       this->num[i].effect_one(num[i]);
-    }
+      break;
+    case NXA_EFFECT_XFADE:
+      this->num[i].effect_xfade(this->prev_num_int[i], num[i], ms);
+      break;
+    case NXA_EFFECT_SHUFFLE:
+      this->num[i].effect_shuffle(num[i], 10, 20);
+      break;
+    case NXA_EFFECT_FOG:
+      this->num[i].effect_fog(num[i], ms/2);
+      break;
+    } // switch (effect)
+
     this->prev_num_int[i] = num[i];
   } // for(i)
 } // NixieTubeArray::set_num()
@@ -129,16 +138,26 @@ void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
  *
  */
 void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
-                             unsigned long xfade_ms) {
+                             nxa_effect_t effect, unsigned long ms) {
   for (int i=0; i < NIXIE_COLON_N; i++) {
     if ( col[i] == this->prev_col_int[i] ) {
       continue;
     }
-    if ( xfade_ms > 0 ) {
-      this->colon[i].effect_xfade(this->prev_col_int[i], col[i], xfade_ms);
-    } else {
+    switch ( effect ) {
+    case NXA_EFFECT_NONE:
       this->colon[i].effect_one(col[i]);
-    }
+      break;
+    case NXA_EFFECT_XFADE:
+      this->colon[i].effect_xfade(this->prev_col_int[i], col[i], ms);
+      break;
+    case NXA_EFFECT_SHUFFLE:
+      this->colon[i].effect_xfade(this->prev_col_int[i], col[i], ms);
+      break;
+    case NXA_EFFECT_FOG:
+      this->colon[i].effect_xfade(this->prev_col_int[i], col[i], ms);
+      break;
+    } // switch (effect)
+
     this->prev_col_int[i] = col[i];
   } // for(t)
 } // NixieTubeArray::set_col()
@@ -146,7 +165,8 @@ void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
 /**
  *
  */
-void NixieTubeArray::set_string(std::string str, unsigned long xfade_ms) {
+void NixieTubeArray::set_string(std::string str,
+                                nxa_effect_t effect, unsigned long ms) {
   static std::string prev_str = "";
   
   if ( str != prev_str ) {
@@ -170,8 +190,8 @@ void NixieTubeArray::set_string(std::string str, unsigned long xfade_ms) {
 
   //log_d("col[] = {%d, %d}", col[0], col[1]);
   
-  this->set_num(num, xfade_ms);
-  this->set_col(col, xfade_ms);
+  this->set_num(num, effect, ms);
+  this->set_col(col, effect, ms);
 
   //this->display(millis());
 } // NixieTubeArray::set_string()
