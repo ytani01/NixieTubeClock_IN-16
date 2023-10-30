@@ -7,7 +7,7 @@
 
 ## Effects
 
-- [Crossfade](docs/movies/crossfade.mp4)
-- [Fog](docs/movies/fog.mp4)
-- [Shuffle](docs/movies/shuffle.mp4)
-<iframe width="560" height="315" src="https://www.youtube.com/embed/e5-Y6pX2xRI?si=B4PGZqAP2CINgTGR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+- [![Crossfade](docs/movies/crossfade.jpg)](https://youtu.be/TvNmbtA_Buw?si=GQT42kCDqJkb_wn9)
+- [![Fog](docs/movies/fog.jpg)](https://youtu.be/mSKaQIv3eQ8?si=7f47oo0_3DHgH0Qz)
+- [![Shuffle](docs/movies/shuffle.jpg)](https://youtu.be/e5-Y6pX2xRI?si=2QsZdDAW-V6RgD0h)
+
