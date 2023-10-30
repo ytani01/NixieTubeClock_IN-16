@@ -44,6 +44,8 @@ public:
 
   String name = "";
 
+  bool btn_enable = true;
+
   Mode();
 
   virtual void setup();

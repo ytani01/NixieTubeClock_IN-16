@@ -212,11 +212,18 @@ void NixieEffectFog::do_loop() {
           count++;
         }
       }
+    } // for(i)
+    if ( this->_el_i < this->_el_n ) {
       if ( count >= this->_el_n - 1) {
         this->end();
         return;
       }
-    } // for(i)
+    } else {
+      if ( count >= this->_el_n ) {
+        this->end();
+        return;
+      }
+    }
   } // if
 } // NixieEffectFog::do_loop()
 

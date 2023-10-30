@@ -135,8 +135,9 @@ void NixieTube::effect_xfade(int el_src, int el_dst,
   this->end_effect();
 
   this->_ef1 = new NixieEffectFadeOut(el_src, this->element, this->element_n);
-  this->_ef2 = new NixieEffectFadeIn(el_dst, this->element, this->element_n);
   this->_ef1->start(ms, start_ms);
+
+  this->_ef2 = new NixieEffectFadeIn(el_dst, this->element, this->element_n);
   this->_ef2->start(ms, start_ms);
 } // NixieTube::effect_xfade()
 

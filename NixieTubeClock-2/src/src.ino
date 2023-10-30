@@ -176,12 +176,25 @@ void cbNtp(Task_NtpInfo_t *ni) {
  *
  */
 void setup() {
+#if 0
   for (int i=0; i < 3; i++) {
     log_i("%d ===", i);
     delay(500);
   }
-
+#endif
   log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
+
+  // NixieTube
+  log_i("=== Nixie Tube Array");
+  Nxa = new NixieTubeArray(PIN_HV5812_CLK,  PIN_HV5812_STOBE,
+                           PIN_HV5812_DATA, PIN_HV5812_BLANK,
+                           PINS_NIXIE_NUM, PINS_NIXIE_COLON);
+  //Nxa->set_string(VersionString);
+  Nxa->set_string("        ");
+
+  TaskNixieTubeArray = new Task_NixieTubeArray(Nxa, 0);
+  TaskNixieTubeArray->start();
+  delay(100);
 
   // I2C
   log_i("=== Init I2C: SDA=%d, SCL=%d", PIN_I2C_SDA, PIN_I2C_SCL);
@@ -225,17 +238,6 @@ void setup() {
   TaskBtnWatcher->start();
   delay(100);
 
-  // NixieTube
-  log_i("=== Nixie Tube Array");
-  Nxa = new NixieTubeArray(PIN_HV5812_CLK,  PIN_HV5812_STOBE,
-                           PIN_HV5812_DATA, PIN_HV5812_BLANK,
-                           PINS_NIXIE_NUM, PINS_NIXIE_COLON);
-
-  TaskNixieTubeArray = new Task_NixieTubeArray(Nxa, 0);
-  TaskNixieTubeArray->start();
-  delay(100);
-  Nxa->set_string(VersionString);
-
   // WiFi
   log_i("=== Init WiFi");
   TaskWifiMgr = new Task_WifiMgr(AP_HDR);
@@ -250,7 +252,7 @@ void setup() {
   
   // Mode
   log_i("=== Init Modes");
-  Mode::add("ModeBoot", new ModeBoot(2000));
+  Mode::add("ModeBoot", new ModeBoot(2500));
   Mode::add("ModeReboot", new ModeReboot(2000));
   Mode::add("ModeClock", new ModeClock());
   Mode::add("ModeSetclock", new ModeSetclock());

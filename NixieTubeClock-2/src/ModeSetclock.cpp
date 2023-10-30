@@ -26,7 +26,7 @@ void ModeSetclock::enter() {
   this->val[VAL_IDX_DAY] = tm->tm_mday;
   this->val[VAL_IDX_HOUR] = tm->tm_hour;
   this->val[VAL_IDX_MINUTE] = tm->tm_min;
-  this->val[VAL_IDX_SEC] = 0;
+  this->val[VAL_IDX_SEC] = (tm->tm_sec / 10) * 10;
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setTextColor(WHITE, BLACK);
@@ -192,7 +192,7 @@ void ModeSetclock::loop() {
   
   char nx_str[16];
   sprintf(nx_str, nx_fmt, num1, num2, num3);
-  log_i("nx_str = %s", nx_str);
+  log_d("nx_str = %s", nx_str);
 
   Nxa->end_all_effect();
   Nxa->set_string(nx_str);
@@ -227,7 +227,19 @@ void ModeSetclock::loop() {
  *
  */
 void ModeSetclock::cbBtn(ButtonInfo_t *bi) {
-  log_d("%s", Button::info2String(bi).c_str());
+  log_i("%s", Button::info2String(bi).c_str());
+
+  // ダブルクリックが次のモードに影響を与えないように
+  static bool flag_mode_change = false;
+  
+  if ( flag_mode_change ) {
+    if ( String(bi->name) == "Btn0" && bi->click_count > 0 ) {
+      log_i("mode change");
+      flag_mode_change = false;
+      Mode::set("ModeClock");
+    }
+    return;
+  }
 
   // enumを整数に変換
   int pos_i = static_cast<int>(this->pos);
@@ -237,97 +249,144 @@ void ModeSetclock::cbBtn(ButtonInfo_t *bi) {
     if ( bi->value == Button::ON ) {
       if ( bi->long_pressed ) {
         if ( bi->repeat_count == 0 ) {
+          flag_mode_change = false;
           Mode::set("ModeClock");
+          return;
         }
+      } else {
+        if ( this->pos == SETCLOCK_POS_SEC ) {
+          // 時刻設定完了
+          struct tm tm;
+          tm.tm_year = val[VAL_IDX_YEAR] + 2000 - 1900;
+          tm.tm_mon = val[VAL_IDX_MONTH] - 1;
+          tm.tm_mday = val[VAL_IDX_DAY];
+          tm.tm_hour = val[VAL_IDX_HOUR];
+          tm.tm_min = val[VAL_IDX_MINUTE];
+          tm.tm_sec = val[VAL_IDX_SEC];
+
+          SysClock::set(&tm);
+          log_i("SysClock : %s", SysClock::now_string().c_str());
+
+          Rtc->adjust(&tm);
+          DateTime now_dt = Rtc->now();
+          log_i("RTC      : %s", datetime2string(&now_dt).c_str());
+
+          if ( TaskNtp->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
+            //
+            // NTP
+            //
+            TaskNtp->start_sync();
+            delay(100);
+        
+            log_i("== adjust RTC from NTP");
+
+            struct tm *tm_sys = SysClock::now_tm();
+            log_i("  src Sys(NTP): %s",
+                  tm2string(tm_sys, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+
+            Rtc->adjust(tm_sys);
+    
+            now_dt = Rtc->now();
+            log_i("  dst RTC     : %s",
+                  datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+          }
+
+          //Mode::set("ModeClock");
+          flag_mode_change = true;
+          log_i("flag_mode_change = %s",flag_mode_change ? "true" : "false");
+          return;
+        } // if (POS_SEC)
+
+        // next pos
+        pos_i++;
+        log_i("pos_i = %d", pos_i);
+
+        this->pos = static_cast<setclock_pos_t>(pos_i);
+
+        // 「日」の場合、年月から、最終日を修正
+        if ( this->pos == SETCLOCK_POS_DAY ) {
+          this->val_max[VAL_IDX_DAY] = last_day(val[VAL_IDX_YEAR] + 2000,
+                                                val[VAL_IDX_MONTH]);
+
+          if ( this->val[VAL_IDX_DAY] > this->val_max[VAL_IDX_DAY] ) {
+            this->val[VAL_IDX_DAY] = this->val_max[VAL_IDX_DAY];
+          }
+        }
+
+        this->flag_nx_update = true;
       }
     }
     return;
   } // if (Btn0)
 
-  if ( String(bi->name) == "Btn1" &&
-       bi->value == Button::ON ) {
+  if ( String(bi->name) == "Btn1" && bi->value == Button::ON ) {
+#if 0    
+    // 月の最終日
+    this->val_max[VAL_IDX_DAY] = last_day(val[VAL_IDX_YEAR] + 2000,
+                                          val[VAL_IDX_MONTH]);
+    log_d("val_max[VAL_IDX_DAY] = %d", this->val[VAL_IDX_DAY]);
+#endif
+    // increment
+    this->val[pos_i]++;
 
-    if ( this->pos == SETCLOCK_POS_SEC ) {
-      // 時刻設定完了
-      struct tm tm;
-      tm.tm_year = val[VAL_IDX_YEAR] + 2000 - 1900;
-      tm.tm_mon = val[VAL_IDX_MONTH] - 1;
-      tm.tm_mday = val[VAL_IDX_DAY];
-      tm.tm_hour = val[VAL_IDX_HOUR];
-      tm.tm_min = val[VAL_IDX_MINUTE];
-      tm.tm_sec = val[VAL_IDX_SEC];
-
-      SysClock::set(&tm);
-      log_i("SysClock : %s", SysClock::now_string().c_str());
-
-      Rtc->adjust(&tm);
-      DateTime now_dt = Rtc->now();
-      log_i("RTC      : %s", datetime2string(&now_dt).c_str());
-
-      if ( TaskNtp->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
-        //
-        // NTP
-        //
-        TaskNtp->start_sync();
-        delay(100);
-        
-        log_i("== adjust RTC from NTP");
-
-        struct tm *tm_sys = SysClock::now_tm();
-        log_i("  src Sys(NTP): %s",
-              tm2string(tm_sys, "%Y-%m-%d(%a),%H:%M:%S").c_str());
-
-        Rtc->adjust(tm_sys);
-    
-        now_dt = Rtc->now();
-        log_i("  dst RTC     : %s",
-              datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+    // 分の場合、長押しで、10秒単位に
+    if ( this->pos == SETCLOCK_POS_MINUTE ) {
+      if ( this->val[pos_i] % 10 == 1 ) {
+        if ( bi->long_pressed ) {
+          this->val[pos_i] += 9;
+        }
       }
-
-      Mode::set("ModeClock");
-      return;
     }
-    
-    pos_i = (pos_i + 1) % pos_n;
-    log_i("pos_i = %d", pos_i);
 
-    this->pos = static_cast<setclock_pos_t>(pos_i);
+    // 秒の場合、10秒ずつ
+    if ( this->pos == SETCLOCK_POS_SEC ) {
+      this->val[pos_i] += 9;
+    }
 
-    // 「日」の場合、年月から、最終日を修正
-    if ( this->pos == SETCLOCK_POS_DAY ) {
-      int max_day = last_day(val[VAL_IDX_YEAR] + 2000,
-                             val[VAL_IDX_MONTH]);
-
-      if ( this->val[VAL_IDX_DAY] > max_day ) {
-        this->val[VAL_IDX_DAY] = max_day;
-      }
+    // 範囲の判断
+    if ( this->val[pos_i] > this->val_max[pos_i] ) {
+      this->val[pos_i] = this->val_min[pos_i];
+      log_d("val[%d] = %d", pos_i, this->val[pos_i]);
     }
 
     this->flag_nx_update = true;
     return;
   } // if (Btn1)
 
-  if ( String(bi->name) == "Btn2" &&
-       bi->value == Button::ON ) {
-
+  if ( String(bi->name) == "Btn2" && bi->value == Button::ON ) {
     // 月の最終日
     this->val_max[VAL_IDX_DAY] = last_day(val[VAL_IDX_YEAR] + 2000,
                                           val[VAL_IDX_MONTH]);
-    log_i("val_max[VAL_IDX_DAY] = %d", this->val[VAL_IDX_DAY]);
+    log_d("val_max[VAL_IDX_DAY] = %d", this->val[VAL_IDX_DAY]);
+
+    // decrement
+    this->val[pos_i]--;
+
+    // 分の場合、長押しで、10秒単位に
+    if ( this->pos == SETCLOCK_POS_MINUTE ) {
+      if ( this->val[pos_i] % 10 == 9 ) {
+        if ( bi->long_pressed ) {
+          this->val[pos_i] -= 9;
+        }
+      }
+    }
 
     // 秒の場合、10秒ずつ
-    if ( this->pos != SETCLOCK_POS_SEC ) {
-      this->val[pos_i]++;
-    } else {
-      this->val[pos_i] += 10;
+    if ( this->pos == SETCLOCK_POS_SEC ) {
+      this->val[pos_i] -= 9;
     }
 
-    // 範囲の判断
-    if ( this->val[pos_i] > this->val_max[pos_i] ) {
-      this->val[pos_i] = this->val_min[pos_i];
-      log_i("val[%d] = %d", pos_i, this->val[pos_i]);
+    // 範囲の調整
+    if ( this->val[pos_i] < this->val_min[pos_i] ) {
+      this->val[pos_i] = this->val_max[pos_i];
+      log_d("val[%d] = %d", pos_i, this->val[pos_i]);
     }
-
+    if ( this->pos == SETCLOCK_POS_SEC ) {
+      if ( this->val[pos_i] == this->val_max[pos_i] ) {
+        this->val[pos_i] = (this->val_max[pos_i] / 10) * 10;
+      }
+    } // if (POS_SEC)
+    
     this->flag_nx_update = true;
     return;
   } // if (Btn2)
