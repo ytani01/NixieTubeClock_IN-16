@@ -1,11 +1,12 @@
 # Nixie Tube Clock
 
-![](docs/figs/OLED-NTP.jpg)
+## OLED
 
-![](docs/figs/OLED-RTC.jpg)
+- ![OLED-NTP](docs/figs/OLED-NTP.jpg)
+- ![OLED-RTC](docs/figs/OLED-RTC.jpg)
 
-![](docs/movies/crossfade.mp4)
+## Effects
 
-![](docs/movies/fog.mp4)
-
-![](docs/movies/shuffle.mp4)
+- [Crossfade](docs/movies/crossfade.mp4)
+- [Fog](docs/movies/fog.mp4)
+- [Shuffle](docs/movies/shuffle.mp4)
