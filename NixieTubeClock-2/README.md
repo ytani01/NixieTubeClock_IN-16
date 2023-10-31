@@ -28,6 +28,10 @@
 
 ```
 
+### Reboot
+[Button 0] + [Button 2]
+
+
 ## OLED
 
 ### OLED: NTP
