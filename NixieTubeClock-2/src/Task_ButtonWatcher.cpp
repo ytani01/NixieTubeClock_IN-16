@@ -6,7 +6,9 @@
 /**
  *
  */
-Task_ButtonWatcher::Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi),
+Task_ButtonWatcher::Task_ButtonWatcher(void
+                                       (*cb)(ButtonInfo_t *bi,
+                                             std::map<std::string, bool>& btn_val),
                                        uint32_t stack_size,
                                        UBaseType_t priority,
                                        UBaseType_t core)
@@ -72,14 +74,16 @@ void Task_ButtonWatcher::loop() {
   
   ButtonInfo_t btn_info;
   portBASE_TYPE ret = this->worker->get(&btn_info);
+  std::map<std::string, bool> btn_val = this->worker->get_BtnVal();
   if ( ret == pdPASS ) {
-      (*(this->_cb))(&btn_info);
+    (*(this->_cb))(&btn_info, btn_val);
   }
 } // Task_ButtonWatcher::loop()
 
 /** static
  * defulat callback
  */
-void Task_ButtonWatcher::def_cb(ButtonInfo_t *bi) {
+void Task_ButtonWatcher::def_cb(ButtonInfo_t *bi,
+                                std::map<std::string, bool>& btn_val) {
   log_d("%s", Button::info2String(bi).c_str());
 } // _def_button_cb()

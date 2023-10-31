@@ -1,6 +1,9 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
- *
+ */
+/**
+
+# has-a tree
 
   Task_ButtonWatcher
     +- Task_ButtonWorker
@@ -8,7 +11,6 @@
 
 ### Example1 (recommeded): Task_ButtonWatcher ###
 ```
-#include <map>
 #include "Task_ButtonWatcher.h"
 :
 static const std::map<const char *, uint8_t> PIN_BTN = {
@@ -19,11 +21,14 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
 :
 Task_ButtonWatcher *taskBtnWatcher=NULL;
 :
-void cb(ButtonInfo *bi) {
+void cb(ButtonInfo *bi, std:map<std::string, bool>& btn_val) {
   log_d("%s", Button::info2String(bi).c_str());
   :
   if ( String(bi->name) == "Btn0" ) {
     :
+    if ( btn_val["Btn1"] == Button::ON ) {
+      :
+    }
   }
   :
   if ( bi->click_count >= 1 ) {
@@ -56,6 +61,7 @@ void loop() {
 #define _TASK_BUTTON_WATCHER_H_
 
 #include <vector>
+#include <map>
 #include "Task.h"
 #include "Button.h"
 #include "Task_ButtonWorker.h"
@@ -69,7 +75,8 @@ public:
   static const UBaseType_t PRIORITY = 0;
   static const UBaseType_t CORE = APP_CPU_NUM;
 
-  Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi)=NULL,
+  Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi,
+                                std::map<std::string, bool>& btn_val),
                      uint32_t stack_size=STACK_SIZE,
                      UBaseType_t priority=PRIORITY,
                      UBaseType_t core=CORE);
@@ -85,7 +92,7 @@ protected:
 
   Task_ButtonWorker *worker;
 
-  void (*_cb)(ButtonInfo_t *bi);
-  static void def_cb(ButtonInfo_t *bi);
+  void (*_cb)(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val);
+  static void def_cb(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val);
 }; // class Task_ButtonWatcher
 #endif // _TASK_BUTTON_WATCHER_H_

@@ -138,6 +138,8 @@ void NixieTube::effect_xfade(int el_src, int el_dst,
   if ( el_src != el_dst ) {
     this->_ef1 = new NixieEffectFadeOut(el_src, this->element, this->element_n);
     this->_ef1->start(ms, start_ms);
+  } else {
+    this->_ef1 = NULL;
   }
 
   this->_ef2 = new NixieEffectFadeIn(el_dst, this->element, this->element_n);
@@ -169,13 +171,3 @@ void NixieTube::effect_blink(unsigned long ms, unsigned long start_ms) {
   this->_ef1 = new NixieEffectBlink(this->element, this->element_n);
   this->_ef1->start(ms, start_ms);
 } // NixieTube::effect_blink()
-
-/**
- *
- */
-void NixieTube::effect_randomOnOff(int el_i,
-                                  unsigned long ms,
-                                  unsigned long start_ms) {
-  this->_ef1 = new NixieEffectRandomOnOff(el_i, this->element, this->element_n);
-  this->_ef1->start(ms, start_ms);
-} // NixieTube::effect_randomOnOff()

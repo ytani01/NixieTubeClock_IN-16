@@ -49,7 +49,6 @@ class NixieTube {
   void effect_fog(int el_i, unsigned long ms, unsigned long start_ms=0);
   void effect_shuffle(int el_i, int n, unsigned long ms, unsigned long start_ms=0);
   void effect_blink(unsigned long ms, unsigned long start_ms=0);
-  void effect_randomOnOff(int el_i, unsigned long ms, unsigned long start_ms=0);
 
  private:
   NixieEffect *_ef1 = NULL;

@@ -53,7 +53,7 @@ void Mode::loop() {
 /** virtual
  *
  */
-void Mode::cbBtn(ButtonInfo_t *bi) {
+void Mode::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
   log_d("%s", Button::info2String(bi).c_str());
 } // Mode::cbBtn()
 

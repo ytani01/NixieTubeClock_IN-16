@@ -69,7 +69,7 @@ int ModeScoreboard::dec_score(int i, int n) {
 /**
  *
  */
-void ModeScoreboard::cbBtn(ButtonInfo_t *bi) {
+void ModeScoreboard::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
   log_i("%s", Button::info2String(bi).c_str());
 
   //

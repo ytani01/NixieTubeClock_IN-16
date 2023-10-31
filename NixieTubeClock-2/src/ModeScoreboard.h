@@ -22,7 +22,7 @@ class ModeScoreboard: public Mode {
   virtual void enter();
   virtual void loop();
 
-  virtual void cbBtn(ButtonInfo_t *bi);
+  virtual void cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val);
 };
 
 #endif // _MODE_SCOREBOARD_H_

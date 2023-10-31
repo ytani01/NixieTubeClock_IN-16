@@ -226,8 +226,8 @@ void ModeSetclock::loop() {
 /**
  *
  */
-void ModeSetclock::cbBtn(ButtonInfo_t *bi) {
-  log_i("%s", Button::info2String(bi).c_str());
+void ModeSetclock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
+  log_d("%s", Button::info2String(bi).c_str());
 
   // ダブルクリックが次のモードに影響を与えないように
   static bool flag_mode_change = false;

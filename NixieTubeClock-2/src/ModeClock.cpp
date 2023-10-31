@@ -258,8 +258,8 @@ void ModeClock::loop() {
 /**
  *
  */
-void ModeClock::cbBtn(ButtonInfo_t *bi) {
-  log_i("%s", Button::info2String(bi).c_str());
+void ModeClock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
+  log_d("%s", Button::info2String(bi).c_str());
 
   if ( String(bi->name) == "Btn0" ) {
     if ( bi->value == Button::ON ) {
@@ -325,6 +325,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
       if ( bri < BRIGHTNESS_MIN ) {
         bri = BRIGHTNESS_RESOLUTION;
       }
+      Nxa->end_all_effect();
       Nxa->set_brightness(bri);
       Nxa->display(millis());
     }

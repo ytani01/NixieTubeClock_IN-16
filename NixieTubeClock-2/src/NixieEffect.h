@@ -100,7 +100,7 @@ class NixieEffectShuffle : public NixieEffect {
   virtual void end();
 
  private:
-  NixieElement *_el1;
+  int _el_i;
   int _n;
   int _el_random;
 }; // class NixieEffectShuffle
@@ -117,17 +117,5 @@ class NixieEffectBlink : public NixieEffect {
   uint8_t  _brightness[NIXIE_ELEMENT_N_MAX];
   boolean  _is_on;
 }; // class NixieEffectBlink
-
-//============================================================================
-class NixieEffectRandomOnOff : public NixieEffect {
- public:
-  NixieEffectRandomOnOff(int el_i, NixieElement *el, unsigned long el_n);
-  virtual void start(unsigned long ms, unsigned long start_ms=0);
-  virtual void do_loop();
-  virtual void end();
-
- private:
-  NixieElement *_el1;
-}; // class NixieEffectRandomOnOff
 
 #endif // NIXIE_EFFECT_H

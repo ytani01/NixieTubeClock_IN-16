@@ -81,6 +81,9 @@ uint8_t PINS_NIXIE_COLON[NIXIE_COLON_N][NIXIE_COLON_DOT_N] = {
 NixieTubeArray *Nxa = NULL;
 Task_NixieTubeArray *TaskNixieTubeArray = NULL;
 
+/** global for enableIntr()/disableIntr()
+ *
+ */
 bool Flag_enableIntr = false;
 
 /** global
@@ -106,23 +109,29 @@ void disableIntr() {
 /**
  *
  */
-void cbBtn(ButtonInfo_t *bi) {
-  log_d("%s", Button::info2String(bi).c_str());
+void cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
+  std::string btn_val_str = "";
+  for (auto b: btn_val) {
+    btn_val_str += " [" + b.first + "]:" + (b.second ? "OFF" : "ON ");
+  }
+  log_i("%s,%s", Button::info2String(bi).c_str(), btn_val_str.c_str());
 
   //
   // reboot check
   //
+#if 0
   if ( String(bi->name) == "Btn0" &&
        bi->value == Button::ON &&
        bi->long_pressed &&
        bi->repeat_count > BTN_REPEAT_COUNT_REBOOT ) {
-    log_w("%s", Button::info2String(bi).c_str());
-
+#endif
+  if ( btn_val["Btn0"] == Button::ON && btn_val["Btn2"] == Button::ON) {
     Mode::set("ModeReboot");
     return;
-  } // if (Btn0)
+  } // if (Btn0 + Btn2)
 
-  Mode::Cur->cbBtn(bi);
+
+  Mode::Cur->cbBtn(bi, btn_val);
 } // cbBtn()
 
 /**

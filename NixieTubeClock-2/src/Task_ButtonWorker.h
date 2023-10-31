@@ -5,6 +5,7 @@
 #define _TASK_BUTTON_WORKER_H_
 
 #include <vector>
+#include <map>
 #include "Task.h"
 #include "Button.h"
 
@@ -34,12 +35,15 @@ public:
   portBASE_TYPE get(ButtonInfo_t *btn_info,
                     TickType_t timeout=DEF_RECV_QUE_TIMEOUT);
 
+  std::map<std::string, bool> get_BtnVal();
+
 protected:
   std::vector<Button *> btn_ent;
 
   virtual void setup();
   virtual void loop();
 
+  static std::map<std::string, bool> BtnVal;
   static void intr_hdr(void *btn_obj);
 }; // class Task_ButtonWorker
 #endif // _TASK_BUTTON_WORKER_H_

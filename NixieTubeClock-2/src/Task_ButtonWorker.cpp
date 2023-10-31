@@ -5,6 +5,7 @@
 
 // static variable
 QueueHandle_t Task_ButtonWorker::BtnQue = (QueueHandle_t)NULL;
+std::map<std::string, bool> Task_ButtonWorker::BtnVal = {};
 
 /**
  *
@@ -34,7 +35,9 @@ void Task_ButtonWorker::addBtn(String name, uint8_t pin) {
   Button *btn = new Button(name, pin, this->intr_hdr);
 
   this->btn_ent.push_back(btn);
-  log_d("btn_ent.size: %d", this->btn_ent.size());
+  Task_ButtonWorker::BtnVal[name.c_str()] = Button::OFF;
+  log_d("btn_ent.size: %d, BtnVal.size: %d",
+        this->btn_ent.size(), Task::ButtonWorker::BtnVal.size());
 } // Task_ButtonWorker::addBtn();
 
 /**
@@ -51,6 +54,9 @@ void Task_ButtonWorker::setup() {
 void Task_ButtonWorker::loop() {
   for (auto btn: this->btn_ent) {
     if ( btn->get() ) {
+      Task_ButtonWorker::BtnVal[btn->info.name] = btn->info.value;
+      log_v("btn->info.name=%s, btn->info.value=%d",
+            btn->info.name, btn->info.value);
       portBASE_TYPE ret = xQueueSend(Task_ButtonWorker::BtnQue,
                                      (void *)&(btn->info), 10);
       if ( ret == pdPASS ) {
@@ -99,6 +105,13 @@ portBASE_TYPE Task_ButtonWorker::get(ButtonInfo_t *btn_info,
   return ret;
 } // Task_ButtonWorker::get()
 
+/**
+ *
+ */
+std::map<std::string, bool> Task_ButtonWorker::get_BtnVal() {
+  return Task_ButtonWorker::BtnVal;
+} // Task_ButtonWorker::get_BtnVal() {
+
 /** [static]
  *
  */
@@ -118,6 +131,11 @@ void IRAM_ATTR Task_ButtonWorker::intr_hdr(void *btn_obj) {
     return;
   }
   isr_log_v("btn->info.name=%s", btn->info.name);
+
+  // BtnVal[]
+  Task_ButtonWorker::BtnVal[btn->info.name] = btn->info.value;
+  isr_log_v("btn->info.name=%s, btn->info.value=%d",
+            btn->info.name, btn->info.value);
 
   // send to queue
   static BaseType_t xHigherPriorityTaskWoken;

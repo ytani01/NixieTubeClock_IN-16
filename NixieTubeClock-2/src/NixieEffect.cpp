@@ -232,6 +232,13 @@ void NixieEffectFog::do_loop() {
  *
  */
 void NixieEffectFog::end() {
+  for (int i=0; i < this->_el_n; i++) {
+    if ( i == this->_el_i ) {
+      this->_el[i].set_brightness_to_max();
+    } else {
+      this->_el[i].set_brightness(0);
+    }
+  }
   NixieEffect::end();
 } // NixieEffectFog::end()
 
@@ -245,14 +252,10 @@ NixieEffectShuffle::NixieEffectShuffle(int el_i, int n,
                                        NixieElement *el, unsigned long el_n)
   : NixieEffect(el, el_n)
 {
-  if ( el_i < el_n ) {
-    this->_el1 = &(el[el_i]);
-  } else {
-    this->_el1 = NULL;
-  }
+  this->_el_i = el_i;
   this->_n = n;
 
-  this->_el_random = 0;
+  this->_el_random = random(this->_el_n);
 }
 
 /** virtual
@@ -286,9 +289,12 @@ void NixieEffectShuffle::do_loop() {
  */
 void NixieEffectShuffle::end() {
   for (int i=0; i < this->_el_n; i++) {
-    this->_el[i].set_brightness(0);
+    if ( i == this->_el_i ) {
+      this->_el[i].set_brightness_to_max();
+    } else {
+      this->_el[i].set_brightness(0);
+    }
   }
-  this->_el1->set_brightness_to_max();
   NixieEffect::end();
 } // NixieEffectShuffle::end()
 
@@ -339,55 +345,3 @@ void NixieEffectBlink::end() {
   } // for(i)
   NixieEffect::end();
 } // NixieEffectBlink::end()
-
-//============================================================================
-// class NixieEffectRandomOnOff
-//----------------------------------------------------------------------------
-/**
- *
- */
-NixieEffectRandomOnOff::NixieEffectRandomOnOff(int el_i,
-                                               NixieElement *el,
-                                               unsigned long el_n)
-  : NixieEffect(el, el_n)
-{
-  if ( el_i < el_n ) {
-    this->_el1 = &(el[el_i]);
-  } else {
-    this->_el1 = NULL;
-  }
-} // NixieEffectRandomOnOff::NixieEffectRandomOnOff()
-
-/** virtual
- *
- */
-void NixieEffectRandomOnOff::start(unsigned long ms, unsigned long start_ms) {
-  NixieEffect::start(ms, start_ms);
-
-  if ( this->_el1 ) {
-    this->_el1->set_brightness_to_max();
-  }
-} // NixieEffectRandomOnOff::start()
-
-/** virtual
- *
- */
-void NixieEffectRandomOnOff::do_loop() {
-  if ( this->_el1 ) {
-    if (random(10) > 5) {
-      this->_el1->set_brightness_to_max();
-    } else {
-      this->_el1->set_brightness(0);    
-    }
-  }
-} // NixieEffectRandomOnOff::do_loop()
-
-/**
- *
- */
-void NixieEffectRandomOnOff::end() {
-  if ( this->_el1 ) {
-    this->_el1->set_brightness_to_max();
-  }
-  NixieEffect::end();
-} // NixieEffectRandomOnOff::end()
