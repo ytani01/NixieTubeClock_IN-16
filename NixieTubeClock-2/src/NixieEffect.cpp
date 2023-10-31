@@ -101,6 +101,7 @@ NixieEffectFadeIn::NixieEffectFadeIn(int el_i,
 {
   if ( el_i < el_n ) {
     this->_el1 = &(el[el_i]);
+    this->_el1->set_brightness(0);
   } else {
     this->_el1 = NULL;
   }

@@ -55,15 +55,15 @@ class NixieTubeArray {
 
   void set_num(uint8_t (&num)[NIXIE_NUM_N],
                nxa_effect_t effect=NXA_EFFECT_NONE,
-               unsigned long ms=0);
+               unsigned long ms=0, bool force_all=false);
 
   void set_col(uint8_t (&col)[NIXIE_COLON_N],
                nxa_effect_t effect=NXA_EFFECT_NONE,
-               unsigned long ms=0);
+               unsigned long ms=0, bool force_all=false);
 
   void set_string(std::string str,
                   nxa_effect_t effect=NXA_EFFECT_NONE,
-                  unsigned long ms=0);
+                  unsigned long ms=0, bool force_all=false);
   
   void display(unsigned long cur_ms);
 

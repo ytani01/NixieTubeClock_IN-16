@@ -110,9 +110,10 @@ void NixieTubeArray::end_all_effect() {
  *
  */
 void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
-                             nxa_effect_t effect, unsigned long ms) {
+                             nxa_effect_t effect, unsigned long ms,
+                             bool force_all) {
   for (int i=0; i < NIXIE_NUM_N; i++) {
-    if ( num[i] == this->prev_num_int[i] ) {
+    if ( (! force_all) && (num[i] == this->prev_num_int[i]) ) {
       continue;
     }
     switch ( effect ) {
@@ -138,9 +139,10 @@ void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
  *
  */
 void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
-                             nxa_effect_t effect, unsigned long ms) {
+                             nxa_effect_t effect, unsigned long ms,
+                             bool force_all) {
   for (int i=0; i < NIXIE_COLON_N; i++) {
-    if ( col[i] == this->prev_col_int[i] ) {
+    if ( (! force_all) && (col[i] == this->prev_col_int[i]) ) {
       continue;
     }
     switch ( effect ) {
@@ -166,7 +168,8 @@ void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
  *
  */
 void NixieTubeArray::set_string(std::string str,
-                                nxa_effect_t effect, unsigned long ms) {
+                                nxa_effect_t effect, unsigned long ms,
+                                bool force_all) {
   static std::string prev_str = "";
   
   if ( str != prev_str ) {
@@ -190,8 +193,8 @@ void NixieTubeArray::set_string(std::string str,
 
   //log_d("col[] = {%d, %d}", col[0], col[1]);
   
-  this->set_num(num, effect, ms);
-  this->set_col(col, effect, ms);
+  this->set_num(num, effect, ms, force_all);
+  this->set_col(col, effect, ms, force_all);
 
   //this->display(millis());
 } // NixieTubeArray::set_string()

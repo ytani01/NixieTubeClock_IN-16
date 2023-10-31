@@ -56,6 +56,7 @@ brightness_t NixieTube::brightness() {
 brightness_t NixieTube::set_brightness(brightness_t bri) {
   this->_brightness = bri;
 
+  this->end_effect();
   for (int i=0; i < this->element_n; i++) {
     this->element[i].set_max_brightness(bri);
     if ( this->element[i].brightness() ) {
@@ -134,8 +135,10 @@ void NixieTube::effect_xfade(int el_src, int el_dst,
                             unsigned long ms, unsigned long start_ms) {
   this->end_effect();
 
-  this->_ef1 = new NixieEffectFadeOut(el_src, this->element, this->element_n);
-  this->_ef1->start(ms, start_ms);
+  if ( el_src != el_dst ) {
+    this->_ef1 = new NixieEffectFadeOut(el_src, this->element, this->element_n);
+    this->_ef1->start(ms, start_ms);
+  }
 
   this->_ef2 = new NixieEffectFadeIn(el_dst, this->element, this->element_n);
   this->_ef2->start(ms, start_ms);

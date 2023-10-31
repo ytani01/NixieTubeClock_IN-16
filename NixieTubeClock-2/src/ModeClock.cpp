@@ -206,7 +206,7 @@ void ModeClock::loop() {
     break;
 
   case CLOCK_MODE_ymd:
-    if ( cur_ms - date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
+    if ( cur_ms - this->date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
       this->clock_mode = this->clock_mode_main;
       log_i("clock_mode = %d", this->clock_mode);
       return;
@@ -234,8 +234,16 @@ void ModeClock::loop() {
   std::string nx_str = tm2string(&nx_tm, nx_fmt);
   log_v("nx_fmt = %s, nx_str = %s", nx_fmt, nx_str.c_str());
 
+  static clock_mode_t prev_clock_mode = CLOCK_MODE_ymd;
+  bool force_all = false;
+  if ( this->clock_mode != prev_clock_mode ) {
+    force_all = true;
+    prev_clock_mode = this->clock_mode;
+  }
+
   unsigned long ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
-  Nxa->set_string(nx_str.c_str(), this->effect[this->conf->eff_i], ms);
+  Nxa->set_string(nx_str.c_str(), this->effect[this->conf->eff_i], ms,
+                  force_all);
 
   prev_nx_str = nx_str;
 
