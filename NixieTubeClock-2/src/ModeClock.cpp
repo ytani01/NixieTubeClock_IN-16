@@ -206,9 +206,13 @@ void ModeClock::loop() {
     break;
 
   case CLOCK_MODE_ymd:
+    // cbBtn()で、date_start_msが、cur_msを抜かすことがあるので、
+    // あらためて cur_ms を取得し直す!
+    cur_ms = millis();
     if ( cur_ms - this->date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
       this->clock_mode = this->clock_mode_main;
-      log_i("clock_mode = %d", this->clock_mode);
+      log_i("clock_mode = %d (cur_ms=%u, date_start_ms=%u)",
+            this->clock_mode, cur_ms, this->date_start_ms);
       return;
     }
 
@@ -303,7 +307,6 @@ void ModeClock::cbBtn(ButtonInfo_t *bi) {
             this->clock_mode_main = CLOCK_MODE_HMS;
           }
           // save main mode
-          //this->conf->clock_mode = static_cast<int>(this->clock_mode_main);
           this->conf->clock_mode = this->clock_mode_main;
           this->conf->save();
             
