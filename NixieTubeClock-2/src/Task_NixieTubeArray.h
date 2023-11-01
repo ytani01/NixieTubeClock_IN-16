@@ -14,7 +14,7 @@
 class Task_NixieTubeArray
   : public Task {
 public:
-  static const uint32_t STACK_SIZE = 8 * 1024;
+  static const uint32_t STACK_SIZE = 4 * 1024;
   static const UBaseType_t PRIORITY = 4;
   static const UBaseType_t CORE = APP_CPU_NUM;
 

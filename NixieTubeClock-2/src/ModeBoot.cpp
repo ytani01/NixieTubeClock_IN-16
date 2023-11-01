@@ -104,7 +104,8 @@ void ModeBoot::loop() {
 /**
  *
  */
-void ModeBoot::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
+void ModeBoot::cbBtn(ButtonInfo_t *bi,
+                     std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
   if ( String(bi->name) == "Btn0" ) {

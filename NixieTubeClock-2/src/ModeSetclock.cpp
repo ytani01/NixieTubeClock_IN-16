@@ -226,7 +226,8 @@ void ModeSetclock::loop() {
 /**
  *
  */
-void ModeSetclock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
+void ModeSetclock::cbBtn(ButtonInfo_t *bi,
+                         std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
   // ダブルクリックが次のモードに影響を与えないように
@@ -320,12 +321,6 @@ void ModeSetclock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val)
   } // if (Btn0)
 
   if ( String(bi->name) == "Btn1" && bi->value == Button::ON ) {
-#if 0    
-    // 月の最終日
-    this->val_max[VAL_IDX_DAY] = last_day(val[VAL_IDX_YEAR] + 2000,
-                                          val[VAL_IDX_MONTH]);
-    log_d("val_max[VAL_IDX_DAY] = %d", this->val[VAL_IDX_DAY]);
-#endif
     // increment
     this->val[pos_i]++;
 

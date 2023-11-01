@@ -21,12 +21,12 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
 :
 Task_ButtonWatcher *taskBtnWatcher=NULL;
 :
-void cb(ButtonInfo *bi, std:map<std::string, bool>& btn_val) {
+void cb(ButtonInfo *bi, std:map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
   :
   if ( String(bi->name) == "Btn0" ) {
     :
-    if ( btn_val["Btn1"] == Button::ON ) {
+    if ( btn_info["Btn1"].value == Button::ON ) {
       :
     }
   }
@@ -75,11 +75,10 @@ public:
   static const UBaseType_t PRIORITY = 0;
   static const UBaseType_t CORE = APP_CPU_NUM;
 
-  std::map<std::string, bool> btn_val;
   std::map<std::string, ButtonInfo_t> btn_info;
 
   Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi,
-                                std::map<std::string, bool>& btn_val),
+                                std::map<std::string, ButtonInfo_t>& btn_info),
                      uint32_t stack_size=STACK_SIZE,
                      UBaseType_t priority=PRIORITY,
                      UBaseType_t core=CORE);
@@ -95,7 +94,9 @@ protected:
 
   Task_ButtonWorker *worker;
 
-  void (*_cb)(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val);
-  static void def_cb(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val);
+  void (*_cb)(ButtonInfo_t *bi,
+              std::map<std::string, ButtonInfo_t>& btn_info);
+  static void def_cb(ButtonInfo_t *bi,
+                     std::map<std::string, ButtonInfo_t>& btn_info);
 }; // class Task_ButtonWatcher
 #endif // _TASK_BUTTON_WATCHER_H_

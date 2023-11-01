@@ -248,6 +248,7 @@ void ModeClock::loop() {
   if ( demo_mode ) {
     force_all = true;
   }
+
   if ( nx_str != prev_nx_str ) {
     unsigned long ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
     Nxa->set_string(nx_str.c_str(), this->effect[this->conf->eff_i], ms,
@@ -262,7 +263,8 @@ void ModeClock::loop() {
 /**
  *
  */
-void ModeClock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
+void ModeClock::cbBtn(ButtonInfo_t *bi,
+                      std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
   if ( String(bi->name) == "Btn0" ) {
@@ -331,22 +333,29 @@ void ModeClock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
   if ( String(bi->name) == "Btn2" ) {
     if ( bi->value == Button::OFF ) {
       if ( bi->click_count == 1 ) {
-        brightness_t bri = Nxa->brightness() / 2;
-        if ( bri < BRIGHTNESS_MIN ) {
-          bri = BRIGHTNESS_RESOLUTION;
-        }
-        Nxa->end_all_effect();
-        Nxa->set_brightness(bri);
-        Nxa->display(millis());
-        return;
-      }
+        if ( ! bi->long_pressed ) {
+          brightness_t bri = Nxa->brightness() / 2;
+          if ( bri < BRIGHTNESS_MIN ) {
+            bri = BRIGHTNESS_RESOLUTION;
+          }
+          Nxa->end_all_effect();
+          Nxa->set_brightness(bri);
+          Nxa->display(millis());
+          return;
+        } // if ( !long_pressed )
+      } // if (click_count == 1 )
+    } // if (OFF)
 
-      if ( bi->click_count >= 2 ) {
-        this->demo_mode = ! this->demo_mode;
-        log_i("demo_mode = %s", this->demo_mode ? "true" : "false");
-        return;
-      }
-    }
+    if ( bi->value == Button::ON ) {
+      if ( bi->long_pressed ) {
+        if ( bi->repeat_count == 0 ) {
+          this->demo_mode = ! this->demo_mode;
+          log_i("demo_mode = %s", this->demo_mode ? "true" : "false");
+          return;
+        } // if (repeat_count == 0)
+      } // if (long_pressed)
+    } // if (ON)
+
     return;
   } // if (Btn2)
 

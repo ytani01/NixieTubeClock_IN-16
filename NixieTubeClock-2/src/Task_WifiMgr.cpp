@@ -33,7 +33,9 @@ Task_WifiMgr::Task_WifiMgr(std::string ap_ssid_hdr,
 
   Task_WifiMgr::Obj_ConfFile_Ssid = new ConfFile_Ssid();
 
+#if 0
   log_i("uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
+#endif
 } // Task_WifiMgr::Task_WifiMgr
 
 /** static

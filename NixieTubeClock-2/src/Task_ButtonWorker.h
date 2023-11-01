@@ -21,8 +21,9 @@ public:
   static const UBaseType_t PRIORITY = 8;
   static const UBaseType_t CORE = APP_CPU_NUM;
 
-  static QueueHandle_t BtnQue; // static for interrupt function
   static std::map<std::string, ButtonInfo_t> BtnInfo;
+
+  static QueueHandle_t BtnQue; // static for interrupt function
 
   Task_ButtonWorker(uint32_t stack_size=STACK_SIZE,
                     UBaseType_t priority=PRIORITY,
@@ -35,8 +36,6 @@ public:
 
   portBASE_TYPE get(ButtonInfo_t *btn_info,
                     TickType_t timeout=DEF_RECV_QUE_TIMEOUT);
-
-  std::map<std::string, bool> get_BtnVal(); // to be deprecated
 
 protected:
   std::vector<Button *> btn_ent;

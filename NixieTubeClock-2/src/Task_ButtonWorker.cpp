@@ -5,7 +5,6 @@
 
 // static variable
 QueueHandle_t Task_ButtonWorker::BtnQue = (QueueHandle_t)NULL;
-std::map<std::string, bool> Task_ButtonWorker::BtnVal = {}; // to be deprecated
 std::map<std::string, ButtonInfo_t> Task_ButtonWorker::BtnInfo = {};
 
 /**
@@ -35,15 +34,17 @@ void Task_ButtonWorker::addBtn(String name, uint8_t pin) {
 
   Button *btn = new Button(name, pin, this->intr_hdr);
 
+  // btn_ent
   this->btn_ent.push_back(btn);
-  Task_ButtonWorker::BtnVal[name.c_str()] = Button::OFF;
 
+  // BtnInfo
   strcpy(Task_ButtonWorker::BtnInfo[name.c_str()].name, name.c_str());
   Task_ButtonWorker::BtnInfo[name.c_str()].pin = pin;
   Task_ButtonWorker::BtnInfo[name.c_str()].intr_hdr = this->intr_hdr;
+  Task_ButtonWorker::BtnInfo[name.c_str()].value = Button::OFF;
 
-  log_d("btn_ent.size: %d, BtnVal.size: %d",
-        this->btn_ent.size(), Task::ButtonWorker::BtnVal.size());
+  log_d("btn_ent.size: %d, BtnInfo.size: %d",
+        this->btn_ent.size(), Task::ButtonWorker::BtnInfo.size());
 } // Task_ButtonWorker::addBtn();
 
 /**
@@ -60,10 +61,13 @@ void Task_ButtonWorker::setup() {
 void Task_ButtonWorker::loop() {
   for (auto btn: this->btn_ent) {
     if ( btn->get() ) {
-      Task_ButtonWorker::BtnVal[btn->info.name] = btn->info.value;
-      Task_ButtonWorker::BtnInfo[btn->info.name].value = btn->info.value;
       log_v("btn->info.name=%s, btn->info.value=%d",
             btn->info.name, btn->info.value);
+
+      // BtnInfo
+      Task_ButtonWorker::BtnInfo[btn->info.name].value = btn->info.value;
+
+      // put que
       portBASE_TYPE ret = xQueueSend(Task_ButtonWorker::BtnQue,
                                      (void *)&(btn->info), 10);
       if ( ret == pdPASS ) {
@@ -73,6 +77,13 @@ void Task_ButtonWorker::loop() {
       }
     } // if
   } // for(itr)
+
+#if 0
+  if ( millis() % 15000 == 0 ) {
+    log_i("=== uxTaskGetStackHighWaterMark = %d",
+          uxTaskGetStackHighWaterMark(NULL));
+  }
+#endif
 
   delay(10);
 } // Task_ButtonWorker::loop()
@@ -112,13 +123,6 @@ portBASE_TYPE Task_ButtonWorker::get(ButtonInfo_t *btn_info,
   return ret;
 } // Task_ButtonWorker::get()
 
-/** to be deprecated
- *
- */
-std::map<std::string, bool> Task_ButtonWorker::get_BtnVal() {
-  return Task_ButtonWorker::BtnVal;
-} // Task_ButtonWorker::get_BtnVal() {
-
 /** [static]
  *
  */
@@ -137,11 +141,6 @@ void IRAM_ATTR Task_ButtonWorker::intr_hdr(void *btn_obj) {
   if ( ! btn->get() ) {
     return;
   }
-  isr_log_v("btn->info.name=%s", btn->info.name);
-
-  // BtnVal[]
-  Task_ButtonWorker::BtnVal[btn->info.name] = btn->info.value;
-  Task_ButtonWorker::BtnInfo[btn->info.name].value = btn->info.value;
 
   isr_log_v("btn->info.name=%s, btn->info.value=%d",
             btn->info.name, btn->info.value);

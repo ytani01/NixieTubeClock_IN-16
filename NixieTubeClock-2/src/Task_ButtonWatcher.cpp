@@ -6,12 +6,11 @@
 /**
  *
  */
-Task_ButtonWatcher::Task_ButtonWatcher(void
-                                       (*cb)(ButtonInfo_t *bi,
-                                             std::map<std::string, bool>& btn_val),
-                                       uint32_t stack_size,
-                                       UBaseType_t priority,
-                                       UBaseType_t core)
+Task_ButtonWatcher::Task_ButtonWatcher
+(void (*cb)(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t>& btn_info),
+ uint32_t stack_size,
+ UBaseType_t priority,
+ UBaseType_t core)
   : Task(__CLASS_NAME__, stack_size, priority, core)
 {
   this->_cb = cb;
@@ -34,8 +33,9 @@ bool Task_ButtonWatcher::addBtn(String name, uint8_t pin) {
   }
 
   this->worker->addBtn(name, pin);
-  this->btn_info[name.c_str()].pin = pin;
+
   strcpy(this->btn_info[name.c_str()].name, name.c_str());
+  this->btn_info[name.c_str()].pin = pin;
   this->btn_info[name.c_str()].value = Button::OFF;
   return true;
 } // Task_ButtonWatcher::addBtn()
@@ -72,15 +72,22 @@ void Task_ButtonWatcher::setup() {
  */
 void Task_ButtonWatcher::loop() {
   if ( this->worker == NULL ) {
+#if 0
+    if ( millis() % 1500 == 0 ) {
+      log_i("=== uxTaskGetStackHighWaterMark = %d",
+            uxTaskGetStackHighWaterMark(NULL));
+    }
+#endif
+    
+    delay(1);
     return;
   }
   
   ButtonInfo_t btn_info;
   portBASE_TYPE ret = this->worker->get(&btn_info);
-  this->btn_val = this->worker->get_BtnVal();
-  this->btn_info = Task_ButtonWorker::BtnInfo;
   if ( ret == pdPASS ) {
-    (*(this->_cb))(&btn_info, this->btn_val);
+    this->btn_info = Task_ButtonWorker::BtnInfo;
+    (*(this->_cb))(&btn_info, this->btn_info);
   }
 } // Task_ButtonWatcher::loop()
 
@@ -88,6 +95,6 @@ void Task_ButtonWatcher::loop() {
  * defulat callback
  */
 void Task_ButtonWatcher::def_cb(ButtonInfo_t *bi,
-                                std::map<std::string, bool>& btn_val) {
+                                std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 } // _def_button_cb()

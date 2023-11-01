@@ -52,15 +52,37 @@ void Task_NixieTubeArray::setup() {
   for (int i=0; i < NIXIE_COLON_N; i++) {
     Nta->colon[i].element[0].set_brightness_to_max();
   } // for(i)
-#endif
   
   log_i("uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
+#endif
 } // Task_NixieTubeArray::setup()
 
 /**
  *
  */
 void Task_NixieTubeArray::loop() {
+#if 1
+  static uint32_t prev_ms = 0;
+  static uint32_t prev_heap_size = 0;
+  static uint32_t prev_stack_size = 0;
+
+  uint32_t ms = millis();
+  uint32_t heap_size = esp_get_free_heap_size() / 1000;
+  uint32_t stack_size = uxTaskGetStackHighWaterMark(NULL);
+
+  if ( ms - prev_ms >= 30 * 1000 ||
+       heap_size / 10 * 10 != prev_heap_size / 10 * 10 ||
+       stack_size != prev_stack_size ) {
+
+    log_i("===== heap_size = %uk, stack_size = %u",
+          heap_size, stack_size);
+
+    prev_ms = ms;
+    prev_heap_size = heap_size;
+    prev_stack_size = stack_size;
+  }
+#endif
+
   if ( ! enable_update ) {
     return;
   }

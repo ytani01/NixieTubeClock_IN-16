@@ -28,7 +28,7 @@ void NixieTube::loop(unsigned long cur_ms) {
     if ( this->_ef1->is_active() ) {
       this->_ef1->loop(cur_ms);
     } else {
-      delete this->_ef1;
+       delete this->_ef1;
       this->_ef1 = (NixieEffect *)NULL;
     }
   }
@@ -74,18 +74,17 @@ void NixieTube::end_effect() {
   if ( this->_ef1 != (NixieEffect *)NULL ) {
     if ( this->_ef1->is_active() ) {
       this->_ef1->end();
-    } else {
-      delete this->_ef1;
-      this->_ef1 = (NixieEffect *)NULL;
     }
+    delete this->_ef1;
+    this->_ef1 = (NixieEffect *)NULL;
   }
+
   if ( this->_ef2 != (NixieEffect *)NULL ) {
     if ( this->_ef2->is_active() ) {
       this->_ef2->end();
-    } else {
-      delete this->_ef2;
-      this->_ef2 = (NixieEffect *)NULL;
     }
+    delete this->_ef2;
+    this->_ef2 = (NixieEffect *)NULL;
   }  
 } // NixieTube::end_effect()
 

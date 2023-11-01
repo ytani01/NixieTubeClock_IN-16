@@ -109,15 +109,11 @@ void disableIntr() {
 /**
  *
  */
-void cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
+void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t>& btn_info) {
   std::string btn_val_str = "";
-  for (auto b: btn_val) {
-    btn_val_str += " [" + b.first + "]:" + (b.second ? "OFF" : "ON ");
-  }
-
-  std::map<std::string, ButtonInfo_t> btn_info = TaskBtnWatcher->btn_info;
   for (auto b: btn_info) {
-    btn_val_str += " [" + b.first + "]:" + (b.second.value ? "OFF" : "ON ");
+    btn_val_str += " [" + b.first + "]:";
+    btn_val_str += (b.second.value == Button::ON ? "ON " : "OFF");
   }
 
   log_i("%s,%s", Button::info2String(bi).c_str(), btn_val_str.c_str());
@@ -125,19 +121,13 @@ void cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
   //
   // reboot check
   //
-#if 0
-  if ( String(bi->name) == "Btn0" &&
-       bi->value == Button::ON &&
-       bi->long_pressed &&
-       bi->repeat_count > BTN_REPEAT_COUNT_REBOOT ) {
-#endif
-  if ( btn_val["Btn0"] == Button::ON && btn_val["Btn2"] == Button::ON) {
+  if ( btn_info["Btn0"].value == Button::ON &&
+       btn_info["Btn2"].value == Button::ON) {
     Mode::set("ModeReboot");
     return;
   } // if (Btn0 + Btn2)
 
-
-  Mode::Cur->cbBtn(bi, btn_val);
+  Mode::Cur->cbBtn(bi, btn_info);
 } // cbBtn()
 
 /**
@@ -304,7 +294,20 @@ unsigned long delayOrChangeMode(unsigned long ms) {
  *
  */
 void loop() {
+#if 0
   //log_v("class %s", __CLASS_NAME__.c_str());
+  static uint32_t prev_heap_size = 0;
+  static uint32_t prev_stack_size = 0;
+  uint32_t heap_size = esp_get_free_heap_size();
+  uint32_t stack_size = uxTaskGetStackHighWaterMark(NULL);
+  if ( heap_size != prev_heap_size ||
+       stack_size != prev_stack_size ) {
+    log_i("===== heap_size = %u, stack_size = %u",
+          heap_size, stack_size);
+    prev_heap_size = heap_size;
+    prev_stack_size = stack_size;
+  }
+#endif
 
   if ( Mode::Cur ) {
     Flag_LoopRunning = true;
