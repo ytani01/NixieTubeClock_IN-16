@@ -74,9 +74,9 @@ void Task_ButtonWatcher::loop() {
   
   ButtonInfo_t btn_info;
   portBASE_TYPE ret = this->worker->get(&btn_info);
-  std::map<std::string, bool> btn_val = this->worker->get_BtnVal();
+  this->btn_val = this->worker->get_BtnVal();
   if ( ret == pdPASS ) {
-    (*(this->_cb))(&btn_info, btn_val);
+    (*(this->_cb))(&btn_info, this->btn_val);
   }
 } // Task_ButtonWatcher::loop()
 
