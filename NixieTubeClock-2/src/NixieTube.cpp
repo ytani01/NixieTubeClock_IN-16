@@ -28,7 +28,7 @@ void NixieTube::loop(unsigned long cur_ms) {
     if ( this->_ef1->is_active() ) {
       this->_ef1->loop(cur_ms);
     } else {
-       delete this->_ef1;
+      //delete this->_ef1;
       this->_ef1 = (NixieEffect *)NULL;
     }
   }
@@ -37,7 +37,7 @@ void NixieTube::loop(unsigned long cur_ms) {
     if ( this->_ef2->is_active() ) {
       this->_ef2->loop(cur_ms);
     } else {
-      delete this->_ef2;
+      //delete this->_ef2;
       this->_ef2 = (NixieEffect *)NULL;
     }
   }
@@ -113,7 +113,7 @@ void NixieTube::effect_one(int el_i) {
  *
  */
 void NixieTube::effect_fadein(int el_i,
-                             unsigned long ms, unsigned long start_ms) {
+                              unsigned long ms, unsigned long start_ms) {
   this->_ef1 = new NixieEffectFadeIn(el_i, this->element, this->element_n);
   this->_ef1->start(ms, start_ms);
 } // NixieTube::effect_fadein()
@@ -122,7 +122,7 @@ void NixieTube::effect_fadein(int el_i,
  *
  */
 void NixieTube::effect_fadeout(int el_i,
-                              unsigned long ms, unsigned long start_ms) {
+                               unsigned long ms, unsigned long start_ms) {
   this->_ef1 = new NixieEffectFadeOut(el_i, this->element, this->element_n);
   this->_ef1->start(ms, start_ms);
 } // NixieTube::effect_fadeout()
@@ -131,7 +131,7 @@ void NixieTube::effect_fadeout(int el_i,
  *
  */
 void NixieTube::effect_xfade(int el_src, int el_dst,
-                            unsigned long ms, unsigned long start_ms) {
+                             unsigned long ms, unsigned long start_ms) {
   this->end_effect();
 
   if ( el_src != el_dst ) {
@@ -157,7 +157,7 @@ void NixieTube::effect_fog(int el_i, unsigned long ms, unsigned long start_ms) {
  *
  */
 void NixieTube::effect_shuffle(int el_i, int n,
-                              unsigned long ms, unsigned long start_ms) {
+                               unsigned long ms, unsigned long start_ms) {
   this->_ef1 = new NixieEffectShuffle(el_i, n,
                                       this->element, this->element_n);
   this->_ef1->start(ms, start_ms);
