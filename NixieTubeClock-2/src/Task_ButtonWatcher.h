@@ -76,6 +76,7 @@ public:
   static const UBaseType_t CORE = APP_CPU_NUM;
 
   std::map<std::string, bool> btn_val;
+  std::map<std::string, ButtonInfo_t> btn_info;
 
   Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi,
                                 std::map<std::string, bool>& btn_val),

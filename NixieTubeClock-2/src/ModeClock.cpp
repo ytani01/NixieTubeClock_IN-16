@@ -245,10 +245,14 @@ void ModeClock::loop() {
     prev_clock_mode = this->clock_mode;
   }
 
-  unsigned long ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
-  Nxa->set_string(nx_str.c_str(), this->effect[this->conf->eff_i], ms,
-                  force_all);
-
+  if ( demo_mode ) {
+    force_all = true;
+  }
+  if ( nx_str != prev_nx_str ) {
+    unsigned long ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
+    Nxa->set_string(nx_str.c_str(), this->effect[this->conf->eff_i], ms,
+                    force_all);
+  }
   prev_nx_str = nx_str;
 
   //---------------
@@ -266,6 +270,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
       if ( bi->long_pressed ) {
         if ( bi->repeat_count == 0 ) {
           Mode::set("ModeSetclock");
+          return;
         }
       }
     }
@@ -274,10 +279,12 @@ void ModeClock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
     if ( bi->click_count == 2 ) {
       this->conf->eff_i = (this->conf->eff_i + 1) % this->effect.size();
       this->conf->save();
+      return;
     }
 
     if ( bi->click_count == 3 ) {
       Mode::set("ModeScoreboard");
+      return;
     }
     return;
   } // if (Btn0)
@@ -296,6 +303,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
           this->date_start_ms = 0;
         }
         log_i("clock_mode = %d", this->clock_mode);
+        return;
       } else { // long_pressed
         if ( bi->repeat_count == 1 ) {
           //
@@ -312,6 +320,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
             
           this->clock_mode = this->clock_mode_main;
           this->date_start_ms = 0;
+          return;
         } // if (repeat_count==0)
       } // if (!long_pressed)
     } // if (ON)
@@ -320,14 +329,23 @@ void ModeClock::cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
   } // if (Btn1)
 
   if ( String(bi->name) == "Btn2" ) {
-    if ( bi->value == Button::ON ) {
-      brightness_t bri = Nxa->brightness() / 2;
-      if ( bri < BRIGHTNESS_MIN ) {
-        bri = BRIGHTNESS_RESOLUTION;
+    if ( bi->value == Button::OFF ) {
+      if ( bi->click_count == 1 ) {
+        brightness_t bri = Nxa->brightness() / 2;
+        if ( bri < BRIGHTNESS_MIN ) {
+          bri = BRIGHTNESS_RESOLUTION;
+        }
+        Nxa->end_all_effect();
+        Nxa->set_brightness(bri);
+        Nxa->display(millis());
+        return;
       }
-      Nxa->end_all_effect();
-      Nxa->set_brightness(bri);
-      Nxa->display(millis());
+
+      if ( bi->click_count >= 2 ) {
+        this->demo_mode = ! this->demo_mode;
+        log_i("demo_mode = %s", this->demo_mode ? "true" : "false");
+        return;
+      }
     }
     return;
   } // if (Btn2)

@@ -34,6 +34,8 @@ class ModeClock: public Mode {
 
   ConfFile_ModeClock *conf;
 
+  bool demo_mode = false;
+
   std::vector<nxa_effect_t> effect = {
     NXA_EFFECT_XFADE,
     NXA_EFFECT_NONE,

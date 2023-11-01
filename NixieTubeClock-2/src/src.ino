@@ -114,6 +114,12 @@ void cbBtn(ButtonInfo_t *bi, std::map<std::string, bool>& btn_val) {
   for (auto b: btn_val) {
     btn_val_str += " [" + b.first + "]:" + (b.second ? "OFF" : "ON ");
   }
+
+  std::map<std::string, ButtonInfo_t> btn_info = TaskBtnWatcher->btn_info;
+  for (auto b: btn_info) {
+    btn_val_str += " [" + b.first + "]:" + (b.second.value ? "OFF" : "ON ");
+  }
+
   log_i("%s,%s", Button::info2String(bi).c_str(), btn_val_str.c_str());
 
   //

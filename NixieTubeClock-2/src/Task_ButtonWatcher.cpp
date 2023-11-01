@@ -34,6 +34,9 @@ bool Task_ButtonWatcher::addBtn(String name, uint8_t pin) {
   }
 
   this->worker->addBtn(name, pin);
+  this->btn_info[name.c_str()].pin = pin;
+  strcpy(this->btn_info[name.c_str()].name, name.c_str());
+  this->btn_info[name.c_str()].value = Button::OFF;
   return true;
 } // Task_ButtonWatcher::addBtn()
 
@@ -75,6 +78,7 @@ void Task_ButtonWatcher::loop() {
   ButtonInfo_t btn_info;
   portBASE_TYPE ret = this->worker->get(&btn_info);
   this->btn_val = this->worker->get_BtnVal();
+  this->btn_info = Task_ButtonWorker::BtnInfo;
   if ( ret == pdPASS ) {
     (*(this->_cb))(&btn_info, this->btn_val);
   }

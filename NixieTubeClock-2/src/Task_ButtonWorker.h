@@ -22,6 +22,7 @@ public:
   static const UBaseType_t CORE = APP_CPU_NUM;
 
   static QueueHandle_t BtnQue; // static for interrupt function
+  static std::map<std::string, ButtonInfo_t> BtnInfo;
 
   Task_ButtonWorker(uint32_t stack_size=STACK_SIZE,
                     UBaseType_t priority=PRIORITY,
@@ -35,7 +36,7 @@ public:
   portBASE_TYPE get(ButtonInfo_t *btn_info,
                     TickType_t timeout=DEF_RECV_QUE_TIMEOUT);
 
-  std::map<std::string, bool> get_BtnVal();
+  std::map<std::string, bool> get_BtnVal(); // to be deprecated
 
 protected:
   std::vector<Button *> btn_ent;
@@ -43,7 +44,7 @@ protected:
   virtual void setup();
   virtual void loop();
 
-  static std::map<std::string, bool> BtnVal;
+  static std::map<std::string, bool> BtnVal; // to be deprecated
   static void intr_hdr(void *btn_obj);
 }; // class Task_ButtonWorker
 #endif // _TASK_BUTTON_WORKER_H_
