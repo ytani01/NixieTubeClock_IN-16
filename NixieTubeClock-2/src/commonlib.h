@@ -10,8 +10,19 @@
 #include <RTClib.h>
 #include <chrono>
 
+/**
+ * memory leak check
+ */
+bool chk_memleak(int sec, int unit=10);
+
+/**
+ * MAC address
+ */
 std::string get_mac_addr_string();
 
+/**
+ * date time
+ */
 static const int DATETIME_STR_LEN = 128;
 
 DateTime tm2datetime(struct tm *tm);

@@ -3,8 +3,39 @@
  */
 #include "commonlib.h"
 
-static String WDayStr[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+// ===========================================================================
+// System memory
+// ===========================================================================
+/**
+ * @brief check memory leak
+ */
+bool chk_memleak(int sec, int unit) {
+  static uint32_t prev_ms = 0;
+  static uint32_t prev_heap_size = 0;
+  static uint32_t prev_stack_size = 0;
 
+  uint32_t ms = millis();
+  uint32_t heap_size = esp_get_free_heap_size() / 1000;
+  uint32_t stack_size = uxTaskGetStackHighWaterMark(NULL);
+
+  if ( ms - prev_ms >= sec * 1000 ||
+       heap_size / unit * unit != prev_heap_size / unit * unit ||
+       stack_size != prev_stack_size ) {
+
+    log_i("===== heap_size = %uk, stack_size = %u",
+          heap_size, stack_size);
+
+    prev_ms = ms;
+    prev_heap_size = heap_size;
+    prev_stack_size = stack_size;
+    return true;
+  }
+  return false;
+} // chk_memleak()
+
+// ===========================================================================
+// MAC address
+// ===========================================================================
 /**
  * get MAC address String
  */
@@ -20,6 +51,11 @@ std::string get_mac_addr_string() {
 
   return std::string(mac_str);
 } // get_mac_addr_string()
+
+// ===========================================================================
+// date time
+// ===========================================================================
+static String WDayStr[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 /**
  * @brief struct tm --> DateTime
