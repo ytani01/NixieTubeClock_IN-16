@@ -34,16 +34,25 @@ class NixieEffect {
   virtual ~NixieEffect();
 
   virtual void start(unsigned long ms, unsigned long start_ms=0);
+  virtual void start(int el_i, unsigned long ms, unsigned long start_ms=0);
+  virtual void start(int el_i, int n, unsigned long ms, unsigned long start_ms=0);
+
   void loop(unsigned long cur_ms=0);
   virtual void do_loop();
+
   virtual void end();
 
   boolean     is_active();
   boolean     tick(unsigned long cur_ms=0);
     
  protected:
+  int _el_i;
+  int _n;
+  NixieElement *_el1;
+
   NixieElement *_el;   // array
   unsigned long _el_n      = 0;           // number of elements (10 or 1)
+
   boolean       _active    = false;
   unsigned long _start_ms  = 0;
   unsigned long _ms        = 1000;
@@ -56,12 +65,12 @@ class NixieEffect {
  */
 class NixieEffectFadeIn : public NixieEffect {
  public:
-  NixieEffectFadeIn(int el_i, NixieElement *el, unsigned long el_n);
+  NixieEffectFadeIn(NixieElement *element, unsigned long el_n);
+  virtual void start(int el_i, unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
 
  private:
-  NixieElement *_el1;
 }; // class NixieEffectFadeIn
 
 /** ==========================================================================
@@ -69,12 +78,12 @@ class NixieEffectFadeIn : public NixieEffect {
  */
 class NixieEffectFadeOut : public NixieEffect {
  public:
-  NixieEffectFadeOut(int el_i, NixieElement *el, unsigned long el_n);
+  NixieEffectFadeOut(NixieElement *element, unsigned long el_n);
+  virtual void start(int el_i, unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
 
  private:
-  NixieElement *_el1;
 }; // class NixieEffectFadeOut
 
 /** ==========================================================================
@@ -82,33 +91,32 @@ class NixieEffectFadeOut : public NixieEffect {
  */
 class NixieEffectFog : public NixieEffect {
  public:
-  NixieEffectFog(int el_i, NixieElement *el, unsigned long el_n);
+  NixieEffectFog(NixieElement *element, unsigned long el_n);
+  virtual void start(int el_i, unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
 
  private:
-  int _el_i;
   bool _fog_up;
 }; // class NixieEffectFog
 
 //============================================================================
 class NixieEffectShuffle : public NixieEffect {
  public:
-  NixieEffectShuffle(int el_i, int n, NixieElement *el, unsigned long el_n);
-  virtual void start(unsigned long ms, unsigned long start_ms=0);
+  NixieEffectShuffle(NixieElement *element, unsigned long el_n);
+  virtual void start(int el_i, int n,
+                     unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
 
  private:
-  int _el_i;
-  int _n;
   int _el_random;
 }; // class NixieEffectShuffle
 
 //============================================================================
 class NixieEffectBlink : public NixieEffect {
  public:
-  NixieEffectBlink(NixieElement *el, unsigned long el_n);
+  NixieEffectBlink(NixieElement *element, unsigned long el_n);
   virtual void start(unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
