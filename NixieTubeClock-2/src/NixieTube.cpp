@@ -6,14 +6,27 @@
 /**
  *
  */
+NixieTube::NixieTube() {
+} // constructor
+
+/**
+ *
+ */
 void NixieTube::setup(int element_n, uint8_t *pin) {
   this->element_n = element_n;
   this->element = new NixieElement[this->element_n];
+  
   for (int d=0; d < element_n; d++) {
     this->element[d].setup(pin[d]);
   } // for (d)
   this->_ef1 = (NixieEffect *)NULL;
   this->_ef2 = (NixieEffect *)NULL;
+
+  this->ef_fadein = new NixieEffectFadeIn(this->element, this->element_n);
+  this->ef_fadeout = new NixieEffectFadeOut(this->element, this->element_n);
+  this->ef_fog = new NixieEffectFog(this->element, this->element_n);
+  this->ef_shuffle = new NixieEffectShuffle(this->element, this->element_n);
+  this->ef_blink = new NixieEffectBlink(this->element, this->element_n);
 } // NixieTube::setup()
 
 /**
@@ -71,20 +84,20 @@ brightness_t NixieTube::set_brightness(brightness_t bri) {
  *
  */
 void NixieTube::end_effect() {
-  if ( this->_ef1 != (NixieEffect *)NULL ) {
+  if ( this->_ef1 ) {
     if ( this->_ef1->is_active() ) {
       this->_ef1->end();
     }
-    delete this->_ef1;
-    this->_ef1 = (NixieEffect *)NULL;
+    //delete this->_ef1;
+    this->_ef1 = NULL;
   }
 
-  if ( this->_ef2 != (NixieEffect *)NULL ) {
+  if ( this->_ef2 ) {
     if ( this->_ef2->is_active() ) {
       this->_ef2->end();
     }
-    delete this->_ef2;
-    this->_ef2 = (NixieEffect *)NULL;
+    //delete this->_ef2;
+    this->_ef2 = NULL;
   }  
 } // NixieTube::end_effect()
 
@@ -92,7 +105,19 @@ void NixieTube::end_effect() {
  *
  */
 boolean NixieTube::effect_is_active() {
-  return (this->_ef1 || this->_ef2);
+  if ( this->_ef1 ) {
+    if ( this->_ef1->is_active() ) {
+      return true;
+    }
+    this->_ef1 = NULL;
+  }
+  if ( this->_ef2 ) {
+    if ( this->_ef2->is_active() ) {
+      return true;
+    }
+    this->_ef1 = NULL;
+  }
+  return false;
 } // NixieTube::effect_is_active()
 
 //============================================================================
@@ -114,8 +139,9 @@ void NixieTube::effect_one(int el_i) {
  */
 void NixieTube::effect_fadein(int el_i,
                               unsigned long ms, unsigned long start_ms) {
-  this->_ef1 = new NixieEffectFadeIn(this->element, this->element_n);
-  this->_ef1->start(el_i, ms, start_ms);
+  this->_ef1 = this->ef_fadein;
+  this->ef_fadein->start(el_i, ms, start_ms);
+  //this->_ef1->start(el_i, ms, start_ms);
 } // NixieTube::effect_fadein()
 
 /**
@@ -123,7 +149,8 @@ void NixieTube::effect_fadein(int el_i,
  */
 void NixieTube::effect_fadeout(int el_i,
                                unsigned long ms, unsigned long start_ms) {
-  this->_ef1 = new NixieEffectFadeOut(this->element, this->element_n);
+  this->_ef1 = this->ef_fadeout;
+  //this->ef_fadeout->start(el_i, ms, start_ms);
   this->_ef1->start(el_i, ms, start_ms);
 } // NixieTube::effect_fadeout()
 
@@ -135,13 +162,15 @@ void NixieTube::effect_xfade(int el_src, int el_dst,
   this->end_effect();
 
   if ( el_src != el_dst ) {
-    this->_ef1 = new NixieEffectFadeOut(this->element, this->element_n);
+    this->_ef1 = this->ef_fadeout;
+    //this->ef_fadeout->start(el_src, ms, start_ms);
     this->_ef1->start(el_src, ms, start_ms);
   } else {
     this->_ef1 = NULL;
   }
 
-  this->_ef2 = new NixieEffectFadeIn(this->element, this->element_n);
+  this->_ef2 = this->ef_fadein;
+  //this->ef_fadein->start(el_dst, ms, start_ms);
   this->_ef2->start(el_dst, ms, start_ms);
 } // NixieTube::effect_xfade()
 
@@ -149,7 +178,8 @@ void NixieTube::effect_xfade(int el_src, int el_dst,
  *
  */
 void NixieTube::effect_fog(int el_i, unsigned long ms, unsigned long start_ms) {
-  this->_ef1 = new NixieEffectFog(this->element, this->element_n);
+  this->_ef1 = this->ef_fog;
+  //this->ef_fog->start(el_i, ms, start_ms);
   this->_ef1->start(el_i, ms, start_ms);
 } // NixieTube::effect_fadeout()
 
@@ -158,7 +188,7 @@ void NixieTube::effect_fog(int el_i, unsigned long ms, unsigned long start_ms) {
  */
 void NixieTube::effect_shuffle(int el_i, int n,
                                unsigned long ms, unsigned long start_ms) {
-  this->_ef1 = new NixieEffectShuffle(this->element, this->element_n);
+  this->_ef1 = this->ef_shuffle;
   this->_ef1->start(el_i, n, ms, start_ms);
 } // NixieTube::effect_shuffle()
 
@@ -166,6 +196,6 @@ void NixieTube::effect_shuffle(int el_i, int n,
  *
  */
 void NixieTube::effect_blink(unsigned long ms, unsigned long start_ms) {
-  this->_ef1 = new NixieEffectBlink(this->element, this->element_n);
+  this->_ef1 = this->ef_blink;
   this->_ef1->start(ms, start_ms);
 } // NixieTube::effect_blink()

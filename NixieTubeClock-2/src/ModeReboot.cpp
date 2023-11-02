@@ -21,16 +21,6 @@ void ModeReboot::enter() {
   Nxa->set_string(VersionString.c_str());
   unsigned long ms = 80 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
   Nxa->set_string("        ", NXA_EFFECT_XFADE, ms);
-#if 0
-  Nxa->num[5].effect_blink(300, start_ms);
-  Nxa->num[4].effect_blink(300, start_ms);
-  Nxa->colon[NIXIE_COLON_R].effect_blink(300, this->start_ms+20);
-  Nxa->num[3].effect_blink(300, this->start_ms+40);
-  Nxa->num[2].effect_blink(300, this->start_ms+40);
-  Nxa->colon[NIXIE_COLON_L].effect_blink(300, this->start_ms+60);
-  Nxa->num[1].effect_blink(300, this->start_ms+80);
-  Nxa->num[0].effect_blink(300, this->start_ms+80);
-#endif
   
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->display();

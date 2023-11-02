@@ -28,9 +28,9 @@
 class NixieTube {
  public:
   int           element_n = 0;
-  NixieElement *element;
+  NixieElement *element; // array
 
-  NixieTube() {};
+  NixieTube();
 
   void setup(int element_n, uint8_t *pin);
   void loop(unsigned long cur_ms=0);
@@ -40,6 +40,12 @@ class NixieTube {
 
   void end_effect();
   bool effect_is_active();
+
+  NixieEffectFadeIn *ef_fadein;
+  NixieEffectFadeOut *ef_fadeout;
+  NixieEffectFog *ef_fog;
+  NixieEffectShuffle *ef_shuffle;
+  NixieEffectBlink *ef_blink;
 
   void effect_one(int el_i);
   void effect_fadein(int el_i, unsigned long ms, unsigned long start_ms=0);

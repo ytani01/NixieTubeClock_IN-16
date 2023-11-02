@@ -39,6 +39,8 @@ void NixieEffect::start(unsigned long ms, unsigned long start_ms) {
  *
  */
 void NixieEffect::start(int el_i, unsigned long ms, unsigned long start_ms) {
+  NixieEffect::start(ms, start_ms);
+
   this->_el_i = el_i;
 
   this->_el1 = NULL;
@@ -47,8 +49,6 @@ void NixieEffect::start(int el_i, unsigned long ms, unsigned long start_ms) {
   } else {
     this->_el1 = NULL;
   }
-
-  NixieEffect::start(ms, start_ms);
 } // NixieEffect::start()
 
 /** virtual
@@ -56,8 +56,9 @@ void NixieEffect::start(int el_i, unsigned long ms, unsigned long start_ms) {
  */
 void NixieEffect::start(int el_i, int n,
                         unsigned long ms, unsigned long start_ms) {
-  this->_n = n;
   NixieEffect::start(el_i, ms, start_ms);
+
+  this->_n = n;
 } // NixieEffect::start()
 
 /**
@@ -131,6 +132,7 @@ NixieEffectFadeIn::NixieEffectFadeIn(NixieElement *element,
 void NixieEffectFadeIn::start(int el_i,
                               unsigned long ms, unsigned long start_ms) {
   NixieEffect::start(el_i, ms, start_ms);
+
   if ( this->_el1 ) {
     this->_el1->set_brightness(0);
   }
@@ -153,11 +155,12 @@ void NixieEffectFadeIn::do_loop() {
  *
  */
 void NixieEffectFadeIn::end() {
+  NixieEffect::end();
+
   if ( this->_el1 ) {
     this->_el1->set_brightness_to_max();
     this->_el1 = NULL;
   }
-  NixieEffect::end();
 } // NixieEffectFadeIn::end()
 
 //============================================================================
@@ -196,11 +199,12 @@ void NixieEffectFadeOut::do_loop() {
  *
  */
 void NixieEffectFadeOut::end() {
+  NixieEffect::end();
+
   if ( this->_el1 ) {
     this->_el1->set_brightness(0);
     this->_el1 = NULL;
   }
-  NixieEffect::end();
 } // NixieEffectFadeOut::end()
 
 //============================================================================
@@ -270,6 +274,8 @@ void NixieEffectFog::do_loop() {
  *
  */
 void NixieEffectFog::end() {
+  NixieEffect::end();
+
   for (int i=0; i < this->_el_n; i++) {
     if ( i == this->_el_i ) {
       this->_el[i].set_brightness_to_max();
@@ -280,7 +286,6 @@ void NixieEffectFog::end() {
   if ( this->_el1 ) {
     this->_el1 = NULL;
   }
-  NixieEffect::end();
 } // NixieEffectFog::end()
 
 //============================================================================
@@ -328,6 +333,8 @@ void NixieEffectShuffle::do_loop() {
  *
  */
 void NixieEffectShuffle::end() {
+  NixieEffect::end();
+
   for (int i=0; i < this->_el_n; i++) {
     if ( i == this->_el_i ) {
       this->_el[i].set_brightness_to_max();
@@ -338,7 +345,6 @@ void NixieEffectShuffle::end() {
   if ( this->_el1 ) {
     this->_el1 = NULL;
   }
-  NixieEffect::end();
 } // NixieEffectShuffle::end()
 
 //============================================================================
@@ -382,8 +388,9 @@ void NixieEffectBlink::do_loop() {
  *
  */
 void NixieEffectBlink::end() {
+  NixieEffect::end();
+
   for (int i=0; i < this->_el_n; i++) {
     this->_el[i].set_brightness(this->_brightness[i]);
   } // for(i)
-  NixieEffect::end();
 } // NixieEffectBlink::end()
