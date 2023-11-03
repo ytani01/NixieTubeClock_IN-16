@@ -34,6 +34,12 @@
 [Button 0] + [Button 2]
 
 
+## WiFi Manager
+
+![WiFi Manger](docs/figs/WiFi_Manager.png)
+
+
+
 ## OLED
 
 ### OLED: NTP
@@ -52,7 +58,3 @@
 
 ### Shuffle
 [![Shuffle](docs/movies/shuffle.jpg)](https://youtu.be/e5-Y6pX2xRI?si=2QsZdDAW-V6RgD0h)
-
-## WiFi Manager
-
-![WiFi Manger](docs/figs/WiFi_Manager.png)
