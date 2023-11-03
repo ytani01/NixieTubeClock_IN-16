@@ -22,6 +22,7 @@
 #ifndef NIXIE_TUBE_H
 #define NIXIE_TUBE_H
 
+#include <map>
 #include "NixieElement.h"
 #include "NixieEffect.h"
 

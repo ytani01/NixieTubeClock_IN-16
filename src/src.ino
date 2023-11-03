@@ -27,8 +27,8 @@ bool Flag_ReqModeChange = false; // モード変更要求フラグ
 bool Flag_LoopRunning = false;   // モード内 loop() 実行中フラグ
 
 // I2C
-#define PIN_I2C_SDA 9
-#define PIN_I2C_SCL 8
+#define PIN_I2C_SDA 8
+#define PIN_I2C_SCL 9
 
 // RTC
 MyRtc *Rtc;
