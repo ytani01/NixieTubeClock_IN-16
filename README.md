@@ -8,11 +8,11 @@
 ## ◆ 特徴
 
 - WiFi対応で、インターネット(NTP)から常に正確な時刻を取得し、自動で時刻合わせします。
-- WiFiの設定は、スマートフォンから行います。
-- WiFiが使えないところでも、内部時計がバッテリーでバックアップされています。
+  - WiFiの設定は、スマートフォンから行います。
+  - WiFiが使えないところでも、内部時計がバッテリーでバックアップされています。
 - 底面に OLEDディスプレイがあり、WiFiの状態などを表示します。
-- ニキシー管ならではのエフェクトを切り替えることができます。
-  (クロスフェード、フォグ(霧)、シャッフル)
+- ニキシー管ならではの複数のエフェクトを切り替えることができます。
+  (エフェクトなし、クロスフェード、フォグ(霧)、シャッフル)
 
 ## ◆ ボタン操作
 
@@ -49,12 +49,14 @@
 
 ## ◆ WiFi 設定
 
-スマートフォンで、一旦、本時計に接続して、WiFiの設定を行います。
+スマートフォンで、一旦、本機のアクセスポイントに接続してWiFiの設定を行います。
+
+アクセスポイント名: NxClk_(固有のMACアドレス)
 
 ![WiFi Manger](docs/figs/WiFi_Manager.png)
 
 
-## OLED表示
+## ◆ OLED表示
 
 ### NTP
 ![OLED-NTP](docs/figs/OLED-NTP.jpg)
@@ -62,7 +64,8 @@
 ### OLED: RTC
 ![OLED-RTC](docs/figs/OLED-RTC.jpg)
 
-## Effects
+
+## ◆ Effects
 
 ### Crossfade
 [![Crossfade](docs/movies/crossfade.jpg)](https://youtu.be/TvNmbtA_Buw?si=GQT42kCDqJkb_wn9)
