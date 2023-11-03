@@ -1,6 +1,6 @@
 # Nixie Tube Clock: IN-16
 
-![](docs/fits/photo01.webp)
+![](docs/figs/photo01.webp)
 
 ## Buttons
 
