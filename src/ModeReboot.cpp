@@ -20,7 +20,7 @@ void ModeReboot::enter() {
 
   Nxa->set_string(VersionString.c_str());
   unsigned long ms = 80 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
-  Nxa->set_string("        ", NXA_EFFECT_XFADE, ms);
+  Nxa->set_string("        ", NXT_EFFECT_XFADE, ms);
   
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->display();

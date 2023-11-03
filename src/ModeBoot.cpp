@@ -20,7 +20,7 @@ void ModeBoot::enter() {
 
   Nxa->set_string("AABBCCDD");
   unsigned long ms = 80 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
-  Nxa->set_string(VersionString.c_str(), NXA_EFFECT_FOG, ms);
+  Nxa->set_string(VersionString.c_str(), NXT_EFFECT_FOG, ms);
 
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->setTextColor(WHITE, BLACK);

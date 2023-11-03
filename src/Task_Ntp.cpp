@@ -40,7 +40,6 @@ void Task_Ntp::start_sync() {
              this->ntp_svr[0].c_str(),
              this->ntp_svr[1].c_str(),
              this->ntp_svr[2].c_str());
-
 #if 0
   configTzTime("JST-9",
                ntp_svr[0].c_str(), ntp_svr[1].c_str(), ntp_svr[2].c_str());

@@ -226,7 +226,7 @@ void ModeClock::loop() {
   static std::string prev_nx_str = "";
 
   long nx_usec = tv->tv_usec;
-  if ( this->effect[this->conf->eff_i] != NXA_EFFECT_NONE ) {
+  if ( this->effect[this->conf->eff_i] != NXT_EFFECT_NONE ) {
     // T.B.D. effectする場合、少し進める
     nx_usec + 500000;
   }

@@ -26,9 +26,17 @@
 #include "NixieElement.h"
 #include "NixieEffect.h"
 
+typedef enum {
+  NXT_EFFECT_NONE,
+  NXT_EFFECT_XFADE,
+  NXT_EFFECT_SHUFFLE,
+  NXT_EFFECT_FOG,
+  NXT_EFFECT_SIZE
+} nxt_effect_t;
+
 class NixieTube {
  public:
-  int           element_n = 0;
+  int element_n = 0;
   NixieElement *element; // array
 
   NixieTube();
@@ -42,24 +50,13 @@ class NixieTube {
   void end_effect();
   bool effect_is_active();
 
-  NixieEffectFadeIn *ef_fadein;
-  NixieEffectFadeOut *ef_fadeout;
-  NixieEffectFog *ef_fog;
-  NixieEffectShuffle *ef_shuffle;
-  NixieEffectBlink *ef_blink;
+  std::map<std::string, NixieEffect *> ef;
 
-  void effect_one(int el_i);
-  void effect_fadein(int el_i, unsigned long ms, unsigned long start_ms=0);
-  void effect_fadeout(int el_i, unsigned long ms, unsigned long start_ms=0);
-  void effect_xfade(int el_src, int el_dst,
+  void ef_only(int el_i);
+  void ef_xfade(int el_src, int el_dst,
                     unsigned long ms, unsigned long start_ms=0);
-  void effect_fog(int el_i, unsigned long ms, unsigned long start_ms=0);
-  void effect_shuffle(int el_i, int n, unsigned long ms, unsigned long start_ms=0);
-  void effect_blink(unsigned long ms, unsigned long start_ms=0);
 
  private:
-  NixieEffect *_ef1 = NULL;
-  NixieEffect *_ef2 = NULL;
   brightness_t _brightness;
 }; // class NixieTube
 #endif // NIXIE_TUBE_H

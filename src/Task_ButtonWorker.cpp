@@ -78,13 +78,6 @@ void Task_ButtonWorker::loop() {
     } // if
   } // for(itr)
 
-#if 0
-  if ( millis() % 15000 == 0 ) {
-    log_i("=== uxTaskGetStackHighWaterMark = %d",
-          uxTaskGetStackHighWaterMark(NULL));
-  }
-#endif
-
   delay(10);
 } // Task_ButtonWorker::loop()
 

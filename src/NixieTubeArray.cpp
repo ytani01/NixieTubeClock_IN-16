@@ -110,24 +110,24 @@ void NixieTubeArray::end_all_effect() {
  *
  */
 void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
-                             nxa_effect_t effect, unsigned long ms,
+                             nxt_effect_t effect, unsigned long ms,
                              bool force_all) {
   for (int i=0; i < NIXIE_NUM_N; i++) {
     if ( (! force_all) && (num[i] == this->prev_num_int[i]) ) {
       continue;
     }
     switch ( effect ) {
-    case NXA_EFFECT_NONE:
-      this->num[i].effect_one(num[i]);
+    case NXT_EFFECT_NONE:
+      this->num[i].ef_only(num[i]);
       break;
-    case NXA_EFFECT_XFADE:
-      this->num[i].effect_xfade(this->prev_num_int[i], num[i], ms);
+    case NXT_EFFECT_XFADE:
+      this->num[i].ef_xfade(this->prev_num_int[i], num[i], ms);
       break;
-    case NXA_EFFECT_SHUFFLE:
-      this->num[i].effect_shuffle(num[i], 10, 20);
+    case NXT_EFFECT_SHUFFLE:
+      this->num[i].ef["shuffle"]->start(num[i], 10, 20);
       break;
-    case NXA_EFFECT_FOG:
-      this->num[i].effect_fog(num[i], ms/2);
+    case NXT_EFFECT_FOG:
+      this->num[i].ef["fog"]->start(num[i], ms/2);
       break;
     } // switch (effect)
 
@@ -139,24 +139,24 @@ void NixieTubeArray::set_num(uint8_t (&num)[NIXIE_NUM_N],
  *
  */
 void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
-                             nxa_effect_t effect, unsigned long ms,
+                             nxt_effect_t effect, unsigned long ms,
                              bool force_all) {
   for (int i=0; i < NIXIE_COLON_N; i++) {
     if ( (! force_all) && (col[i] == this->prev_col_int[i]) ) {
       continue;
     }
     switch ( effect ) {
-    case NXA_EFFECT_NONE:
-      this->colon[i].effect_one(col[i]);
+    case NXT_EFFECT_NONE:
+      this->colon[i].ef_only(col[i]);
       break;
-    case NXA_EFFECT_XFADE:
-      this->colon[i].effect_xfade(this->prev_col_int[i], col[i], ms);
+    case NXT_EFFECT_XFADE:
+      this->colon[i].ef_xfade(this->prev_col_int[i], col[i], ms);
       break;
-    case NXA_EFFECT_SHUFFLE:
-      this->colon[i].effect_xfade(this->prev_col_int[i], col[i], ms);
+    case NXT_EFFECT_SHUFFLE:
+      this->colon[i].ef["shuffle"]->start(col[i], 10, 20);
       break;
-    case NXA_EFFECT_FOG:
-      this->colon[i].effect_xfade(this->prev_col_int[i], col[i], ms);
+    case NXT_EFFECT_FOG:
+      this->colon[i].ef["fog"]->start(col[i], ms/2);
       break;
     } // switch (effect)
 
@@ -168,7 +168,7 @@ void NixieTubeArray::set_col(uint8_t (&col)[NIXIE_COLON_N],
  *
  */
 void NixieTubeArray::set_string(std::string str,
-                                nxa_effect_t effect, unsigned long ms,
+                                nxt_effect_t effect, unsigned long ms,
                                 bool force_all) {
   static std::string prev_str = "";
   

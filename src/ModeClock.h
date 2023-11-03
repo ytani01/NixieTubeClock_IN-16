@@ -36,11 +36,11 @@ class ModeClock: public Mode {
 
   bool demo_mode = false;
 
-  std::vector<nxa_effect_t> effect = {
-    NXA_EFFECT_XFADE,
-    NXA_EFFECT_NONE,
-    NXA_EFFECT_FOG,
-    NXA_EFFECT_SHUFFLE
+  std::vector<nxt_effect_t> effect = {
+    NXT_EFFECT_XFADE,
+    NXT_EFFECT_NONE,
+    NXT_EFFECT_FOG,
+    NXT_EFFECT_SHUFFLE
   };
   
   ModeClock();

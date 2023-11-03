@@ -11,9 +11,9 @@
 #include <chrono>
 
 /**
- * memory leak check
+ * memory check
  */
-bool chk_memleak(int sec, int unit=10);
+bool chk_mem(int sec, int unit=10);
 
 /**
  * MAC address

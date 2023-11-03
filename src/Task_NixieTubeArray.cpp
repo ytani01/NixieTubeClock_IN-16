@@ -37,24 +37,6 @@ void Task_NixieTubeArray::setup() {
   log_d("%s", this->conf.name.c_str());
 
   Nta->set_string("        ");
-#if 0
-  for (int i = 0; i < NIXIE_NUM_N; i++) {
-    for (int e=0; e < NIXIE_NUM_DIGIT_N; e++) {
-      NtaNumEl(i,e).set_brightness_to_max();
-      if ( this->init_val[i] == e ) {
-        NtaNumEl(i,e).set_brightness_to_max();
-      } else {
-        NtaNumEl(i,e).set_brightness(0);
-      }
-    } // for(e)
-  } // for(i)
-
-  for (int i=0; i < NIXIE_COLON_N; i++) {
-    Nta->colon[i].element[0].set_brightness_to_max();
-  } // for(i)
-  
-  log_i("uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
-#endif
 } // Task_NixieTubeArray::setup()
 
 /**
@@ -62,7 +44,7 @@ void Task_NixieTubeArray::setup() {
  */
 void Task_NixieTubeArray::loop() {
 #if 1
-  chk_memleak(60, 5);
+  chk_mem(60, 100);
 #endif
 
   if ( ! enable_update ) {

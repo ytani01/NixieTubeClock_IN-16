@@ -9,7 +9,7 @@
 /**
  * @brief check memory leak
  */
-bool chk_memleak(int sec, int unit) {
+bool chk_mem(int sec, int unit) {
   static uint32_t prev_ms = 0;
   static uint32_t prev_heap_size = 0;
   static uint32_t prev_stack_size = 0;

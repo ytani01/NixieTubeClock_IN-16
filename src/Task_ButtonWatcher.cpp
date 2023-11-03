@@ -72,13 +72,6 @@ void Task_ButtonWatcher::setup() {
  */
 void Task_ButtonWatcher::loop() {
   if ( this->worker == NULL ) {
-#if 0
-    if ( millis() % 1500 == 0 ) {
-      log_i("=== uxTaskGetStackHighWaterMark = %d",
-            uxTaskGetStackHighWaterMark(NULL));
-    }
-#endif
-    
     delay(1);
     return;
   }

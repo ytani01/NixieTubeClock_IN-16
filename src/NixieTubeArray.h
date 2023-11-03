@@ -25,14 +25,6 @@
 #include "NixieTube.h"
 #include "ConfFile_Brightness.h"
 
-typedef enum {
-  NXA_EFFECT_NONE,
-  NXA_EFFECT_XFADE,
-  NXA_EFFECT_SHUFFLE,
-  NXA_EFFECT_FOG,
-  NXA_EFFECT_SIZE
-} nxa_effect_t;
-
 class NixieTubeArray {
  public:
   static const unsigned int DISP_DELAY_US = 1; // microsec
@@ -54,15 +46,15 @@ class NixieTubeArray {
   void end_all_effect();
 
   void set_num(uint8_t (&num)[NIXIE_NUM_N],
-               nxa_effect_t effect=NXA_EFFECT_NONE,
+               nxt_effect_t effect=NXT_EFFECT_NONE,
                unsigned long ms=0, bool force_all=false);
 
   void set_col(uint8_t (&col)[NIXIE_COLON_N],
-               nxa_effect_t effect=NXA_EFFECT_NONE,
+               nxt_effect_t effect=NXT_EFFECT_NONE,
                unsigned long ms=0, bool force_all=false);
 
   void set_string(std::string str,
-                  nxa_effect_t effect=NXA_EFFECT_NONE,
+                  nxt_effect_t effect=NXT_EFFECT_NONE,
                   unsigned long ms=0, bool force_all=false);
   
   void display(unsigned long cur_ms);
