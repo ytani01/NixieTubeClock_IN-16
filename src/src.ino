@@ -20,15 +20,15 @@
 #include "ModeSetclock.h"
 #include "ModeScoreboard.h"
 
-std::string VersionString = " 2. 1. 3";
+std::string VersionString = " 2. 1. 4";
 
 // Mode
 bool Flag_ReqModeChange = false; // モード変更要求フラグ
 bool Flag_LoopRunning = false;   // モード内 loop() 実行中フラグ
 
 // I2C
-#define PIN_I2C_SDA 8
-#define PIN_I2C_SCL 9
+#define PIN_I2C_SDA 9
+#define PIN_I2C_SCL 8
 
 // RTC
 MyRtc *Rtc;
