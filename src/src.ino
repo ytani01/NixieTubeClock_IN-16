@@ -186,7 +186,7 @@ void setup() {
     delay(500);
   }
 #endif
-  log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
+  //log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
 
   // NixieTube
   log_i("=== Nixie Tube Array");
@@ -271,9 +271,10 @@ void setup() {
 
   enableIntr();
 
-  log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
-  log_i("=== start %s ===",
+  log_i("=== MAC address: %s ===",
         get_mac_addr_string().c_str());
+  log_i("========== CORE_DEBUG_LEVEL = %d\n", CORE_DEBUG_LEVEL);
+  chk_mem();
 } // setup()
 
 /**

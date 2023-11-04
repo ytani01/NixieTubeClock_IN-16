@@ -13,7 +13,7 @@
 /**
  * memory check
  */
-bool chk_mem(int sec, int unit=10);
+bool chk_mem(int sec=0, int unit=10);
 
 /**
  * MAC address
