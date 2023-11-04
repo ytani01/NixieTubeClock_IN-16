@@ -36,7 +36,10 @@ std::string datetime2string(DateTime *dt,
                             const char fmt[]="%Y/%m/%d(%a) %H:%M:%S");
 
 bool is_leap_year(int year);
+
 int last_day(int year, int month);
+
+std::string ms2string(unsigned long ms);
 
 /**
  * class name

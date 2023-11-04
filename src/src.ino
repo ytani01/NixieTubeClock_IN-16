@@ -318,7 +318,7 @@ void loop() {
   static unsigned long prev_ms = 0;
   unsigned long ms = millis();
 
-  static unsigned long interval = 2 * 60 * 1000;
+  static unsigned long interval = 1 * 60 * 1000;
   if ( ms - prev_ms > interval ) {
     std::deque<uint32_t> heap = chk_heap(5);
     std::string heap_str = "";
@@ -337,9 +337,9 @@ void loop() {
       }
     }
 
-    log_i("========== %s> heap:%s, interval: %u -> %u",
-          SysClock::now_string().c_str(),
-          heap_str.c_str(), prev_interval, interval);
+    log_i("========== %s> heap:%s, interval: %s -> %s",
+          SysClock::now_string().c_str(), heap_str.c_str(),
+          ms2string(prev_interval).c_str(), ms2string(interval).c_str());
     
     prev_ms = ms;
   } // if(interval)
