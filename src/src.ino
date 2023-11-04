@@ -278,8 +278,10 @@ void setup() {
   Mode::set("ModeBoot");
   delay(100);
 
+  // enable interrupt
   enableIntr();
 
+  // Heap check
   log_i("=== MAC address: %s ===",
         get_mac_addr_string().c_str());
   log_i("========== CORE_DEBUG_LEVEL = %d\n", CORE_DEBUG_LEVEL);
@@ -291,18 +293,8 @@ void setup() {
     heap_str += " " + std::to_string(h);
   }
 
-  unsigned long prev_interval = interval;
-    
-  if ( heap.size() >= 2 ) {
-    if ( heap[0] != heap[1] ) {
-      interval /= 2;
-    } else {
-      interval *= 2;
-    }
-  }
+  log_i("========== heap:%s", heap_str.c_str());
 
-  log_i("========== heap:%s, interval: %u -> %u",
-        heap_str.c_str(), prev_interval, interval);
 } // setup()
 
 /**

@@ -336,11 +336,12 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
     if ( bi->value == Button::OFF ) {
       if ( bi->click_count == 1 ) {
         if ( ! bi->long_pressed ) {
+          Nxa->end_all_effect();
+
           brightness_t bri = Nxa->brightness() / 2;
           if ( bri < BRIGHTNESS_MIN ) {
             bri = BRIGHTNESS_RESOLUTION;
           }
-          Nxa->end_all_effect();
           Nxa->set_brightness(bri);
           Nxa->display(millis());
           return;

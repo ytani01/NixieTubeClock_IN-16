@@ -7,11 +7,13 @@
  *
  */
 DateTime MyRtc::now() {
+  bool prev_flag_intr = Flag_enableIntr;
+  
   disableIntr();
 
   DateTime dt = MY_RTC::now();
 
-  if ( Flag_enableIntr ) {
+  if ( prev_flag_intr ) {
     enableIntr();
   }
 
@@ -22,11 +24,13 @@ DateTime MyRtc::now() {
  *
  */
 void MyRtc::adjust(const DateTime &dt) {
+  bool prev_flag_intr = Flag_enableIntr;
+
   disableIntr();
 
   MY_RTC::adjust(dt);
 
-  if ( Flag_enableIntr ) {
+  if ( prev_flag_intr ) {
     enableIntr();
   }
 } // MyRtc::adjust()
