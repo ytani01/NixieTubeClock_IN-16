@@ -34,7 +34,7 @@ Task_Ntp::Task_Ntp(String ntp_svr[],
  *
  */
 void Task_Ntp::start_sync() {
-  log_i("start sync: %s ..", SNTP_SYNC_STATUS_STR[this->prev_stat]);
+  log_d("start sync: %s ..", SNTP_SYNC_STATUS_STR[this->prev_stat]);
 
   configTime(9 * 3600L, 0,
              this->ntp_svr[0].c_str(),
@@ -105,7 +105,7 @@ void Task_Ntp::loop() {
    *   SNTP_SYNC_MODE_SMOOTHの同期中の場合は、SNTP_SYNC_STAUS_IN_PROGRESS)
    */
   this->info.sntp_stat = sntp_get_sync_status();
-  log_i("sntp_stat = %s ..", SNTP_SYNC_STATUS_STR[this->info.sntp_stat]);
+  log_d("sntp_stat = %s ..", SNTP_SYNC_STATUS_STR[this->info.sntp_stat]);
 
   if ( this->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
     interval = INTERVAL_NORMAL;    

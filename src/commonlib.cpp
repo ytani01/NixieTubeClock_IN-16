@@ -33,6 +33,25 @@ bool chk_mem(int sec, int unit) {
   return false;
 } // chk_memleak()
 
+/**
+ *
+ */
+std::deque<uint32_t> chk_heap(size_t q_size) {
+  static std::deque<uint32_t> hist;
+
+  log_v("heap.size():%d", hist.size());
+
+  if ( q_size != 0 ) {
+    while ( hist.size() >= (q_size - 1) ) {
+      hist.pop_back();
+    }
+  }
+
+  hist.push_front(esp_get_free_heap_size());
+
+  return hist;
+} // chk_heap()
+
 // ===========================================================================
 // MAC address
 // ===========================================================================

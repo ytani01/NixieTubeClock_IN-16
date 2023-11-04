@@ -43,7 +43,7 @@ void Task_NixieTubeArray::setup() {
  *
  */
 void Task_NixieTubeArray::loop() {
-#if 1
+#if 0
   chk_mem(60, 100);
 #endif
 

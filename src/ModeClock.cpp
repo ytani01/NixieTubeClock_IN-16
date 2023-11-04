@@ -17,8 +17,8 @@ ModeClock::ModeClock(): Mode() {
     this->conf->clock_mode = CLOCK_MODE_HMS;
     this->conf->save();
   }
-  if ( this->conf->eff_i >= this->effect.size() ) {
-    this->conf->eff_i = 0;
+  if ( this->conf->effect_i >= this->effect.size() ) {
+    this->conf->effect_i = 0;
     this->conf->save();
   }
   
@@ -228,7 +228,7 @@ void ModeClock::loop() {
   static std::string prev_nx_str = "";
 
   long nx_usec = tv->tv_usec;
-  if ( this->effect[this->conf->eff_i] != NXT_EFFECT_NONE ) {
+  if ( this->effect[this->conf->effect_i] != NXT_EFFECT_NONE ) {
     // T.B.D. effectする場合、少し進める
     nx_usec + 500000;
   }
@@ -247,14 +247,14 @@ void ModeClock::loop() {
     prev_clock_mode = this->clock_mode;
   }
 
-  if ( demo_mode ) {
+  if ( this->conf->demo_mode ) {
     force_all = true;
   }
 
   if ( nx_str != prev_nx_str ) {
     unsigned long ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
-    Nxa->set_string(nx_str.c_str(), this->effect[this->conf->eff_i], ms,
-                    force_all);
+    Nxa->set_string(nx_str.c_str(), this->effect[this->conf->effect_i],
+                    ms, force_all);
   }
   prev_nx_str = nx_str;
 
@@ -281,7 +281,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
 
     // Btn1:OFF
     if ( bi->click_count == 2 ) {
-      this->conf->eff_i = (this->conf->eff_i + 1) % this->effect.size();
+      this->conf->effect_i = (this->conf->effect_i + 1) % this->effect.size();
       this->conf->save();
       return;
     }
@@ -351,8 +351,10 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
     if ( bi->value == Button::ON ) {
       if ( bi->long_pressed ) {
         if ( bi->repeat_count == 0 ) {
-          this->demo_mode = ! this->demo_mode;
-          log_i("demo_mode = %s", this->demo_mode ? "true" : "false");
+          this->conf->demo_mode = ! this->conf->demo_mode;
+          log_i("demo_mode = %s", this->conf->demo_mode ? "true" : "false");
+
+          this->conf->save();
           return;
         } // if (repeat_count == 0)
       } // if (long_pressed)

@@ -9,11 +9,13 @@
 #include <esp32-hal-log.h>
 #include <RTClib.h>
 #include <chrono>
+#include <deque>
 
 /**
  * memory check
  */
 bool chk_mem(int sec=0, int unit=10);
+std::deque<uint32_t> chk_heap(size_t q_size=0);
 
 /**
  * MAC address
