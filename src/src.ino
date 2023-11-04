@@ -144,21 +144,19 @@ void cbNtp(Task_NtpInfo_t *ni) {
     DateTime prev_dt = Rtc->now();
     std::string prev_dt_string = datetime2string(&prev_dt);
 
-    struct tm *tm_sys = SysClock::now_tm();
-    std::string tm_sys_string = tm2string(tm_sys);
+    struct tm *now_sys = SysClock::now_tm();
+    std::string now_sys_string = tm2string(now_sys);
 
-    Rtc->adjust(tm_sys);
+    Rtc->adjust(now_sys);
 
-    DateTime now_dt = Rtc->now();
-    std::string now_dt_string = datetime2string(&now_dt);
+    DateTime now_rtc = Rtc->now();
+    std::string now_rtc_string = datetime2string(&now_rtc);
 
-    if ( prev_dt_string != now_dt_string ) {
-      log_i("== adjust RTC from NTP: now RTC     : %s",
-            now_dt_string.c_str());
-      log_i("                        src Sys(NTP): %s",
-            tm2string(tm_sys).c_str());
-      log_i("                        dst RTC     : %s",
-            datetime2string(&now_dt).c_str());
+    if ( prev_dt_string != now_rtc_string ) {
+      log_i("== adjust RTC from NTP");
+      log_i("  prev RTC     : %s", prev_dt_string.c_str());
+      log_i("  src  Sys(NTP): %s", now_sys_string.c_str());
+      log_i("  dst  RTC     : %s", now_rtc_string.c_str());
     }
   } else {
     //
@@ -168,17 +166,17 @@ void cbNtp(Task_NtpInfo_t *ni) {
     //
     std::string prev_sys_string = SysClock::now_string();
 
-    DateTime now_dt = Rtc->now();
-    std::string now_rtc_string = datetime2string(&now_dt);
+    DateTime now_rtc = Rtc->now();
+    std::string now_rtc_string = datetime2string(&now_rtc);
 
-    SysClock::set(&now_dt);
+    SysClock::set(&now_rtc);
     std::string now_sys_string = SysClock::now_string();
 
     if ( prev_sys_string != now_sys_string ) {
-      log_i("== adjust system clock from RTC: src RTC: %s",
-            now_rtc_string.c_str());
-      log_i("                                 dst Sys: %s",
-            now_sys_string.c_str());
+      log_i("== adjust system clock from RTC");
+      log_i("  prev Sys: %s", prev_sys_string.c_str());
+      log_i("  src  RTC: %s", now_rtc_string.c_str());
+      log_i("  dst  Sys: %s", now_sys_string.c_str());
     }
   } // if (SNTP_SYNC_STATUS_COMPLETED)
 
