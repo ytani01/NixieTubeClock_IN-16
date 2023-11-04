@@ -32,7 +32,7 @@ void ModeSetclock::enter() {
   Disp->setTextColor(WHITE, BLACK);
 
   Disp->setFont(NULL);
-  Disp->setTextSize(1);
+  Disp->setTextSize(2);
   Disp->setCursor(0, 0);
   Disp->setTextWrap(true);
   Disp->printf("%s", this->name.c_str());
@@ -51,110 +51,6 @@ void ModeSetclock::exit() {
  */
 void ModeSetclock::loop() {
   unsigned long cur_ms = millis();
-  struct timeval *tv = SysClock::now_timeval();
-
-  //
-  // WiFi status
-  //
-  static wifi_mgr_mode_t prev_wifimgr_mode = WIFI_MGR_MODE_NONE;
-  wifi_mgr_mode_t wifimgr_mode = TaskWifiMgr->mode;
-
-  if ( wifimgr_mode != prev_wifimgr_mode ) {
-    log_i("wifimgr_mode = %d:%s",
-          wifimgr_mode, WIFI_MGR_MODE_T_STR[wifimgr_mode]);
-
-    prev_wifimgr_mode = wifimgr_mode;
-  }
-
-  static wl_status_t prev_wl_stat = WL_IDLE_STATUS;
-  wl_status_t wl_stat = TaskWifiMgr->wl_stat;
-
-  if ( wl_stat != prev_wl_stat ) {
-    log_i("wl_stat = %d:%s",
-          wl_stat, WL_STATUS_T_STR2(wl_stat));
-
-    if ( wl_stat == WL_CONNECTED ) {
-      log_i("SSID: %s", TaskWifiMgr->cur_ssid.c_str());
-    }
-
-    prev_wl_stat = wl_stat;
-  }
-
-  //
-  // Disp
-  //
-  char *fmt_date, *fmt_time;
-
-  fmt_date = (char *)"%Y/%m/%d(%a)";
-  if ( tv->tv_sec % 2 == 0 ) {
-    fmt_time =(char *)"%H:%M:%S";
-  } else {
-    fmt_time =(char *)"%H %M %S";
-  }
-
-  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
-  Disp->setCursor(0, 0);
-  Disp->setTextSize(1);
-  Disp->setTextColor(WHITE, BLACK);
-
-  struct tm *tm = SysClock::now_tm();
-  Disp->printf("%s", tm2string(tm, fmt_date).c_str());
-
-  if ( wifimgr_mode == WIFI_MGR_MODE_AP ) {
-    Disp->printf("  RTC");
-  } else {
-    if ( TaskNtp->info.sntp_stat == SNTP_SYNC_STATUS_COMPLETED ) {
-      Disp->printf("  NTP");
-    } else {
-      if ( wl_stat == WL_CONNECTED ) {
-        if ( millis() % 500 >= 250 ) {
-          Disp->printf("  NTP");
-        }
-      } else {
-        if ( millis() % 1500 >= 750 ) {
-          Disp->printf("  NTP");
-        }
-      }
-    }
-  }
-  Disp->printf("\n");
-  
-  Disp->printf("     %s\n", tm2string(tm, fmt_time).c_str());
-
-  if ( wifimgr_mode == WIFI_MGR_MODE_STA ) {
-    if ( wl_stat == WL_CONNECTED ) {
-      Disp->printf("%s\n", TaskWifiMgr->cur_ssid.c_str());
-      Disp->printf("%s\n", WiFi.localIP().toString().c_str());
-    } else {
-      Mode::disp_spin(100);
-      if ( cur_ms % 1000 > 500 ) {
-        static wl_status_t prev_wl_stat = WL_IDLE_STATUS;
-        static WiFiEvent_t prev_evid = (WiFiEvent_t)NULL;
-        static char *str = (char *)"";
-        if ( wl_stat != prev_wl_stat ) {
-          str = (char *)WL_STATUS_T_STR2(wl_stat);
-          prev_wl_stat = wl_stat;
-        }
-        if ( Task_WifiMgr::LastEvId != prev_evid ) {
-          str = Task_WifiMgr::LastEvStr;
-          prev_evid = Task_WifiMgr::LastEvId;
-        }
-        Disp->printf("%s\n", str);
-      } else {
-        Disp->printf("\n");
-      }
-    }
-  } else { // WIFI_MGR_MODE_AP
-    if ( cur_ms % 5000 >= 0 ) {
-      Disp->printf("<<WiFi Setup SSID>>\n%s\n", TaskWifiMgr->ap_ssid.c_str());
-    } else {
-      Disp->printf("\n\n");
-    }
-  }
-  
-  Disp->printf("%s", get_mac_addr_string().c_str());
-
-  Disp->display();
 
   if ( ! this->flag_nx_update ) {
     delayOrChangeMode(this->LOOP_DELAY_MS);
@@ -162,6 +58,72 @@ void ModeSetclock::loop() {
   }
   this->flag_nx_update = false;
     
+  //
+  // Disp
+  //
+  Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
+  Disp->setCursor(0, 0);
+  //Disp->setTextSize(2);
+
+  char yy_str[3], mm_str[3], dd_str[3], HH_str[3], MM_str[3], SS_str[3];
+  
+  Disp->setTextColor(WHITE, BLACK);
+  Disp->printf("20");
+  if ( this->pos == SETCLOCK_POS_YEAR ) {
+    Disp->setTextColor(BLACK, WHITE);
+  } else {
+    Disp->setTextColor(WHITE, BLACK);
+  }
+  Disp->printf("%02d", this->val[VAL_IDX_YEAR]);
+  Disp->setTextColor(WHITE, BLACK);
+  Disp->printf("/");
+    
+  if ( this->pos == SETCLOCK_POS_MONTH ) {
+    Disp->setTextColor(BLACK, WHITE);
+  } else {
+    Disp->setTextColor(WHITE, BLACK);
+  }
+  Disp->printf("%02d", this->val[VAL_IDX_MONTH]);
+  Disp->setTextColor(WHITE, BLACK);
+  Disp->printf("/");
+    
+  if ( this->pos == SETCLOCK_POS_DAY ) {
+    Disp->setTextColor(BLACK, WHITE);
+  } else {
+    Disp->setTextColor(WHITE, BLACK);
+  }
+  Disp->printf("%02d", this->val[VAL_IDX_DAY]);
+  Disp->setTextColor(WHITE, BLACK);
+  Disp->printf("\n");
+    
+  Disp->printf(" ");
+  if ( this->pos == SETCLOCK_POS_HOUR ) {
+    Disp->setTextColor(BLACK, WHITE);
+  } else {
+    Disp->setTextColor(WHITE, BLACK);
+  }
+  Disp->printf("%02d", this->val[VAL_IDX_HOUR]);
+  Disp->setTextColor(WHITE, BLACK);
+  Disp->printf(":");
+    
+  if ( this->pos == SETCLOCK_POS_MINUTE ) {
+    Disp->setTextColor(BLACK, WHITE);
+  } else {
+    Disp->setTextColor(WHITE, BLACK);
+  }
+  Disp->printf("%02d", this->val[VAL_IDX_MINUTE]);
+  Disp->setTextColor(WHITE, BLACK);
+  Disp->printf(":");
+    
+  if ( this->pos == SETCLOCK_POS_SEC ) {
+    Disp->setTextColor(BLACK, WHITE);
+  } else {
+    Disp->setTextColor(WHITE, BLACK);
+  }
+  Disp->printf("%02d", this->val[VAL_IDX_SEC]);
+
+  Disp->display();
+
   //
   // NixieTubeArray
   //

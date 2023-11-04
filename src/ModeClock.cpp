@@ -17,8 +17,8 @@ ModeClock::ModeClock(): Mode() {
     this->conf->clock_mode = CLOCK_MODE_HMS;
     this->conf->save();
   }
-  if ( this->conf->eff_i >= this->effect.size() ) {
-    this->conf->eff_i = 0;
+  if ( this->conf->effect_i >= this->effect.size() ) {
+    this->conf->effect_i = 0;
     this->conf->save();
   }
   
@@ -128,7 +128,9 @@ void ModeClock::loop() {
   }
   Disp->printf("\n");
   
-  Disp->printf("     %s\n", tm2string(tm, fmt_time).c_str());
+  Disp->printf(" %s    %7u\n",
+               tm2string(tm, fmt_time).c_str(),
+               esp_get_free_heap_size());
 
   if ( wifimgr_mode == WIFI_MGR_MODE_STA ) {
     if ( wl_stat == WL_CONNECTED ) {
@@ -226,7 +228,7 @@ void ModeClock::loop() {
   static std::string prev_nx_str = "";
 
   long nx_usec = tv->tv_usec;
-  if ( this->effect[this->conf->eff_i] != NXT_EFFECT_NONE ) {
+  if ( this->effect[this->conf->effect_i] != NXT_EFFECT_NONE ) {
     // T.B.D. effectする場合、少し進める
     nx_usec + 500000;
   }
@@ -245,14 +247,14 @@ void ModeClock::loop() {
     prev_clock_mode = this->clock_mode;
   }
 
-  if ( demo_mode ) {
+  if ( this->conf->demo_mode ) {
     force_all = true;
   }
 
   if ( nx_str != prev_nx_str ) {
     unsigned long ms = 30 * (BRIGHTNESS_RESOLUTION / Nxa->brightness());
-    Nxa->set_string(nx_str.c_str(), this->effect[this->conf->eff_i], ms,
-                    force_all);
+    Nxa->set_string(nx_str.c_str(), this->effect[this->conf->effect_i],
+                    ms, force_all);
   }
   prev_nx_str = nx_str;
 
@@ -271,23 +273,41 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
     if ( bi->value == Button::ON ) {
       if ( bi->long_pressed ) {
         if ( bi->repeat_count == 0 ) {
+          //
+          // ModeSetclock
+          //
           Mode::set("ModeSetclock");
           return;
-        }
-      }
-    }
+        } // if (repeat_count == 0)
 
-    // Btn1:OFF
-    if ( bi->click_count == 2 ) {
-      this->conf->eff_i = (this->conf->eff_i + 1) % this->effect.size();
-      this->conf->save();
-      return;
-    }
+        return;
+      } // if (long_pressed)
 
-    if ( bi->click_count == 3 ) {
-      Mode::set("ModeScoreboard");
       return;
-    }
+    } // if (Btn0:ON)
+
+    // Btn0:OFF
+    if ( bi->value == Button::OFF ) {
+      if ( bi->click_count == 2 ) {
+        //
+        // change effect
+        //
+        this->conf->effect_i = (this->conf->effect_i + 1) % this->effect.size();
+        this->conf->save();
+        return;
+      } // if (click_count == 2)
+
+      if ( bi->click_count == 3 ) {
+        //
+        // Mode: Scoreboard
+        //
+        Mode::set("ModeScoreboard");
+        return;
+      } // if (click_count == 3)
+
+      return;
+    } // if (OFF)
+
     return;
   } // if (Btn0)
 
@@ -295,7 +315,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
     if ( bi->value == Button::ON ) {
       if ( ! bi->long_pressed ) {
         //
-        // Btn1: single short push
+        // change clock mode (display date)
         //
         if ( this->clock_mode != CLOCK_MODE_ymd ) {
           this->clock_mode = CLOCK_MODE_ymd;
@@ -309,7 +329,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
       } else { // long_pressed
         if ( bi->repeat_count == 1 ) {
           //
-          // Btn1: long pressed(1)
+          // change clock main mode ("HH:MM:SS" <-> "dd HH:MM")
           //
           if ( this->clock_mode_main == CLOCK_MODE_HMS ) {
             this->clock_mode_main = CLOCK_MODE_dHM;
@@ -323,39 +343,67 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
           this->clock_mode = this->clock_mode_main;
           this->date_start_ms = 0;
           return;
-        } // if (repeat_count==0)
+        } // if (repeat_count==1)
+        return;
       } // if (!long_pressed)
+      return;
     } // if (ON)
-
     return;
   } // if (Btn1)
 
   if ( String(bi->name) == "Btn2" ) {
     if ( bi->value == Button::OFF ) {
-      if ( bi->click_count == 1 ) {
-        if ( ! bi->long_pressed ) {
+      if ( ! bi->long_pressed ) {
+        if ( bi->click_count == 1 ) {
+          //
+          // change brightness
+          //
+          Nxa->end_all_effect();
+
           brightness_t bri = Nxa->brightness() / 2;
           if ( bri < BRIGHTNESS_MIN ) {
             bri = BRIGHTNESS_RESOLUTION;
           }
-          Nxa->end_all_effect();
+
           Nxa->set_brightness(bri);
           Nxa->display(millis());
           return;
-        } // if ( !long_pressed )
-      } // if (click_count == 1 )
-    } // if (OFF)
+        } // if (click_count == 1)
+
+        if ( bi->click_count == 2 ) {
+          //
+          // change effect
+          //
+          this->conf->effect_i = (this->conf->effect_i + 1) % this->effect.size();
+          this->conf->save();
+          return;
+        } // if (click_count == 2)
+        
+        return;
+      } // if ( !long_pressed )
+      
+      return;
+    } // if (Btn2:OFF)
 
     if ( bi->value == Button::ON ) {
       if ( bi->long_pressed ) {
         if ( bi->repeat_count == 0 ) {
-          this->demo_mode = ! this->demo_mode;
-          log_i("demo_mode = %s", this->demo_mode ? "true" : "false");
+          //
+          // demo mode: all effect tube
+          //
+          this->conf->demo_mode = ! this->conf->demo_mode;
+          log_i("demo_mode = %s", this->conf->demo_mode ? "true" : "false");
+
+          this->conf->save();
           return;
         } // if (repeat_count == 0)
+        
+        return;
       } // if (long_pressed)
-    } // if (ON)
-
+      
+      return;
+    } // if (Btn2:ON)
+    
     return;
   } // if (Btn2)
 

@@ -30,7 +30,7 @@ public:
 
   static const unsigned long INTERVAL_NORMAL = 1 * 60 * 1000; // ms
   static const unsigned long INTERVAL_PROGRESS = 10 * 1000; // ms
-  static const unsigned long INTERVAL_NO_WIFI = 5 * 1000; // ms
+  static const unsigned long INTERVAL_NO_WIFI = 10 * 1000; // ms
   
   String *ntp_svr;
 

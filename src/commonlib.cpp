@@ -33,6 +33,26 @@ bool chk_mem(int sec, int unit) {
   return false;
 } // chk_memleak()
 
+/**
+ *
+ */
+std::deque<uint32_t> chk_heap(size_t q_size) {
+  static std::deque<uint32_t> hist;
+
+  log_v("heap.size():%d", hist.size());
+
+  if ( q_size > 0 ) {
+    while ( hist.size() >= q_size ) {
+      hist.pop_back();
+    }
+  }
+
+  hist.push_front(esp_get_free_heap_size());
+  log_v("heap.size():%d", hist.size());
+
+  return hist;
+} // chk_heap()
+
 // ===========================================================================
 // MAC address
 // ===========================================================================
@@ -123,3 +143,64 @@ int last_day(int year, int month) {
   }
   return 31;
 } // getLastDayOfMonth()
+
+/**
+ *
+ */
+std::string ms2string(unsigned long ms) {
+  if ( ms < 1000 ) {
+    return std::to_string(ms) + "ms";
+  }
+
+  unsigned long sec = ms / 1000;
+  ms %= 1000;
+
+  char ms_str[4];
+  sprintf(ms_str, ".%03d", ms);
+
+  if ( sec < 60 ) {
+    return std::to_string(sec)
+      + std::string(ms_str);
+  }
+
+  // sec >= 60
+
+  unsigned long minute = sec / 60;
+  sec %= 60;
+
+  char sec_str[3];
+  sprintf(sec_str, ":%02d", sec);
+  
+  if ( minute < 60 ) {
+    return std::to_string(minute)
+      + std::string(sec_str)
+      + std::string(ms_str);
+  }
+
+  // minute >= 60
+
+  unsigned long hour = minute / 60;
+  minute %= 60;
+  char minute_str[3];
+  sprintf(minute_str, ":%02d", minute);
+
+  if ( hour < 24 ) {
+    return std::to_string(hour)
+      + std::string(minute_str)
+      + std::string(sec_str)
+      + std::string(ms_str);
+  }
+
+  // hour >= 24
+
+  unsigned long day = hour / 24;
+  hour %= 24;
+  char hour_str[3];
+  sprintf(hour_str, "_%02d", hour);
+  
+  return std::to_string(day)
+    + std::string(hour_str)
+    + std::string(minute_str)
+    + std::string(sec_str)
+    + std::string(ms_str);
+} // ms2string()

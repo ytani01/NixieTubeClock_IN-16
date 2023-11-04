@@ -20,7 +20,7 @@
 #include "ModeSetclock.h"
 #include "ModeScoreboard.h"
 
-std::string VersionString = " 2. 1. 4";
+std::string VersionString = " 2. 1. 5";
 
 // Mode
 bool Flag_ReqModeChange = false; // モード変更要求フラグ
@@ -141,37 +141,44 @@ void cbNtp(Task_NtpInfo_t *ni) {
     //
     // adjust RTC
     //
-    log_i("== adjust RTC from NTP");
+    DateTime prev_dt = Rtc->now();
+    std::string prev_dt_string = datetime2string(&prev_dt);
 
-    DateTime now_dt = Rtc->now();
-    log_i("  now RTC     : %s",
-          datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+    struct tm *now_sys = SysClock::now_tm();
+    std::string now_sys_string = tm2string(now_sys);
 
-    struct tm *tm_sys = SysClock::now_tm();
-    log_i("  src Sys(NTP): %s",
-          tm2string(tm_sys, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+    Rtc->adjust(now_sys);
 
-    Rtc->adjust(tm_sys);
-    
-    now_dt = Rtc->now();
-    log_i("  dst RTC     : %s",
-          datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+    DateTime now_rtc = Rtc->now();
+    std::string now_rtc_string = datetime2string(&now_rtc);
+
+    if ( prev_dt_string != now_rtc_string ) {
+      log_i("== adjust RTC from NTP");
+      log_i("  prev RTC     : %s", prev_dt_string.c_str());
+      log_i("  src  Sys(NTP): %s", now_sys_string.c_str());
+      log_i("  dst  RTC     : %s", now_rtc_string.c_str());
+    }
   } else {
     //
     // NTP is not available
     //
     // adjust system clock from RTC
     //
-    log_i("== adjust system clock from RTC");
+    std::string prev_sys_string = SysClock::now_string();
 
-    DateTime now_dt = Rtc->now();
-    log_i("  src RTC: %s",
-          datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
+    DateTime now_rtc = Rtc->now();
+    std::string now_rtc_string = datetime2string(&now_rtc);
 
-    SysClock::set(&now_dt);
+    SysClock::set(&now_rtc);
+    std::string now_sys_string = SysClock::now_string();
 
-    log_i("  dst Sys: %s", SysClock::now_string().c_str());
-  }
+    if ( prev_sys_string != now_sys_string ) {
+      log_i("== adjust system clock from RTC");
+      log_i("  prev Sys: %s", prev_sys_string.c_str());
+      log_i("  src  RTC: %s", now_rtc_string.c_str());
+      log_i("  dst  Sys: %s", now_sys_string.c_str());
+    }
+  } // if (SNTP_SYNC_STATUS_COMPLETED)
 
   prev_sntp_stat = ni->sntp_stat;
 } // cbNtp()
@@ -186,7 +193,7 @@ void setup() {
     delay(500);
   }
 #endif
-  log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
+  //log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
 
   // NixieTube
   log_i("=== Nixie Tube Array");
@@ -269,11 +276,23 @@ void setup() {
   Mode::set("ModeBoot");
   delay(100);
 
+  // enable interrupt
   enableIntr();
 
-  log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
-  log_i("=== start %s ===",
+  // Heap check
+  log_i("=== MAC address: %s ===",
         get_mac_addr_string().c_str());
+  log_i("========== CORE_DEBUG_LEVEL = %d\n", CORE_DEBUG_LEVEL);
+
+  std::deque<uint32_t> heap = chk_heap(5);
+  std::string heap_str = "";
+
+  for (auto h: heap) {
+    heap_str += " " + std::to_string(h);
+  }
+
+  log_i("========== heap:%s", heap_str.c_str());
+
 } // setup()
 
 /**
@@ -293,6 +312,37 @@ unsigned long delayOrChangeMode(unsigned long ms) {
  *
  */
 void loop() {
+#if 1
+  static unsigned long prev_ms = 0;
+  unsigned long ms = millis();
+
+  static unsigned long interval = 1 * 60 * 1000;
+  if ( ms - prev_ms > interval ) {
+    std::deque<uint32_t> heap = chk_heap(5);
+    std::string heap_str = "";
+
+    for (auto h: heap) {
+      heap_str += " " + std::to_string(h);
+    }
+
+    unsigned long prev_interval = interval;
+    
+    if ( heap.size() >= 2 ) {
+      if ( heap[0] != heap[1] ) {
+        interval /= 2;
+      } else {
+        interval *= 2;
+      }
+    }
+
+    log_i("========== %s> heap:%s, interval: %s -> %s",
+          SysClock::now_string().c_str(), heap_str.c_str(),
+          ms2string(prev_interval).c_str(), ms2string(interval).c_str());
+    
+    prev_ms = ms;
+  } // if(interval)
+#endif
+
   if ( Mode::Cur ) {
     Flag_LoopRunning = true;
     Mode::Cur->loop();
@@ -311,12 +361,15 @@ void loop() {
       //delayMicroseconds(1); // X
       //ets_delay_us(1); // X
       wait_count++;
+      
       auto xLastTime = xTaskGetTickCount();
       vTaskDelayUntil(&xLastTime, 1);
     }
     if ( wait_count > 0 ) {
       log_i("wait_count=%u", wait_count);
     }
+    auto xLastTime = xTaskGetTickCount();
+    vTaskDelayUntil(&xLastTime, 1);
   } else {
     log_e("Mode::Cur == NULL !?");
     delayOrChangeMode(2000);

@@ -352,7 +352,10 @@ void Task_WifiMgr::loop_ap_mode() {
   while ( true ) {
     this->dns_svr.processNextRequest();
     Task_WifiMgr::web_svr.handleClient();
-    delay(10);
+
+    //delay(10);
+    auto xLastTime = xTaskGetTickCount();
+    vTaskDelayUntil(&xLastTime, 1);
   }
   
   this->mode = WIFI_MGR_MODE_STA;

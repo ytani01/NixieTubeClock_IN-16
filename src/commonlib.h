@@ -9,11 +9,13 @@
 #include <esp32-hal-log.h>
 #include <RTClib.h>
 #include <chrono>
+#include <deque>
 
 /**
  * memory check
  */
-bool chk_mem(int sec, int unit=10);
+bool chk_mem(int sec=0, int unit=10);
+std::deque<uint32_t> chk_heap(size_t q_size=0);
 
 /**
  * MAC address
@@ -34,7 +36,10 @@ std::string datetime2string(DateTime *dt,
                             const char fmt[]="%Y/%m/%d(%a) %H:%M:%S");
 
 bool is_leap_year(int year);
+
 int last_day(int year, int month);
+
+std::string ms2string(unsigned long ms);
 
 /**
  * class name
