@@ -68,7 +68,7 @@ void ModeSetclock::loop() {
   char yy_str[3], mm_str[3], dd_str[3], HH_str[3], MM_str[3], SS_str[3];
   
   Disp->setTextColor(WHITE, BLACK);
-  Disp->printf(" ");
+  Disp->printf("20");
   if ( this->pos == SETCLOCK_POS_YEAR ) {
     Disp->setTextColor(BLACK, WHITE);
   } else {
