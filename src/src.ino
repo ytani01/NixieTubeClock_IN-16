@@ -337,7 +337,8 @@ void loop() {
       }
     }
 
-    log_i("========== heap:%s, interval: %u -> %u",
+    log_i("========== %s> heap:%s, interval: %u -> %u",
+          SysClock::now_string().c_str(),
           heap_str.c_str(), prev_interval, interval);
     
     prev_ms = ms;

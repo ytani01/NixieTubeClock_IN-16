@@ -41,13 +41,14 @@ std::deque<uint32_t> chk_heap(size_t q_size) {
 
   log_v("heap.size():%d", hist.size());
 
-  if ( q_size != 0 ) {
-    while ( hist.size() >= (q_size - 1) ) {
+  if ( q_size > 0 ) {
+    while ( hist.size() >= q_size ) {
       hist.pop_back();
     }
   }
 
   hist.push_front(esp_get_free_heap_size());
+  log_i("heap.size():%d", hist.size());
 
   return hist;
 } // chk_heap()
