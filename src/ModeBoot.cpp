@@ -100,8 +100,16 @@ void ModeBoot::cbBtn(ButtonInfo_t *bi,
 
   if ( String(bi->name) == "Btn0" ) {
     if ( bi->value == Button::ON ) {
+      //
+      // WiFi OFF (AP mode)
+      //
       WiFi.disconnect();
       TaskWifiMgr->mode = WIFI_MGR_MODE_AP;
-    }
-  }
+      log_i("force WiFi OFF (AP mode)");
+      return;
+    } // if (ON)
+
+    return;
+  } // if (Btn0)
+  
 } // ModeBoot::cbBtn()
