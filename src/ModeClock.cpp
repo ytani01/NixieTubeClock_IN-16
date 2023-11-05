@@ -128,9 +128,12 @@ void ModeClock::loop() {
   }
   Disp->printf("\n");
   
+#if 0
   Disp->printf(" %s    %7u\n",
                tm2string(tm, fmt_time).c_str(),
                esp_get_free_heap_size());
+#endif
+  Disp->printf("     %s\n", tm2string(tm, fmt_time).c_str());
 
   if ( wifimgr_mode == WIFI_MGR_MODE_STA ) {
     if ( wl_stat == WL_CONNECTED ) {
