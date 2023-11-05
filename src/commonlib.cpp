@@ -155,7 +155,7 @@ std::string ms2string(unsigned long ms) {
   unsigned long sec = ms / 1000;
   ms %= 1000;
 
-  char ms_str[4];
+  char ms_str[5];
   sprintf(ms_str, ".%03d", ms);
 
   if ( sec < 60 ) {
@@ -168,7 +168,7 @@ std::string ms2string(unsigned long ms) {
   unsigned long minute = sec / 60;
   sec %= 60;
 
-  char sec_str[3];
+  char sec_str[4];
   sprintf(sec_str, ":%02d", sec);
   
   if ( minute < 60 ) {
@@ -181,7 +181,8 @@ std::string ms2string(unsigned long ms) {
 
   unsigned long hour = minute / 60;
   minute %= 60;
-  char minute_str[3];
+
+  char minute_str[4];
   sprintf(minute_str, ":%02d", minute);
 
   if ( hour < 24 ) {
@@ -195,7 +196,8 @@ std::string ms2string(unsigned long ms) {
 
   unsigned long day = hour / 24;
   hour %= 24;
-  char hour_str[3];
+
+  char hour_str[4];
   sprintf(hour_str, "_%02d", hour);
   
   return std::to_string(day)
