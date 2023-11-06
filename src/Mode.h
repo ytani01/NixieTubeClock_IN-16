@@ -4,7 +4,7 @@
 #ifndef _MODE_H_
 #define _MODE_H_
 
-#include <Arduino.h>
+//#include <Arduino.h>
 #include <esp32-hal-log.h>
 #include <map>
 #include "commonlib.h"
@@ -44,7 +44,7 @@ public:
   static Mode *Cur;
   static Mode *Prev;
 
-  String name = "";
+  std::string name = "";
 
   bool btn_enable = true;
 
@@ -58,8 +58,8 @@ public:
   virtual void cbBtn(ButtonInfo_t *bi,
                      std::map<std::string, ButtonInfo_t>& btn_info);
 
-  static void add(String name, Mode *mode);
-  static void set(String name);
+  static void add(std::string name, Mode *mode);
+  static void set(std::string name);
   static void disp_spin(unsigned long interval_ms=100);
 
 protected:

@@ -61,22 +61,20 @@ void Mode::cbBtn(ButtonInfo_t *bi,
 /** static
  *
  */
-void Mode::add(String name, Mode *mode) {
-  std::string name_string = name.c_str();
+void Mode::add(std::string name, Mode *mode) {
+  Mode::Ent.emplace(name, mode);
 
-  Mode::Ent.emplace(name_string, mode);
-
-  Mode::Ent.at(name_string)->name = name;
+  Mode::Ent[name]->name = name;
 
   log_d("size: %d, name: %s, mode: 0x%X",
-        Mode::Ent.size(), name_string.c_str(), mode);
+        Mode::Ent.size(), name.c_str(), mode);
 } // Mode::add()
 
 /** static
  *
  * @brief  set Mode
  */
-void Mode::set(String name) {
+void Mode::set(std::string name) {
   if ( Mode::Ent.size() == 0 ) {
     log_e("Mode::Ent is empty");
     return;
@@ -88,18 +86,17 @@ void Mode::set(String name) {
   Mode::Prev = Mode::Cur;
   std::string prev_mode_name = "(NULL)";
   if ( Mode::Prev ) {
-    prev_mode_name = Mode::Prev->name.c_str(); // String --> std::string
+    prev_mode_name = Mode::Prev->name;
   }
   log_i("%s --> %s ...", prev_mode_name.c_str(), name.c_str());
 
   /*
     set Mode::Cur
   */
-  std::string cur_mode_name = name.c_str(); // String -> std::string
   try {
-    Mode::Cur = Mode::Ent.at(cur_mode_name);
+    Mode::Cur = Mode::Ent[name];
   } catch (const std::out_of_range e) {
-    log_e("Mode:%s is invalid", cur_mode_name.c_str());
+    log_e("Mode:%s is invalid", name.c_str());
     Mode::Cur = Mode::Prev;
     return;
   }
@@ -132,7 +129,9 @@ void Mode::set(String name) {
     */
     Mode::Cur->enter();
 
-    log_d("%s --> %s: done", prev_mode_name.c_str(), Mode::Cur->name.c_str());
+    log_d("%s --> %s: done",
+          Mode::Prev->name.c_str(),
+          Mode::Cur->name.c_str());
   }
   Flag_ReqModeChange = false;
   
