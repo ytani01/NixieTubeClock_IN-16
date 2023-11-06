@@ -20,7 +20,6 @@
 
 補足
 - Reboot: [Button 0] + [Button 2]
-- エフェクトの全桁表示切り替え: [Button 2]ダブルクリック
 
 
 ## ◆ WiFi 設定
