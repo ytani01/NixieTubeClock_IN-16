@@ -12,6 +12,7 @@
 #include "Display.h"
 #include "Button.h"
 #include "MyRtc.h"
+
 #include "Task_NixieTubeArray.h"
 #include "Task_WifiMgr.h"
 #include "Task_Ntp.h"
@@ -21,9 +22,10 @@ extern std::string VersionString;
 
 extern Display_t *Disp;
 extern MyRtc *Rtc;
-extern Task_WifiMgr *TaskWifiMgr;
 extern NixieTubeArray *Nxa;
+
 extern Task_NixieTubeArray *TaskNixieTubeArray;
+extern Task_WifiMgr *TaskWifiMgr;
 extern Task_Ntp *TaskNtp;
 
 extern bool Flag_LoopRunning;

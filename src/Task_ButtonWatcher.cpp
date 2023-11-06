@@ -76,11 +76,12 @@ void Task_ButtonWatcher::loop() {
     return;
   }
   
-  ButtonInfo_t btn_info;
-  portBASE_TYPE ret = this->worker->get(&btn_info);
+  ButtonInfo_t btn_info1;
+  portBASE_TYPE ret = this->worker->get(&btn_info1);
   if ( ret == pdPASS ) {
     this->btn_info = Task_ButtonWorker::BtnInfo;
-    (*(this->_cb))(&btn_info, this->btn_info);
+
+    (*(this->_cb))(&btn_info1, this->btn_info);
   }
 } // Task_ButtonWatcher::loop()
 
