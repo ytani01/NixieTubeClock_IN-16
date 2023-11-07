@@ -14,7 +14,7 @@ static void _ntp_cb(Task_NtpInfo_t *ntp_info) {
 /** constructor
  *
  */
-Task_Ntp::Task_Ntp(String ntp_svr[],
+Task_Ntp::Task_Ntp(std::vector<std::string> ntp_svr,
                    void (*cb)(Task_NtpInfo_t *ntp_info),
                    uint32_t stack_size,
                    UBaseType_t priority,

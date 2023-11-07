@@ -13,7 +13,11 @@
 extern MyRtc *Rtc;
 extern Task_WifiMgr *TaskWifiMgr;
 
-static const char *SNTP_SYNC_STATUS_STR[] = {"RESET", "COMPLETED", "IN_PROGRESS"};
+static const char *SNTP_SYNC_STATUS_STR[] = {
+  "RESET",
+  "COMPLETED",
+  "IN_PROGRESS"
+};
 
 typedef struct {
   sntp_sync_status_t sntp_stat;
@@ -32,13 +36,13 @@ public:
   static const unsigned long INTERVAL_PROGRESS = 10 * 1000; // ms
   static const unsigned long INTERVAL_NO_WIFI = 10 * 1000; // ms
   
-  String *ntp_svr;
+  std::vector<std::string> ntp_svr;
 
   Task_NtpInfo_t info;
   sntp_sync_status_t prev_stat = SNTP_SYNC_STATUS_RESET;
   
   // constructor
-  Task_Ntp(String ntp_svr[],
+  Task_Ntp(std::vector<std::string> ntp_svr,
            void (*cb)(Task_NtpInfo_t *ntp_info)=NULL,
            uint32_t stack_size=STACK_SIZE,
            UBaseType_t priority=PRIORITY,

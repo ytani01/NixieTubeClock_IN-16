@@ -44,14 +44,18 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
 };
 Task_ButtonWatcher *TaskBtnWatcher = NULL;
 
-static const int BTN_REPEAT_COUNT_REBOOT = 15;
-
 // WiFi
 static const std::string AP_HDR = "NxClk_";
 Task_WifiMgr *TaskWifiMgr = NULL;
 
 // Ntp
-const String NTP_SVR[] = {"ntp.nict.jp", "pool.ntp.org", "time.google.com"};
+//const String NTP_SVR[] = {"ntp.nict.jp", "pool.ntp.org", "time.google.com"};
+static const std::vector<std::string> NTP_SVR = {
+  "ntp.nict.jp",
+  "pool.ntp.org",
+  "time.google.com"
+};
+
 Task_Ntp *TaskNtp = NULL;
 
 // Nixie Tube
@@ -260,7 +264,7 @@ void setup() {
 
   // NTP
   log_i("=== Init NTP");
-  TaskNtp = new Task_Ntp((String *)NTP_SVR, cbNtp);
+  TaskNtp = new Task_Ntp(NTP_SVR, cbNtp);
   TaskNtp->start();
   delay(100);
   
