@@ -88,12 +88,12 @@ void ModeReboot::loop() {
 /**
  *
  */
-void ModeReboot::cbBtn(ButtonInfo_t *bi,
-                       std::map<std::string, ButtonInfo_t>& btn_info) {
+void ModeReboot::cbBtn(const ButtonInfo_t& bi,
+                       const std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
-  if ( String(bi->name) == "Btn0" ) {
-    if ( bi->value == Button::ON ) {
+  if ( String(bi.name) == "Btn0" ) {
+    if ( bi.value == Button::ON ) {
       WiFi.disconnect();
       TaskWifiMgr->mode = WIFI_MGR_MODE_AP;
     }

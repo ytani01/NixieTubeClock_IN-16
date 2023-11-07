@@ -115,11 +115,12 @@ void disableIntr() {
 /**
  *
  */
-bool skipCbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
+bool skipCbBtn(const ButtonInfo_t& bi,
+               const std::map<std::string, ButtonInfo_t>& btn_info) {
   if ( ! Flag_SkipCbBtn ) return false;
 
   /*  Flag_SkipCbBtn == true  */
-  if ( bi->value == Button::ON ) {
+  if ( bi.value == Button::ON ) {
 
     int count = 0;
     for (auto b: btn_info) {
@@ -129,11 +130,11 @@ bool skipCbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
       }
     } // for (btn_info)
 
-    if ( bi->push_count > 1 ) return true;
-    if ( bi->long_pressed ) return true;
+    if ( bi.push_count > 1 ) return true;
+    if ( bi.long_pressed ) return true;
 
     Flag_SkipCbBtn = false;
-
+    log_i("Flag_SkipCbBtn = %s", Flag_SkipCbBtn ? "true" : "false");
     return false;
   } // if(ON)
 
@@ -146,6 +147,7 @@ bool skipCbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
 
   /*  all Buttons are OFF  */
   Flag_SkipCbBtn = false;
+  log_i("Flag_SkipCbBtn = %s", Flag_SkipCbBtn ? "true" : "false");
 
   return true;
 } // skipCbBtn()
@@ -153,7 +155,8 @@ bool skipCbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
 /**
  *
  */
-void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
+void cbBtn(const ButtonInfo_t& bi,
+           const std::map<std::string, ButtonInfo_t>& btn_info) {
   /*
     for debug
   */
@@ -162,7 +165,9 @@ void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
     btn_val_str += " [" + b.first + "] ";
     btn_val_str += (b.second.value == Button::ON ? "ON  " : "OFF ");
   }
-  log_i("%s,%s", Button::info2String(bi).c_str(), btn_val_str.c_str());
+  log_i("%s,%s",
+        Button::info2String(const_cast<ButtonInfo_t*>(&bi)).c_str(),
+        btn_val_str.c_str());
 
   /*
     skip callback ?
@@ -175,8 +180,12 @@ void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
   /*
     reboot check
   */
-  if ( btn_info["Btn0"].value == Button::ON &&
-       btn_info["Btn2"].value == Button::ON) {
+  // ### memo ###
+  // const std::mapの場合、foo[key]ではなく、foo.at(key)で参照する。
+  // foo[key]は、std::mapを書き換える可能性がある書式だから(?)
+  //
+  if ( btn_info.at("Btn0").value == Button::ON &&
+       btn_info.at("Btn2").value == Button::ON) {
     Mode::set("ModeReboot");
     return;
   } // if (Btn0 + Btn2)
@@ -402,6 +411,7 @@ void loop() {
 #endif
 
   if ( Mode::Cur ) {
+
     Flag_LoopRunning = true;
     Mode::Cur->loop();
     if ( Flag_ReqModeChange ) {
@@ -428,8 +438,11 @@ void loop() {
     }
     auto xLastTime = xTaskGetTickCount();
     vTaskDelayUntil(&xLastTime, 1);
+
   } else {
+
     log_e("Mode::Cur == NULL !?");
     delayOrChangeMode(2000);
+
   }
 } // loop()

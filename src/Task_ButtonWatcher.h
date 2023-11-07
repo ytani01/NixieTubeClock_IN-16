@@ -77,8 +77,8 @@ public:
 
   std::map<std::string, ButtonInfo_t> btn_info;
 
-  Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi,
-                                std::map<std::string, ButtonInfo_t> btn_info),
+  Task_ButtonWatcher(void (*cb)(const ButtonInfo_t& bi,
+                                const std::map<std::string, ButtonInfo_t>& btn_info),
                      uint32_t stack_size=STACK_SIZE,
                      UBaseType_t priority=PRIORITY,
                      UBaseType_t core=CORE);
@@ -94,9 +94,9 @@ protected:
 
   Task_ButtonWorker *worker;
 
-  void (*_cb)(ButtonInfo_t *bi,
-              std::map<std::string, ButtonInfo_t> btn_info);
-  static void def_cb(ButtonInfo_t *bi,
-                     std::map<std::string, ButtonInfo_t> btn_info);
+  void (*_cb)(const ButtonInfo_t& bi,
+              const std::map<std::string, ButtonInfo_t>& btn_info);
+  static void def_cb(const ButtonInfo_t& bi,
+                     const std::map<std::string, ButtonInfo_t>& btn_info);
 }; // class Task_ButtonWatcher
 #endif // _TASK_BUTTON_WATCHER_H_

@@ -61,6 +61,7 @@ void loop() {
 
 #include "esp_spiffs.h"
 #include "SPIFFS.h"
+#include <vector>
 
 /**
  *

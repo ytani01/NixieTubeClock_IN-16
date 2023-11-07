@@ -49,8 +49,8 @@ class ModeClock: public Mode {
   virtual void exit();
   virtual void loop();
 
-  virtual void cbBtn(ButtonInfo_t *bi,
-                     std::map<std::string, ButtonInfo_t>& btn_info);
+  virtual void cbBtn(const ButtonInfo_t& bi,
+                     const std::map<std::string, ButtonInfo_t>& btn_info);
 };
 
 #endif // _MODE_CLOCK_H_

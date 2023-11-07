@@ -56,8 +56,8 @@ public:
   virtual void exit();
   virtual void loop();
 
-  virtual void cbBtn(ButtonInfo_t *bi,
-                     std::map<std::string, ButtonInfo_t>& btn_info);
+  virtual void cbBtn(const ButtonInfo_t& bi,
+                     const std::map<std::string, ButtonInfo_t>& btn_info);
 
   static void add(std::string name, Mode *mode);
   static void set(std::string name);

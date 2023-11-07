@@ -268,14 +268,14 @@ void ModeClock::loop() {
 /**
  *
  */
-void ModeClock::cbBtn(ButtonInfo_t *bi,
-                      std::map<std::string, ButtonInfo_t>& btn_info) {
+void ModeClock::cbBtn(const ButtonInfo_t& bi,
+                      const std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
-  if ( String(bi->name) == "Btn0" ) {
-    if ( bi->value == Button::ON ) {
-      if ( bi->long_pressed ) {
-        if ( bi->repeat_count == 0 ) {
+  if ( String(bi.name) == "Btn0" ) {
+    if ( bi.value == Button::ON ) {
+      if ( bi.long_pressed ) {
+        if ( bi.repeat_count == 0 ) {
           //
           // ModeSetclock
           //
@@ -290,8 +290,8 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
     } // if (Btn0:ON)
 
     // Btn0:OFF
-    if ( bi->value == Button::OFF ) {
-      if ( bi->click_count == 2 ) {
+    if ( bi.value == Button::OFF ) {
+      if ( bi.click_count == 2 ) {
         //
         // change effect
         //
@@ -300,7 +300,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
         return;
       } // if (click_count == 2)
 
-      if ( bi->click_count == 3 ) {
+      if ( bi.click_count == 3 ) {
         //
         // Mode: Scoreboard
         //
@@ -314,9 +314,9 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
     return;
   } // if (Btn0)
 
-  if ( String(bi->name) == "Btn1" ) {
-    if ( bi->value == Button::ON ) {
-      if ( ! bi->long_pressed ) {
+  if ( String(bi.name) == "Btn1" ) {
+    if ( bi.value == Button::ON ) {
+      if ( ! bi.long_pressed ) {
         //
         // change clock mode (display date)
         //
@@ -330,7 +330,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
         log_i("clock_mode = %d", this->clock_mode);
         return;
       } else { // long_pressed
-        if ( bi->repeat_count == 1 ) {
+        if ( bi.repeat_count == 1 ) {
           //
           // change clock main mode ("HH:MM:SS" <-> "dd HH:MM")
           //
@@ -354,10 +354,10 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
     return;
   } // if (Btn1)
 
-  if ( String(bi->name) == "Btn2" ) {
-    if ( bi->value == Button::OFF ) {
-      if ( ! bi->long_pressed ) {
-        if ( bi->click_count == 1 ) {
+  if ( String(bi.name) == "Btn2" ) {
+    if ( bi.value == Button::OFF ) {
+      if ( ! bi.long_pressed ) {
+        if ( bi.click_count == 1 ) {
           //
           // change brightness
           //
@@ -373,7 +373,7 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
           return;
         } // if (click_count == 1)
 
-        if ( bi->click_count == 2 ) {
+        if ( bi.click_count == 2 ) {
           //
           // change effect
           //
@@ -388,9 +388,9 @@ void ModeClock::cbBtn(ButtonInfo_t *bi,
       return;
     } // if (Btn2:OFF)
 
-    if ( bi->value == Button::ON ) {
-      if ( bi->long_pressed ) {
-        if ( bi->repeat_count == 0 ) {
+    if ( bi.value == Button::ON ) {
+      if ( bi.long_pressed ) {
+        if ( bi.repeat_count == 0 ) {
           //
           // demo mode: all effect tube
           //

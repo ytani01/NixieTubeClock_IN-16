@@ -5,6 +5,7 @@
 #define _MODE_SCOREBOARD_H_
 
 #include "Mode.h"
+#include "ConfFile_ModeScoreboard.h"
 
 class ModeScoreboard: public Mode {
  public:
@@ -12,18 +13,20 @@ class ModeScoreboard: public Mode {
   static constexpr char* NX_FMT1 = (char *)"%2d %2d %2d";
 
   static const int SCORE_MAX = 99;
-  int score[3];
+
+  ConfFile_ModeScoreboard *conf;
 
   ModeScoreboard();
 
+  void display();
   int inc_score(int i, int n=1);
   int dec_score(int i, int n=1);
 
   virtual void enter();
   virtual void loop();
 
-  virtual void cbBtn(ButtonInfo_t *bi,
-                     std::map<std::string, ButtonInfo_t>& btn_info);
+  virtual void cbBtn(const ButtonInfo_t& bi,
+                     const std::map<std::string, ButtonInfo_t>& btn_info);
 };
 
 #endif // _MODE_SCOREBOARD_H_

@@ -188,15 +188,15 @@ void ModeSetclock::loop() {
 /**
  *
  */
-void ModeSetclock::cbBtn(ButtonInfo_t *bi,
-                         std::map<std::string, ButtonInfo_t>& btn_info) {
+void ModeSetclock::cbBtn(const ButtonInfo_t& bi,
+                         const std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
   // ダブルクリックが次のモードに影響を与えないように
   static bool flag_mode_change = false;
   
   if ( flag_mode_change ) {
-    if ( String(bi->name) == "Btn0" && bi->click_count > 0 ) {
+    if ( String(bi.name) == "Btn0" && bi.click_count > 0 ) {
       log_i("mode change");
       flag_mode_change = false;
       Mode::set("ModeClock");
@@ -208,10 +208,10 @@ void ModeSetclock::cbBtn(ButtonInfo_t *bi,
   int pos_i = static_cast<int>(this->pos);
   int pos_n = static_cast<int>(SETCLOCK_POS_N);
 
-  if ( String(bi->name) == "Btn0" ) {
-    if ( bi->value == Button::ON ) {
-      if ( bi->long_pressed ) {
-        if ( bi->repeat_count == 0 ) {
+  if ( String(bi.name) == "Btn0" ) {
+    if ( bi.value == Button::ON ) {
+      if ( bi.long_pressed ) {
+        if ( bi.repeat_count == 0 ) {
           flag_mode_change = false;
           Mode::set("ModeClock");
           return;
@@ -282,14 +282,14 @@ void ModeSetclock::cbBtn(ButtonInfo_t *bi,
     return;
   } // if (Btn0)
 
-  if ( String(bi->name) == "Btn1" && bi->value == Button::ON ) {
+  if ( String(bi.name) == "Btn1" && bi.value == Button::ON ) {
     // increment
     this->val[pos_i]++;
 
     // 分の場合、長押しで、10秒単位に
     if ( this->pos == SETCLOCK_POS_MINUTE ) {
       if ( this->val[pos_i] % 10 == 1 ) {
-        if ( bi->long_pressed ) {
+        if ( bi.long_pressed ) {
           this->val[pos_i] += 9;
         }
       }
@@ -310,7 +310,7 @@ void ModeSetclock::cbBtn(ButtonInfo_t *bi,
     return;
   } // if (Btn1)
 
-  if ( String(bi->name) == "Btn2" && bi->value == Button::ON ) {
+  if ( String(bi.name) == "Btn2" && bi.value == Button::ON ) {
     // 月の最終日
     this->val_max[VAL_IDX_DAY] = last_day(val[VAL_IDX_YEAR] + 2000,
                                           val[VAL_IDX_MONTH]);
@@ -322,7 +322,7 @@ void ModeSetclock::cbBtn(ButtonInfo_t *bi,
     // 分の場合、長押しで、10秒単位に
     if ( this->pos == SETCLOCK_POS_MINUTE ) {
       if ( this->val[pos_i] % 10 == 9 ) {
-        if ( bi->long_pressed ) {
+        if ( bi.long_pressed ) {
           this->val[pos_i] -= 9;
         }
       }

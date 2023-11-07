@@ -53,9 +53,11 @@ void Mode::loop() {
 /** virtual
  *
  */
-void Mode::cbBtn(ButtonInfo_t *bi,
-                 std::map<std::string, ButtonInfo_t>& btn_info) {
-  log_d("%s", Button::info2String(bi).c_str());
+void Mode::cbBtn(const ButtonInfo_t& bi,
+                 const std::map<std::string, ButtonInfo_t>& btn_info) {
+  log_d("%s", Button::info2String(const_calst<ButtonInfo_t*>(bi)).c_str());
+
+  log_e("to be overridden");
 } // Mode::cbBtn()
 
 /** static
