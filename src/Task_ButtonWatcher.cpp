@@ -8,7 +8,7 @@
  */
 Task_ButtonWatcher::Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi,
                                                   std::map<std::string,
-                                                  ButtonInfo_t>& btn_info),
+                                                  ButtonInfo_t> btn_info),
                                        uint32_t stack_size,
                                        UBaseType_t priority,
                                        UBaseType_t core)
@@ -90,6 +90,6 @@ void Task_ButtonWatcher::loop() {
  * defulat callback
  */
 void Task_ButtonWatcher::def_cb(ButtonInfo_t *bi,
-                                std::map<std::string, ButtonInfo_t>& btn_info) {
+                                std::map<std::string, ButtonInfo_t> btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 } // _def_button_cb()

@@ -44,6 +44,8 @@ static const std::map<const char *, uint8_t> PIN_BTN = {
 };
 Task_ButtonWatcher *TaskBtnWatcher = NULL;
 
+bool Flag_SkipCbBtn = false;
+
 // WiFi
 static const std::string AP_HDR = "NxClk_";
 Task_WifiMgr *TaskWifiMgr = NULL;
@@ -113,7 +115,18 @@ void disableIntr() {
 /**
  *
  */
-void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t>& btn_info) {
+bool skipCbBtn(ButtonInfo_t bi, std::map<std::string, ButtonInfo_t> btn_info) {
+  if ( ! Flag_LoopRunning ) {
+    return false;
+  }
+
+  return true;
+} // skipCbBtn()
+
+/**
+ *
+ */
+void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
   //
   // for debug
   //

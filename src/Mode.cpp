@@ -87,6 +87,7 @@ void Mode::set(std::string name) {
   std::string prev_mode_name = "(NULL)";
   if ( Mode::Prev ) {
     prev_mode_name = Mode::Prev->name;
+    Flag_SkipCbBtn = true;
   }
   log_i("%s --> %s ...", prev_mode_name.c_str(), name.c_str());
 

@@ -28,6 +28,7 @@ extern Task_NixieTubeArray *TaskNixieTubeArray;
 extern Task_WifiMgr *TaskWifiMgr;
 extern Task_Ntp *TaskNtp;
 
+extern bool Flag_SkipCbBtn;
 extern bool Flag_LoopRunning;
 extern bool Flag_ReqModeChange;
 extern unsigned long delayOrChangeMode(unsigned long ms);
