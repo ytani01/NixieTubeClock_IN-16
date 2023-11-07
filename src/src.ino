@@ -115,10 +115,37 @@ void disableIntr() {
 /**
  *
  */
-bool skipCbBtn(ButtonInfo_t bi, std::map<std::string, ButtonInfo_t> btn_info) {
-  if ( ! Flag_LoopRunning ) {
+bool skipCbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
+  if ( ! Flag_SkipCbBtn ) return false;
+
+  /*  Flag_SkipCbBtn == true  */
+  if ( bi->value == Button::ON ) {
+
+    int count = 0;
+    for (auto b: btn_info) {
+      if ( b.second.value == Button::ON ) {
+        count++;
+        if ( count >= 2 ) return true;
+      }
+    } // for (btn_info)
+
+    if ( bi->push_count > 1 ) return true;
+    if ( bi->long_pressed ) return true;
+
+    Flag_SkipCbBtn = false;
+
     return false;
-  }
+  } // if(ON)
+
+  /*  OFF  */
+
+  int count = 0;
+  for (auto b: btn_info) {
+    if ( b.second.value == Button::ON ) return true;
+  } // for (btn_info)
+
+  /*  all Buttons are OFF  */
+  Flag_SkipCbBtn = false;
 
   return true;
 } // skipCbBtn()
@@ -127,9 +154,9 @@ bool skipCbBtn(ButtonInfo_t bi, std::map<std::string, ButtonInfo_t> btn_info) {
  *
  */
 void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
-  //
-  // for debug
-  //
+  /*
+    for debug
+  */
   std::string btn_val_str = "";
   for (auto b: btn_info) {
     btn_val_str += " [" + b.first + "]:";
@@ -137,9 +164,17 @@ void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
   }
   log_i("%s,%s", Button::info2String(bi).c_str(), btn_val_str.c_str());
 
-  //
-  // reboot check
-  //
+  /*
+    skip callback ?
+  */
+  if ( skipCbBtn(bi, btn_info) ) {
+    log_w(".. ignored");
+    return;
+  }
+  
+  /*
+    reboot check
+  */
   if ( btn_info["Btn0"].value == Button::ON &&
        btn_info["Btn2"].value == Button::ON) {
     Mode::set("ModeReboot");
@@ -333,6 +368,9 @@ unsigned long delayOrChangeMode(unsigned long ms) {
  */
 void loop() {
 #if 1
+  /*
+    heap check
+  */
   static unsigned long prev_ms = 0;
   unsigned long ms = millis();
 
@@ -355,7 +393,7 @@ void loop() {
       }
     }
 
-    log_i("========== %s> heap:%s, interval: %s -> %s",
+    log_i("========== %s > heap:%s, interval: %s -> %s",
           SysClock::now_string().c_str(), heap_str.c_str(),
           ms2string(prev_interval).c_str(), ms2string(interval).c_str());
     
