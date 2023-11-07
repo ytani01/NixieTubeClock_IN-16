@@ -6,11 +6,12 @@
 /**
  *
  */
-Task_ButtonWatcher::Task_ButtonWatcher
-(void (*cb)(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t>& btn_info),
- uint32_t stack_size,
- UBaseType_t priority,
- UBaseType_t core)
+Task_ButtonWatcher::Task_ButtonWatcher(void (*cb)(ButtonInfo_t *bi,
+                                                  std::map<std::string,
+                                                  ButtonInfo_t>& btn_info),
+                                       uint32_t stack_size,
+                                       UBaseType_t priority,
+                                       UBaseType_t core)
   : Task(__CLASS_NAME__, stack_size, priority, core)
 {
   this->_cb = cb;

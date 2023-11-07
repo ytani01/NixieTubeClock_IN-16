@@ -110,6 +110,9 @@ void disableIntr() {
  *
  */
 void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t>& btn_info) {
+  //
+  // for debug
+  //
   std::string btn_val_str = "";
   for (auto b: btn_info) {
     btn_val_str += " [" + b.first + "]:";
