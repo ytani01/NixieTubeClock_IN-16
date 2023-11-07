@@ -188,10 +188,10 @@ char* Button::info2str(ButtonInfo_t *info, bool interrupted) {
   static char buf[128];
 
   String intrString = interrupted ? "!" : "*";
-  String valueString = info->value ? "H(OFF)" : "L(ON )";
+  String valueString = info->value == Button::ON ? "ON " : "OFF";
   String longPressedString = info->long_pressed ? "L" : "-";
   
-  sprintf(buf, "%sBTN[%s:%d] %s P:%d C:%d %s R:%d",
+  sprintf(buf, "%sBTN[%s:%d] %s P:%d C:%d %s R:%-2d",
           intrString.c_str(),
           info->name, info->pin, valueString.c_str(),
           info->push_count, info->click_count,

@@ -105,7 +105,7 @@ void ModeBoot::cbBtn(ButtonInfo_t *bi,
       //
       WiFi.disconnect();
       TaskWifiMgr->mode = WIFI_MGR_MODE_AP;
-      log_i("force WiFi OFF (AP mode)");
+      log_i("*** force WiFi OFF (AP mode)");
       return;
     } // if (ON)
 

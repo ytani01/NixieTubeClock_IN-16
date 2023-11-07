@@ -159,8 +159,8 @@ void cbBtn(ButtonInfo_t *bi, std::map<std::string, ButtonInfo_t> btn_info) {
   */
   std::string btn_val_str = "";
   for (auto b: btn_info) {
-    btn_val_str += " [" + b.first + "]:";
-    btn_val_str += (b.second.value == Button::ON ? "ON " : "OFF");
+    btn_val_str += " [" + b.first + "] ";
+    btn_val_str += (b.second.value == Button::ON ? "ON  " : "OFF ");
   }
   log_i("%s,%s", Button::info2String(bi).c_str(), btn_val_str.c_str());
 
