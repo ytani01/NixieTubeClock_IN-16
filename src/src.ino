@@ -21,7 +21,7 @@
 #include "Mode_Scoreboard.h"
 #include "Mode_Test1.h"
 
-std::string VersionString = " 2. 1. 7";
+std::string VersionString = " 2. 2. 0";
 
 // Mode
 bool Flag_ReqModeChange = false; // モード変更要求フラグ

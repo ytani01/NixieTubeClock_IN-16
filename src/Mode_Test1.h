@@ -12,7 +12,8 @@ class Mode_Test1: public Mode {
  public:
   static const unsigned long LOOP_DELAY_MS = 10 * 1000; // ms
 
-  int val = 0;
+  int tube = 0;
+  int num = 0;
 
   Mode_Test1();
 

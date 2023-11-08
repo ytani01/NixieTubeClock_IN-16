@@ -60,7 +60,7 @@ public:
                      const std::map<std::string, ButtonInfo_t>& btn_info);
 
   static void add(std::string name, Mode *mode);
-  static void set(std::string name);
+  static void set(std::string name="");
   static void disp_spin(unsigned long interval_ms=100);
 
 protected:
