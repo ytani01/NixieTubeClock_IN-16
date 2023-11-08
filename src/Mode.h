@@ -22,7 +22,7 @@ extern std::string VersionString;
 
 extern Display_t *Disp;
 extern MyRtc *Rtc;
-extern NixieTubeArray *Nxa;
+extern Nixie_TubeArray *Nxa;
 
 extern Task_NixieTubeArray *TaskNixieTubeArray;
 extern Task_WifiMgr *TaskWifiMgr;

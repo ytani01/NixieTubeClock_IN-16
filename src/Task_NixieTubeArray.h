@@ -6,7 +6,7 @@
 
 #include "Task.h"
 #include "Nixie.h"
-#include "NixieTubeArray.h"
+#include "Nixie_TubeArray.h"
 
 /**
  *
@@ -22,7 +22,7 @@ public:
 
   bool enable_update = true;
 
-  Task_NixieTubeArray(NixieTubeArray *nta,
+  Task_NixieTubeArray(Nixie_TubeArray *nta,
                       brightness_t brightness = 0, // default: load conf file
                       int *init_val=NULL,
                       uint32_t stack_size=STACK_SIZE,
@@ -33,7 +33,7 @@ protected:
   virtual void setup();
   virtual void loop();
 
-  NixieTubeArray *_nta;
+  Nixie_TubeArray *_nta;
   int *init_val;
 }; // class Task_NixieTubeArray
 

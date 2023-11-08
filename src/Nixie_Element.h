@@ -4,19 +4,19 @@
  *----------------------------------------------------------------------------
  * [ Data structure ( not a class tree ) ]
  *
- *  NixieTubeArray
+ *  Nixie_TubeArray
  *   |
- *   +- NixieTube num[NIXIE_NUM_N]
+ *   +- Nixie_Tube num[NIXIE_NUM_N]
  *   |   |
- *   |   +- NixieElement element[NIXIE_NUM_DIGIT_N]
+ *   |   +- Nixie_Element element[NIXIE_NUM_DIGIT_N]
  *   |   |
- *   |   +- NixieEffect
+ *   |   +- Nixie_Effect
  *   |
- *   +- NixieTube colon[NIXIE_COLON_N]
+ *   +- Nixie_Tube colon[NIXIE_COLON_N]
  *       |
- *       +- NixieElement element[NIXIE_COLON_DOT_N]
+ *       +- Nixie_Element element[NIXIE_COLON_DOT_N]
  *       |
- *       +- NixieEffect
+ *       +- Nixie_Effect
  *----------------------------------------------------------------------------
  */
 #ifndef NIXIE_ELEMENT_H
@@ -25,9 +25,9 @@
 #include "Arduino.h"
 #include "Nixie.h"
 
-class NixieElement {
+class Nixie_Element {
  public:
-  NixieElement() {};
+  Nixie_Element() {};
   
   void setup(uint8_t pin);
   
@@ -53,5 +53,5 @@ class NixieElement {
   brightness_t _max_brightness = 8;
   boolean _on = false;
 
-}; // class NixieElement
+}; // class Nixie_Element
 #endif // NIXIE_ELEMENT_H

@@ -1,36 +1,36 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "NixieTube.h"
+#include "Nixie_Tube.h"
 
 /**
  *
  */
-NixieTube::NixieTube() {
+Nixie_Tube::Nixie_Tube() {
 } // constructor
 
 /**
  *
  */
-void NixieTube::setup(int element_n, uint8_t *pin) {
+void Nixie_Tube::setup(int element_n, uint8_t *pin) {
   this->element_n = element_n;
-  this->element = new NixieElement[this->element_n];
+  this->element = new Nixie_Element[this->element_n];
   
   for (int d=0; d < element_n; d++) {
     this->element[d].setup(pin[d]);
   } // for (d)
 
-  this->ef["fadein"] = new NixieEffectFadeIn(this->element, this->element_n);
-  this->ef["fadeout"] = new NixieEffectFadeOut(this->element, this->element_n);
-  this->ef["fog"] = new NixieEffectFog(this->element, this->element_n);
-  this->ef["shuffle"] = new NixieEffectShuffle(this->element, this->element_n);
-  this->ef["blink"] = new NixieEffectBlink(this->element, this->element_n);
-} // NixieTube::setup()
+  this->ef["fadein"] = new Nixie_EffectFadeIn(this->element, this->element_n);
+  this->ef["fadeout"] = new Nixie_EffectFadeOut(this->element, this->element_n);
+  this->ef["fog"] = new Nixie_EffectFog(this->element, this->element_n);
+  this->ef["shuffle"] = new Nixie_EffectShuffle(this->element, this->element_n);
+  this->ef["blink"] = new Nixie_EffectBlink(this->element, this->element_n);
+} // Nixie_Tube::setup()
 
 /**
  *
  */
-void NixieTube::loop(unsigned long cur_ms) {
+void Nixie_Tube::loop(unsigned long cur_ms) {
   if ( cur_ms == 0 ) {
     cur_ms = millis();
   }
@@ -40,19 +40,19 @@ void NixieTube::loop(unsigned long cur_ms) {
       e.second->loop(cur_ms);
     }
   }  
-} // NixieTube::loop()
+} // Nixie_Tube::loop()
 
 /**
  *
  */
-brightness_t NixieTube::brightness() {
+brightness_t Nixie_Tube::brightness() {
   return this->_brightness;
-} // NixieTube::brightness()
+} // Nixie_Tube::brightness()
 
 /**
  *
  */
-brightness_t NixieTube::set_brightness(brightness_t bri) {
+brightness_t Nixie_Tube::set_brightness(brightness_t bri) {
   this->_brightness = bri;
 
   this->end_effect();
@@ -64,36 +64,36 @@ brightness_t NixieTube::set_brightness(brightness_t bri) {
   } // for
 
   return this->_brightness;
-} // NixieTube::set_brightness()
+} // Nixie_Tube::set_brightness()
 
 /**
  *
  */
-void NixieTube::end_effect() {
+void Nixie_Tube::end_effect() {
   for (auto e: this->ef) {
     if ( e.second->is_active() ) {
       e.second->end();
     }
   }
-} // NixieTube::end_effect()
+} // Nixie_Tube::end_effect()
 
 /**
  *
  */
-boolean NixieTube::effect_is_active() {
+boolean Nixie_Tube::effect_is_active() {
   for (auto e: this->ef) {
     if ( e.second->is_active() ) {
       return true;
     }
   }
   return false;
-} // NixieTube::effect_is_active()
+} // Nixie_Tube::effect_is_active()
 
 //============================================================================
 /**
  *
  */
-void NixieTube::ef_only(int el_i) {
+void Nixie_Tube::ef_only(int el_i) {
   for (int i=0; i < this->element_n; i++) {
     if ( i == el_i ) {
       this->element[i].set_brightness_to_max();
@@ -101,12 +101,12 @@ void NixieTube::ef_only(int el_i) {
       this->element[i].set_brightness(0);
     }
   } // for(i)
-} // NixieTube::ef_only()
+} // Nixie_Tube::ef_only()
 
 /**
  *
  */
-void NixieTube::ef_xfade(int el_src, int el_dst,
+void Nixie_Tube::ef_xfade(int el_src, int el_dst,
                              unsigned long ms, unsigned long start_ms) {
   this->end_effect();
 
@@ -115,4 +115,4 @@ void NixieTube::ef_xfade(int el_src, int el_dst,
   }
 
   this->ef["fadein"]->start(el_dst, ms, start_ms);
-} // NixieTube::ef_xfade()
+} // Nixie_Tube::ef_xfade()

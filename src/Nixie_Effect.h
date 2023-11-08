@@ -4,34 +4,34 @@
  *----------------------------------------------------------------------------
  * [ has-a tree ]
  *
- *  NixieTubeArray
+ *  Nixie_TubeArray
  *   |
- *   +- NixieTube num[NIXIE_NUM_N]
+ *   +- Nixie_Tube num[NIXIE_NUM_N]
  *   |   |
- *   |   +- NixieElement element[NIXIE_NUM_DIGIT_N]
+ *   |   +- Nixie_Element element[NIXIE_NUM_DIGIT_N]
  *   |   |
- *   |   +- NixieEffect
+ *   |   +- Nixie_Effect
  *   |
- *   +- NixieTube colon[NIXIE_COLON_N]
+ *   +- Nixie_Tube colon[NIXIE_COLON_N]
  *       |
- *       +- NixieElement element[NIXIE_COLON_DOT_N]
+ *       +- Nixie_Element element[NIXIE_COLON_DOT_N]
  *       |
- *       +- NixieEffect
+ *       +- Nixie_Effect
  *----------------------------------------------------------------------------
  */
 #ifndef NIXIE_EFFECT_H
 #define NIXIE_EFFECT_H
 
 #include "Nixie.h"
-#include "NixieElement.h"
+#include "Nixie_Element.h"
 
 /** ==========================================================================
  *
  */
-class NixieEffect {
+class Nixie_Effect {
  public:
-  NixieEffect(NixieElement *element, unsigned long el_n);
-  virtual ~NixieEffect();
+  Nixie_Effect(Nixie_Element *element, unsigned long el_n);
+  virtual ~Nixie_Effect();
 
   virtual void start(unsigned long ms, unsigned long start_ms=0);
   virtual void start(int el_i, unsigned long ms, unsigned long start_ms=0);
@@ -48,9 +48,9 @@ class NixieEffect {
  protected:
   int _el_i;
   int _n;
-  NixieElement *_el1;
+  Nixie_Element *_el1;
 
-  NixieElement *_el;   // array
+  Nixie_Element *_el;   // array
   unsigned long _el_n      = 0;           // number of elements (10 or 1)
 
   boolean       _active    = false;
@@ -58,52 +58,52 @@ class NixieEffect {
   unsigned long _ms        = 1000;
   unsigned long _tick      = 0;
   unsigned long _prev_tick = 0;
-}; // class NixieEffect
+}; // class Nixie_Effect
 
 /** ==========================================================================
  *
  */
-class NixieEffectFadeIn : public NixieEffect {
+class Nixie_EffectFadeIn : public Nixie_Effect {
  public:
-  NixieEffectFadeIn(NixieElement *element, unsigned long el_n);
+  Nixie_EffectFadeIn(Nixie_Element *element, unsigned long el_n);
   virtual void start(int el_i, unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
 
  private:
-}; // class NixieEffectFadeIn
+}; // class Nixie_EffectFadeIn
 
 /** ==========================================================================
  *
  */
-class NixieEffectFadeOut : public NixieEffect {
+class Nixie_EffectFadeOut : public Nixie_Effect {
  public:
-  NixieEffectFadeOut(NixieElement *element, unsigned long el_n);
+  Nixie_EffectFadeOut(Nixie_Element *element, unsigned long el_n);
   virtual void start(int el_i, unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
 
  private:
-}; // class NixieEffectFadeOut
+}; // class Nixie_EffectFadeOut
 
 /** ==========================================================================
  *
  */
-class NixieEffectFog : public NixieEffect {
+class Nixie_EffectFog : public Nixie_Effect {
  public:
-  NixieEffectFog(NixieElement *element, unsigned long el_n);
+  Nixie_EffectFog(Nixie_Element *element, unsigned long el_n);
   virtual void start(int el_i, unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
 
  private:
   bool _fog_up;
-}; // class NixieEffectFog
+}; // class Nixie_EffectFog
 
 //============================================================================
-class NixieEffectShuffle : public NixieEffect {
+class Nixie_EffectShuffle : public Nixie_Effect {
  public:
-  NixieEffectShuffle(NixieElement *element, unsigned long el_n);
+  Nixie_EffectShuffle(Nixie_Element *element, unsigned long el_n);
   virtual void start(int el_i, int n,
                      unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
@@ -111,12 +111,12 @@ class NixieEffectShuffle : public NixieEffect {
 
  private:
   int _el_random;
-}; // class NixieEffectShuffle
+}; // class Nixie_EffectShuffle
 
 //============================================================================
-class NixieEffectBlink : public NixieEffect {
+class Nixie_EffectBlink : public Nixie_Effect {
  public:
-  NixieEffectBlink(NixieElement *element, unsigned long el_n);
+  Nixie_EffectBlink(Nixie_Element *element, unsigned long el_n);
   virtual void start(unsigned long ms, unsigned long start_ms=0);
   virtual void do_loop();
   virtual void end();
@@ -124,6 +124,6 @@ class NixieEffectBlink : public NixieEffect {
  private:
   uint8_t  _brightness[NIXIE_ELEMENT_N_MAX];
   boolean  _is_on;
-}; // class NixieEffectBlink
+}; // class Nixie_EffectBlink
 
 #endif // NIXIE_EFFECT_H

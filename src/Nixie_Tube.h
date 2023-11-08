@@ -4,27 +4,27 @@
  *----------------------------------------------------------------------------
  * [ Data structure ( not a class tree ) ]
  *
- *  NixieTubeArray
+ *  Nixie_TubeArray
  *   |
- *   +- NixieTube num[NIXIE_NUM_N]
+ *   +- Nixie_Tube num[NIXIE_NUM_N]
  *   |   |
- *   |   +- NixieElement element[NIXIE_NUM_DIGIT_N]
+ *   |   +- Nixie_Element element[NIXIE_NUM_DIGIT_N]
  *   |   |
- *   |   +- NixieEffect
+ *   |   +- Nixie_Effect
  *   |
- *   +- NixieTube colon[NIXIE_COLON_N]
+ *   +- Nixie_Tube colon[NIXIE_COLON_N]
  *       |
- *       +- NixieElement element[NIXIE_COLON_DOT_N]
+ *       +- Nixie_Element element[NIXIE_COLON_DOT_N]
  *       |
- *       +- NixieEffect
+ *       +- Nixie_Effect
  *----------------------------------------------------------------------------
  */
 #ifndef NIXIE_TUBE_H
 #define NIXIE_TUBE_H
 
 #include <map>
-#include "NixieElement.h"
-#include "NixieEffect.h"
+#include "Nixie_Element.h"
+#include "Nixie_Effect.h"
 
 typedef enum {
   NXT_EFFECT_NONE,
@@ -34,12 +34,12 @@ typedef enum {
   NXT_EFFECT_SIZE
 } nxt_effect_t;
 
-class NixieTube {
+class Nixie_Tube {
  public:
   int element_n = 0;
-  NixieElement *element; // array
+  Nixie_Element *element; // array
 
-  NixieTube();
+  Nixie_Tube();
 
   void setup(int element_n, uint8_t *pin);
   void loop(unsigned long cur_ms=0);
@@ -50,7 +50,7 @@ class NixieTube {
   void end_effect();
   bool effect_is_active();
 
-  std::map<std::string, NixieEffect *> ef;
+  std::map<std::string, Nixie_Effect *> ef;
 
   void ef_only(int el_i);
   void ef_xfade(int el_src, int el_dst,
@@ -58,5 +58,5 @@ class NixieTube {
 
  private:
   brightness_t _brightness;
-}; // class NixieTube
+}; // class Nixie_Tube
 #endif // NIXIE_TUBE_H

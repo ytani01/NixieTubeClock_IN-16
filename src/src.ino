@@ -84,7 +84,7 @@ uint8_t PINS_NIXIE_COLON[NIXIE_COLON_N][NIXIE_COLON_DOT_N] = {
   {PIN_COLON_L_TOP}
 };
 
-NixieTubeArray *Nxa = NULL;
+Nixie_TubeArray *Nxa = NULL;
 Task_NixieTubeArray *TaskNixieTubeArray = NULL;
 
 /** global for enableIntr()/disableIntr()
@@ -259,9 +259,9 @@ void setup() {
 #endif
   //log_i("=== uxTaskGetStackHighWaterMark = %d", uxTaskGetStackHighWaterMark(NULL));
 
-  // NixieTube
+  // Nixie_Tube
   log_i("=== Nixie Tube Array");
-  Nxa = new NixieTubeArray(PIN_HV5812_CLK,  PIN_HV5812_STOBE,
+  Nxa = new Nixie_TubeArray(PIN_HV5812_CLK,  PIN_HV5812_STOBE,
                            PIN_HV5812_DATA, PIN_HV5812_BLANK,
                            PINS_NIXIE_NUM, PINS_NIXIE_COLON);
   //Nxa->set_string(VersionString);

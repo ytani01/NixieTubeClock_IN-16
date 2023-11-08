@@ -125,7 +125,7 @@ void ModeSetclock::loop() {
   Disp->display();
 
   //
-  // NixieTubeArray
+  // Nixie_TubeArray
   //
   char *nx_fmt = NX_FMT_HMS;
   int num1, num2, num3;

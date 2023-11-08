@@ -4,38 +4,38 @@
  *------------------------------------------------------------------------
  * [ Data structure ( not a class tree ) ]
  *
- *  NixieTubeArray
+ *  Nixie_TubeArray
  *   |
- *   +- NixieTube num[NIXIE_NUM_N]
+ *   +- Nixie_Tube num[NIXIE_NUM_N]
  *   |   |
- *   |   +- NixieElement element[NIXIE_NUM_DIGIT_N]
+ *   |   +- Nixie_Element element[NIXIE_NUM_DIGIT_N]
  *   |   |
- *   |   +- NixieEffect
+ *   |   +- Nixie_Effect
  *   |
- *   +- NixieTube colon[NIXIE_COLON_N]
+ *   +- Nixie_Tube colon[NIXIE_COLON_N]
  *       |
- *       +- NixieElement element[NIXIE_COLON_DOT_N]
+ *       +- Nixie_Element element[NIXIE_COLON_DOT_N]
  *       |
- *       +- NixieEffect
+ *       +- Nixie_Effect
  *-----------------------------------------------------------------------
  */
 #ifndef _NIXIE_TUBE_ARRAY_H_
 #define _NIXIE_TUBE_ARRAY_H_
 
-#include "NixieTube.h"
+#include "Nixie_Tube.h"
 #include "ConfFile_Brightness.h"
 
-class NixieTubeArray {
+class Nixie_TubeArray {
  public:
   static const unsigned int DISP_DELAY_US = 1; // microsec
           
-  NixieTube  num[NIXIE_NUM_N];
-  NixieTube  colon[NIXIE_COLON_N];
+  Nixie_Tube  num[NIXIE_NUM_N];
+  Nixie_Tube  colon[NIXIE_COLON_N];
 
   uint8_t prev_num_int[NIXIE_NUM_N];
   uint8_t prev_col_int[NIXIE_COLON_N];
 
-  NixieTubeArray(uint8_t clk, uint8_t stobe, uint8_t data, uint8_t blank,
+  Nixie_TubeArray(uint8_t clk, uint8_t stobe, uint8_t data, uint8_t blank,
                  uint8_t num[NIXIE_NUM_N][NIXIE_NUM_DIGIT_N],
                  uint8_t colon[NIXIE_COLON_N][NIXIE_COLON_DOT_N]);
   void loop(unsigned long cur_ms);

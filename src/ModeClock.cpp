@@ -171,7 +171,7 @@ void ModeClock::loop() {
   Disp->display();
 
   //
-  // for NixieTubeArray
+  // for Nixie_TubeArray
   //
   char *nx_fmt;
 

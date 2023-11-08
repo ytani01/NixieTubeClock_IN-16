@@ -11,7 +11,7 @@ int Task_NixieTubeArray::INIT_VAL[] = {0, 0, 0, 0, 0, 0};
 /** constructor
  *
  */
-Task_NixieTubeArray::Task_NixieTubeArray(NixieTubeArray *nta,
+Task_NixieTubeArray::Task_NixieTubeArray(Nixie_TubeArray *nta,
                                          brightness_t brightness,
                                          int *init_val,
                                          uint32_t stack_size,
