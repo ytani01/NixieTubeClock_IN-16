@@ -19,6 +19,7 @@
 #include "Mode_Clock.h"
 #include "Mode_Setclock.h"
 #include "Mode_Scoreboard.h"
+#include "Mode_Test1.h"
 
 std::string VersionString = " 2. 1. 7";
 
@@ -332,6 +333,7 @@ void setup() {
   Mode::add("Mode_Clock", new Mode_Clock());
   Mode::add("Mode_Setclock", new Mode_Setclock());
   Mode::add("Mode_Scoreboard", new Mode_Scoreboard());
+  Mode::add("Mode_Test1", new Mode_Test1());
 
   for (auto m: Mode::Ent) {
     m.second->setup();

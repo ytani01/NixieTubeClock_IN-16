@@ -112,4 +112,14 @@ void Mode_Boot::cbBtn(const ButtonInfo_t& bi,
     return;
   } // if (Btn0)
   
+  if ( String(bi.name) == "Btn2" ) {
+    if ( bi.value == Button::ON ) {
+      Mode::set("Mode_Test1");
+      
+      return;
+    } // if (ON)
+
+    return;
+  } // if (Btn2)
+  
 } // Mode_Boot::cbBtn()
