@@ -1,19 +1,19 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ModeReboot.h"
+#include "Mode_Reboot.h"
 
 /**
  *
  */
-ModeReboot::ModeReboot(unsigned long interval): Mode() {
+Mode_Reboot::Mode_Reboot(unsigned long interval): Mode() {
   this->interval = interval;
-} // ModeReboot::ModeReboot()
+} // Mode_Reboot::Mode_Reboot()
 
 /** virtual
  *
  */
-void ModeReboot::enter() {
+void Mode_Reboot::enter() {
   log_i("enter mode: %s", this->name.c_str());
 
   this->start_ms = millis();
@@ -24,21 +24,21 @@ void ModeReboot::enter() {
   
   Disp->fillRect(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
   Disp->display();
-} // ModeReboot::enter()
+} // Mode_Reboot::enter()
 
 /** virtual
  *
  */
-void ModeReboot::exit() {
+void Mode_Reboot::exit() {
   log_i("");
   Nxa->end_all_effect();
   this->start_ms = 0;
-} // ModeReboot::exit()
+} // Mode_Reboot::exit()
 
 /** virtual
  *
  */
-void ModeReboot::loop() {
+void Mode_Reboot::loop() {
   unsigned long cur_ms = millis();
   struct tm *tm = SysClock::now_tm();
   struct timeval *tv = SysClock::now_timeval();
@@ -83,12 +83,12 @@ void ModeReboot::loop() {
   Disp->display();
 
   delayOrChangeMode(50);
-} // ModeReboot::loop()
+} // Mode_Reboot::loop()
 
 /**
  *
  */
-void ModeReboot::cbBtn(const ButtonInfo_t& bi,
+void Mode_Reboot::cbBtn(const ButtonInfo_t& bi,
                        const std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
@@ -98,4 +98,4 @@ void ModeReboot::cbBtn(const ButtonInfo_t& bi,
       TaskWifiMgr->mode = WIFI_MGR_MODE_AP;
     }
   }
-} // ModeReboot::cbBtn()
+} // Mode_Reboot::cbBtn()

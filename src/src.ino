@@ -14,11 +14,11 @@
 #include "Task_Ntp.h"
 
 #include "Mode.h"
-#include "ModeBoot.h"
-#include "ModeReboot.h"
-#include "ModeClock.h"
-#include "ModeSetclock.h"
-#include "ModeScoreboard.h"
+#include "Mode_Boot.h"
+#include "Mode_Reboot.h"
+#include "Mode_Clock.h"
+#include "Mode_Setclock.h"
+#include "Mode_Scoreboard.h"
 
 std::string VersionString = " 2. 1. 7";
 
@@ -186,7 +186,7 @@ void cbBtn(const ButtonInfo_t& bi,
   //
   if ( btn_info.at("Btn0").value == Button::ON &&
        btn_info.at("Btn2").value == Button::ON) {
-    Mode::set("ModeReboot");
+    Mode::set("Mode_Reboot");
     return;
   } // if (Btn0 + Btn2)
 
@@ -327,17 +327,17 @@ void setup() {
   
   // Mode
   log_i("=== Init Modes");
-  Mode::add("ModeBoot", new ModeBoot(2500));
-  Mode::add("ModeReboot", new ModeReboot(2000));
-  Mode::add("ModeClock", new ModeClock());
-  Mode::add("ModeSetclock", new ModeSetclock());
-  Mode::add("ModeScoreboard", new ModeScoreboard());
+  Mode::add("Mode_Boot", new Mode_Boot(2500));
+  Mode::add("Mode_Reboot", new Mode_Reboot(2000));
+  Mode::add("Mode_Clock", new Mode_Clock());
+  Mode::add("Mode_Setclock", new Mode_Setclock());
+  Mode::add("Mode_Scoreboard", new Mode_Scoreboard());
 
   for (auto m: Mode::Ent) {
     m.second->setup();
   }
 
-  Mode::set("ModeBoot");
+  Mode::set("Mode_Boot");
   delay(100);
 
   // enable interrupt

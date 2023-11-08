@@ -25,7 +25,7 @@ typedef struct {
   int sec;
 } setclock_val_t;
 
-class ModeSetclock: public Mode {
+class Mode_Setclock: public Mode {
  public:
   static const unsigned long LOOP_DELAY_MS = 50; // ms
   static const unsigned long BLINK_INTERVAL_MS = 300; // ms
@@ -52,7 +52,7 @@ class ModeSetclock: public Mode {
   unsigned long start_ms = 0;
   static const unsigned long IDLE_INTERVAL_MS = 60 * 1000; // ms
   
-  ModeSetclock();
+  Mode_Setclock();
 
   virtual void enter();
   virtual void exit();

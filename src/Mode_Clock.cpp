@@ -1,12 +1,12 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ModeClock.h"
+#include "Mode_Clock.h"
 
 /**
  *
  */
-ModeClock::ModeClock(): Mode() {
+Mode_Clock::Mode_Clock(): Mode() {
   //
   // load config file
   //
@@ -25,12 +25,12 @@ ModeClock::ModeClock(): Mode() {
   this->clock_mode_main = (clock_mode_t)this->conf->clock_mode;
   this->clock_mode = this->clock_mode_main;
 
-} // ModeClock::ModeClock()
+} // Mode_Clock::Mode_Clock()
 
 /** virtual
  *
  */
-void ModeClock::enter() {
+void Mode_Clock::enter() {
   log_i("enter mode: %s", this->name.c_str());
 
   Nxa->set_string("        ");
@@ -46,19 +46,19 @@ void ModeClock::enter() {
   Disp->display();
 
   delay(10);
-} // ModeClock::enter()
+} // Mode_Clock::enter()
 
 /** virtual
  *
  */
-void ModeClock::exit() {
+void Mode_Clock::exit() {
   Nxa->end_all_effect();
-} // ModeClock::exit()
+} // Mode_Clock::exit()
 
 /** virtual
  *
  */
-void ModeClock::loop() {
+void Mode_Clock::loop() {
   unsigned long cur_ms = millis();
   struct tm *tm = SysClock::now_tm();
   struct timeval *tv = SysClock::now_timeval();
@@ -179,16 +179,16 @@ void ModeClock::loop() {
   case CLOCK_MODE_HMS:
     if ( wl_stat == WL_CONNECTED ) {
       if ( tv->tv_sec % 2 == 0 ) {
-        nx_fmt = ModeClock::NX_FMT_HMS1;
+        nx_fmt = Mode_Clock::NX_FMT_HMS1;
       } else {
-        nx_fmt = ModeClock::NX_FMT_HMS2;
+        nx_fmt = Mode_Clock::NX_FMT_HMS2;
       }
     } else {
       //if ( tv->tv_sec % 4 <= 2 ) {
       if ( tv->tv_sec % 2 <= 0 ) {
-        nx_fmt = ModeClock::NX_FMT_HMS1;
+        nx_fmt = Mode_Clock::NX_FMT_HMS1;
       } else {
-        nx_fmt = ModeClock::NX_FMT_HMS2;
+        nx_fmt = Mode_Clock::NX_FMT_HMS2;
       }
     }
     break;
@@ -196,16 +196,16 @@ void ModeClock::loop() {
   case CLOCK_MODE_dHM:
     if ( wl_stat == WL_CONNECTED ) {
       if ( tv->tv_sec % 2 == 0 ) {
-        nx_fmt = ModeClock::NX_FMT_dHM1;
+        nx_fmt = Mode_Clock::NX_FMT_dHM1;
       } else {
-        nx_fmt = ModeClock::NX_FMT_dHM2;
+        nx_fmt = Mode_Clock::NX_FMT_dHM2;
       }
     } else {
       //if ( tv->tv_sec % 4 <= 2 ) {
       if ( tv->tv_sec % 2 <= 0 ) {
-        nx_fmt = ModeClock::NX_FMT_dHM1;
+        nx_fmt = Mode_Clock::NX_FMT_dHM1;
       } else {
-        nx_fmt = ModeClock::NX_FMT_dHM2;
+        nx_fmt = Mode_Clock::NX_FMT_dHM2;
       }
     }
     break;
@@ -214,14 +214,14 @@ void ModeClock::loop() {
     // cbBtn()で、date_start_msが、cur_msを抜かすことがあるので、
     // あらためて cur_ms を取得し直す!
     cur_ms = millis();
-    if ( cur_ms - this->date_start_ms > ModeClock::CLOCK_MODE_DATE_INTERVAL ) {
+    if ( cur_ms - this->date_start_ms > Mode_Clock::CLOCK_MODE_DATE_INTERVAL ) {
       this->clock_mode = this->clock_mode_main;
       log_i("clock_mode = %d (cur_ms=%u, date_start_ms=%u)",
             this->clock_mode, cur_ms, this->date_start_ms);
       return;
     }
 
-    nx_fmt = ModeClock::NX_FMT_ymd;
+    nx_fmt = Mode_Clock::NX_FMT_ymd;
     break;
 
   default:
@@ -263,12 +263,12 @@ void ModeClock::loop() {
 
   //---------------
   delayOrChangeMode(this->LOOP_DELAY_MS);
-} // ModeClock::loop()
+} // Mode_Clock::loop()
 
 /**
  *
  */
-void ModeClock::cbBtn(const ButtonInfo_t& bi,
+void Mode_Clock::cbBtn(const ButtonInfo_t& bi,
                       const std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
@@ -277,9 +277,9 @@ void ModeClock::cbBtn(const ButtonInfo_t& bi,
       if ( bi.long_pressed ) {
         if ( bi.repeat_count == 0 ) {
           //
-          // ModeSetclock
+          // Mode_Setclock
           //
-          Mode::set("ModeSetclock");
+          Mode::set("Mode_Setclock");
           return;
         } // if (repeat_count == 0)
 
@@ -304,7 +304,7 @@ void ModeClock::cbBtn(const ButtonInfo_t& bi,
         //
         // Mode: Scoreboard
         //
-        Mode::set("ModeScoreboard");
+        Mode::set("Mode_Scoreboard");
         return;
       } // if (click_count == 3)
 
@@ -410,4 +410,4 @@ void ModeClock::cbBtn(const ButtonInfo_t& bi,
     return;
   } // if (Btn2)
 
-} // ModeClock::cbBtn()
+} // Mode_Clock::cbBtn()

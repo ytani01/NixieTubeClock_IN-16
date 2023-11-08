@@ -1,19 +1,19 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ModeBoot.h"
+#include "Mode_Boot.h"
 
 /**
  *
  */
-ModeBoot::ModeBoot(unsigned long interval): Mode() {
+Mode_Boot::Mode_Boot(unsigned long interval): Mode() {
   this->interval = interval;
-} // ModeBoot::ModeBoot()
+} // Mode_Boot::Mode_Boot()
 
 /** virtual
  *
  */
-void ModeBoot::enter() {
+void Mode_Boot::enter() {
   log_i("enter mode: %s", this->name.c_str());
 
   this->start_ms = millis();
@@ -31,21 +31,21 @@ void ModeBoot::enter() {
   Disp->setTextWrap(true);
   Disp->printf("%s", this->name.c_str());
   Disp->display();
-} // ModeBoot::enter()
+} // Mode_Boot::enter()
 
 /** virtual
  *
  */
-void ModeBoot::exit() {
+void Mode_Boot::exit() {
   log_i("");
   Nxa->end_all_effect();
   this->start_ms = 0;
-} // ModeBoot::exit()
+} // Mode_Boot::exit()
 
 /** virtual
  *
  */
-void ModeBoot::loop() {
+void Mode_Boot::loop() {
   unsigned long cur_ms = millis();
   struct tm *tm = SysClock::now_tm();
   struct timeval *tv = SysClock::now_timeval();
@@ -56,7 +56,7 @@ void ModeBoot::loop() {
   if ( cur_ms - this->start_ms > this->interval ) {
     log_i("done");
     Flag_LoopRunning = false;
-    Mode::set("ModeClock");
+    Mode::set("Mode_Clock");
     return;
   }
 
@@ -89,12 +89,12 @@ void ModeBoot::loop() {
   Disp->display();
 
   delayOrChangeMode(50);
-} // ModeBoot::loop()
+} // Mode_Boot::loop()
 
 /**
  *
  */
-void ModeBoot::cbBtn(const ButtonInfo_t& bi,
+void Mode_Boot::cbBtn(const ButtonInfo_t& bi,
                      const std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(&bi).c_str());
 
@@ -112,4 +112,4 @@ void ModeBoot::cbBtn(const ButtonInfo_t& bi,
     return;
   } // if (Btn0)
   
-} // ModeBoot::cbBtn()
+} // Mode_Boot::cbBtn()

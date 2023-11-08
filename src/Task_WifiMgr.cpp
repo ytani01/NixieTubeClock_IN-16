@@ -553,7 +553,7 @@ void Task_WifiMgr::handle_do_reboot() {
   log_w("[WifiMgr:AP] reboot esp32 ..");
   //delay(2000);
   //ESP.restart();
-  Mode::set("ModeReboot");
+  Mode::set("Mode_Reboot");
 } // Task_WifiMgr::handle_do_reboot()
 
 /** static

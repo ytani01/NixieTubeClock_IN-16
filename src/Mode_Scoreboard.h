@@ -7,7 +7,7 @@
 #include "Mode.h"
 #include "ConfFile_ModeScoreboard.h"
 
-class ModeScoreboard: public Mode {
+class Mode_Scoreboard: public Mode {
  public:
   static const unsigned long LOOP_DELAY_MS = 10000; // ms
   static constexpr char* NX_FMT1 = (char *)"%2d %2d %2d";
@@ -16,7 +16,7 @@ class ModeScoreboard: public Mode {
 
   ConfFile_ModeScoreboard *conf;
 
-  ModeScoreboard();
+  Mode_Scoreboard();
 
   void display();
   int inc_score(int i, int n=1);

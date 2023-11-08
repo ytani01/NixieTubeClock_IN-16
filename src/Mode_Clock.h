@@ -14,7 +14,7 @@ typedef enum {
   CLOCK_MODE_SIZE
 } clock_mode_t;
 
-class ModeClock: public Mode {
+class Mode_Clock: public Mode {
  public:
   static const unsigned long LOOP_DELAY_MS = 50; // ms
 
@@ -43,7 +43,7 @@ class ModeClock: public Mode {
     NXT_EFFECT_SHUFFLE
   };
   
-  ModeClock();
+  Mode_Clock();
 
   virtual void enter();
   virtual void exit();

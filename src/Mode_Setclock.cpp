@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2023 Yoichi Tanibayashi
  */
-#include "ModeSetclock.h"
+#include "Mode_Setclock.h"
 
 /**
  *
  */
-ModeSetclock::ModeSetclock(): Mode() {
-} // ModeSetclock::ModeSetclock()
+Mode_Setclock::Mode_Setclock(): Mode() {
+} // Mode_Setclock::Mode_Setclock()
 
 /** virtual
  *
  */
-void ModeSetclock::enter() {
+void Mode_Setclock::enter() {
   log_i("enter mode: %s", this->name.c_str());
 
   struct tm *tm = SysClock::now_tm();
@@ -37,19 +37,19 @@ void ModeSetclock::enter() {
   Disp->setTextWrap(true);
   Disp->printf("%s", this->name.c_str());
   Disp->display();
-} // ModeSetclock::enter()
+} // Mode_Setclock::enter()
 
 /** virtual
  *
  */
-void ModeSetclock::exit() {
+void Mode_Setclock::exit() {
   Nxa->end_all_effect();
-} // ModeSetclock::exit()
+} // Mode_Setclock::exit()
 
 /** virtual
  *
  */
-void ModeSetclock::loop() {
+void Mode_Setclock::loop() {
   unsigned long cur_ms = millis();
 
   if ( ! this->flag_nx_update ) {
@@ -134,7 +134,7 @@ void ModeSetclock::loop() {
   case SETCLOCK_POS_YEAR:
   case SETCLOCK_POS_MONTH:
   case SETCLOCK_POS_DAY:
-    nx_fmt = ModeSetclock::NX_FMT_ymd;
+    nx_fmt = Mode_Setclock::NX_FMT_ymd;
     num1 = this->val[VAL_IDX_YEAR];
     num2 = this->val[VAL_IDX_MONTH];
     num3 = this->val[VAL_IDX_DAY];
@@ -142,7 +142,7 @@ void ModeSetclock::loop() {
   case SETCLOCK_POS_HOUR:
   case SETCLOCK_POS_MINUTE:
   case SETCLOCK_POS_SEC:
-    nx_fmt = ModeSetclock::NX_FMT_HMS;
+    nx_fmt = Mode_Setclock::NX_FMT_HMS;
     num1 = this->val[VAL_IDX_HOUR];
     num2 = this->val[VAL_IDX_MINUTE];
     num3 = this->val[VAL_IDX_SEC];
@@ -183,12 +183,12 @@ void ModeSetclock::loop() {
   //
   this->prev_pos = this->pos;
   delayOrChangeMode(this->LOOP_DELAY_MS);
-} // ModeSetclock::loop()
+} // Mode_Setclock::loop()
 
 /**
  *
  */
-void ModeSetclock::cbBtn(const ButtonInfo_t& bi,
+void Mode_Setclock::cbBtn(const ButtonInfo_t& bi,
                          const std::map<std::string, ButtonInfo_t>& btn_info) {
   log_d("%s", Button::info2String(bi).c_str());
 
@@ -199,7 +199,7 @@ void ModeSetclock::cbBtn(const ButtonInfo_t& bi,
     if ( String(bi.name) == "Btn0" && bi.click_count > 0 ) {
       log_i("mode change");
       flag_mode_change = false;
-      Mode::set("ModeClock");
+      Mode::set("Mode_Clock");
     }
     return;
   }
@@ -213,7 +213,7 @@ void ModeSetclock::cbBtn(const ButtonInfo_t& bi,
       if ( bi.long_pressed ) {
         if ( bi.repeat_count == 0 ) {
           flag_mode_change = false;
-          Mode::set("ModeClock");
+          Mode::set("Mode_Clock");
           return;
         }
       } else {
@@ -254,7 +254,7 @@ void ModeSetclock::cbBtn(const ButtonInfo_t& bi,
                   datetime2string(&now_dt, "%Y-%m-%d(%a),%H:%M:%S").c_str());
           }
 
-          //Mode::set("ModeClock");
+          //Mode::set("Mode_Clock");
           flag_mode_change = true;
           log_i("flag_mode_change = %s",flag_mode_change ? "true" : "false");
           return;
@@ -348,4 +348,4 @@ void ModeSetclock::cbBtn(const ButtonInfo_t& bi,
     return;
   } // if (Btn2)
 
-} // ModeSetclock::cbBtn()
+} // Mode_Setclock::cbBtn()
